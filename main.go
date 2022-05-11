@@ -35,5 +35,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	addExample(client, ctx)
 	fmt.Println(databases, "anduvo")
+}
+
+func addExample(client *mongo.Client, ctx context.Context) {
+	votesDatabase := client.Database("votes")
+	uruguayCollection := votesDatabase.Collection("uruguayVotes")
+	voteResult, err := uruguayCollection.InsertMany(ctx, []interface{}{
+		bson.D{
+			{"id", "1234567-8"},
+		},
+		bson.D{
+			{"id", "1234567-9"},
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Inserted %v documents into uruguayVotes collection!\n", len(voteResult.InsertedIDs))
+
 }
