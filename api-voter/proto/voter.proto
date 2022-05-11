@@ -1,0 +1,19 @@
+syntax = "proto3";
+option go_package = "./proto";
+package proto;
+
+// The greeting service definition.
+service VoteService {
+  // Sends a greeting
+  rpc Vote (VoteRequest) returns (VoteReply) {}
+}
+
+// The request message containing the user's name.
+message VoteRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message VoteReply {
+  string message = 1;
+}

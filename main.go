@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import api_voter "239850_221025_219401/api-voter"
 
 func main() {
-	fmt.Println("Hello world")
+	api_voter.Connection()
 }
