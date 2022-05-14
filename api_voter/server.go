@@ -5,9 +5,10 @@ import (
 	"239850_221025_219401/api-voter/proto"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
+
+	"google.golang.org/grpc"
 )
 
 var vote proto.VoteReply
