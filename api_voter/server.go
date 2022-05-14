@@ -1,12 +1,13 @@
 package api_voter
 
 import (
-	"239850_221025_219401/api-voter/proto"
+	"239850_221025_219401/api_voter/proto"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
+
+	"google.golang.org/grpc"
 )
 
 var vote proto.VoteReply
@@ -17,7 +18,8 @@ type voterServer struct {
 
 func (newVote *voterServer) Vote(ctx context.Context, req *proto.VoteRequest) (*proto.VoteReply, error) {
 	name := req.GetName()
-	fmt.Println(name)
+	//fmt.Println(name)
+	sendCertificate(name)
 	vote := &proto.VoteReply{Message: "Anduvo 1+1"}
 	return vote, nil
 }

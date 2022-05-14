@@ -3,17 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
+	api_voter "239850_221025_219401/api_voter"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
-	"time"
 )
 
 func main() {
-	//
-	//api_voter.Connection()
+	api_voter.Connection()
+	//mongoDB()
+}
+
+func mongoDB() {
 	const uri = "mongodb://localhost:27017"
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
