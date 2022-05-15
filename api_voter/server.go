@@ -20,6 +20,7 @@ func (newVote *voterServer) Vote(ctx context.Context, req *proto.VoteRequest) (*
 	name := req.GetName()
 	//fmt.Println(name)
 	sendCertificate(name)
+	PrintCertificate()
 	vote := &proto.VoteReply{Message: "Anduvo 1+1"}
 	return vote, nil
 }
