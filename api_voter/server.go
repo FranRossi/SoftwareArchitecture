@@ -1,7 +1,8 @@
 package api_voter
 
 import (
-	"239850_221025_219401/api_voter/proto"
+	"239850_221025_219401/api-voter/data-access/repository"
+	"239850_221025_219401/api-voter/proto"
 	"context"
 	"fmt"
 	"log"
@@ -17,17 +18,28 @@ type voterServer struct {
 }
 
 func (newVote *voterServer) Vote(ctx context.Context, req *proto.VoteRequest) (*proto.VoteReply, error) {
-	name := req.GetName()
-	//fmt.Println(name)
-	sendCertificate(name)
+
+  // rabbitmq test
+  sendCertificate(name)
 	PrintCertificate()
-	vote := &proto.VoteReply{Message: "Anduvo 1+1"}
-	return vote, nil
+
+	idVoter := req.GetId()
+	message, err := checkVoter(idVoter)
+	vote := &proto.VoteReply{Message: message}
+	return vote, err
 }
 
-const addr = "localhost:50004"
+func checkVoter(idVoter string) (string, error) {
+	_, err := repository.CheckVoterId(idVoter)
+	if err != nil {
+		log.Fatal(err)
+		return "Error chequeando", err
+	}
+	return "Chequeo bien el id", err
+}
 
 func Connection() {
+	const addr = "localhost:50004"
 	conn, err := net.Listen("tcp", addr)
 
 	if err != nil {
