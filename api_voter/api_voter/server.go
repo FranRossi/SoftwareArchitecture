@@ -1,7 +1,7 @@
 package api_voter
 
 import (
-	"239850_221025_219401/api_voter/proto"
+	"api_voter/proto"
 	"context"
 	"fmt"
 	"log"
