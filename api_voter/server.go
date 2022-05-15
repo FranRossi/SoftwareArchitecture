@@ -18,6 +18,11 @@ type voterServer struct {
 }
 
 func (newVote *voterServer) Vote(ctx context.Context, req *proto.VoteRequest) (*proto.VoteReply, error) {
+
+  // rabbitmq test
+  sendCertificate(name)
+	PrintCertificate()
+
 	idVoter := req.GetId()
 	message, err := checkVoter(idVoter)
 	vote := &proto.VoteReply{Message: message}
