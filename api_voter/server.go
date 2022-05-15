@@ -1,8 +1,8 @@
 package api_voter
 
 import (
-	"239850_221025_219401/api-voter/data-access/repository"
-	"239850_221025_219401/api-voter/proto"
+	"239850_221025_219401/api_voter/data_access/repository"
+	"239850_221025_219401/api_voter/proto"
 	"context"
 	"fmt"
 	"log"
@@ -19,13 +19,14 @@ type voterServer struct {
 
 func (newVote *voterServer) Vote(ctx context.Context, req *proto.VoteRequest) (*proto.VoteReply, error) {
 
-  // rabbitmq test
-  sendCertificate(name)
-	PrintCertificate()
-
 	idVoter := req.GetId()
 	message, err := checkVoter(idVoter)
 	vote := &proto.VoteReply{Message: message}
+
+	// rabbitmq test
+	sendCertificate(idVoter)
+	PrintCertificate()
+
 	return vote, err
 }
 
