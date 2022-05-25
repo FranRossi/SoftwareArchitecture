@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"ElectoralService/UruguayanElection/connections"
+	"fmt"
+)
 
 func main() {
-	fmt.Println("Hello")
+	fmt.Println("Connecting")
+	connections.Connection()
 }
