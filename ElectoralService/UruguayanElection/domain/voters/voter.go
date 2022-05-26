@@ -1,6 +1,6 @@
 package voters
 
-type candidate struct {
+type voter struct {
 	id              string
 	civicCredential string
 	name            string

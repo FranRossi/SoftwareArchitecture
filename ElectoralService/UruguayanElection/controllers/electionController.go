@@ -16,7 +16,7 @@ func NewElectionController(repo *repositories.ElectionRepo) *ElectionController 
 	return &ElectionController{repo: repo}
 }
 
-func (controller *ElectionController) SendElectionSettings(c *fiber.Ctx) error {
+func (controller *ElectionController) CreateElectionSettings(c *fiber.Ctx) error {
 	var election models.Election
 	// Tengo que pasar la direccion de memoria asi va a pone las variables
 	// Que vienen en el contexto declaradas segun el json del modelo
@@ -47,6 +47,27 @@ func (controller *ElectionController) SendElectionSettings(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error":    false,
 		"msg":      "Election settings send successfully!",
+		"election": election,
+	})
+}
+
+func (controller *ElectionController) GetElection(c *fiber.Ctx) error {
+
+	// Get book by ID.
+	election, err := controller.repo.GetElection(c.Params("id"))
+	if err != nil {
+		// Return, if book not found.
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error":    true,
+			"msg":      err.Error(),
+			"election": nil,
+		})
+	}
+
+	// Return status 200 OK.
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"error":    false,
+		"msg":      nil,
 		"election": election,
 	})
 }
