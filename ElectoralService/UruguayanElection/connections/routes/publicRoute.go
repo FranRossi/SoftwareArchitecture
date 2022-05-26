@@ -9,6 +9,6 @@ func PublicRoutes(a *fiber.App, controller *controllers.ElectionController) {
 	// Create routes group.
 	route := a.Group("/api/v1")
 
-	// Routes for POST method:
-	route.Post("/election", controller.CreateElectionSettings)
+	// Routes for Get method:
+	route.Get("/election", controller.GetElection)
 }

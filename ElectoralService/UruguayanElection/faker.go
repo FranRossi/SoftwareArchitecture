@@ -2,7 +2,6 @@ package UruguayanElection
 
 import (
 	"ElectoralService/UruguayanElection/models"
-	"fmt"
 	"github.com/bxcodec/faker/v3"
 	"math/rand"
 	"reflect"
@@ -10,23 +9,23 @@ import (
 	"time"
 )
 
-func CreateElectionModel(amountVoters int) {
-	CustomGeneratorVoter(amountVoters)
-	CustomGeneratorPoliticalParties()
-	CustomGeneratorCandidates()
-	CustomGeneratorCircuits()
+func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, error) {
+	customGeneratorVoter(amountVoters)
+	customGeneratorPoliticalParties()
+	customGeneratorCandidates()
+	customGeneratorCircuits()
 	electionModel := models.ElectionModel{}
 	_ = faker.AddProvider("customIdFaker", func(v reflect.Value) (interface{}, error) {
-		return strconv.FormatInt(int64(1), 10), nil
+		return id, nil
 	})
 	err := faker.FakeData(&electionModel)
 	if err != nil {
-		fmt.Println(err)
+		return models.ElectionModel{}, err
 	}
-	fmt.Printf("%+v", electionModel)
+	return electionModel, err
 }
 
-func CustomGeneratorVoter(amountVoters int) {
+func customGeneratorVoter(amountVoters int) {
 	_ = faker.AddProvider("custom_voter", func(v reflect.Value) (interface{}, error) {
 		rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 		departments := []string{"Montevideo", "Colonia", "Rocha", "Florida", "San Jose", "Soriano", "Salto", "Paysandu", "Treinta y Tres", "Artigas"}
@@ -34,11 +33,11 @@ func CustomGeneratorVoter(amountVoters int) {
 		for i := 0; i < amountVoters; i++ {
 			voterModel := models.VoterModel{}
 			voterModel.Id = strconv.FormatInt(int64(i+10000000), 10)
-			departamentNumber := rand.Intn(len(departments))
-			voterModel.Department = departments[departamentNumber]
-			// TODO
-			//voterModel.CivicCredential
-			voterModel.IdCircuit = strconv.FormatInt(int64(departamentNumber), 10)
+			departmentNumber := rand.Intn(len(departments))
+			voterModel.Department = departments[departmentNumber]
+
+			voterModel.CivicCredential = randomCivicCredential()
+			voterModel.IdCircuit = strconv.FormatInt(int64(departmentNumber), 10)
 			faker.FakeData(&voterModel)
 			voters = append(voters, voterModel)
 
@@ -47,7 +46,21 @@ func CustomGeneratorVoter(amountVoters int) {
 	})
 }
 
-func CustomGeneratorPoliticalParties() {
+func randomCivicCredential() string {
+	const letterBytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const numbersBytes = "0123456789"
+	b := make([]byte, 8)
+	for i := range b {
+		if i < 3 {
+			b[i] = letterBytes[rand.Intn(len(letterBytes))]
+		} else {
+			b[i] = numbersBytes[rand.Intn(len(numbersBytes))]
+		}
+	}
+	return string(b)
+}
+
+func customGeneratorPoliticalParties() {
 	_ = faker.AddProvider("custom_political_party", func(v reflect.Value) (interface{}, error) {
 		politicalParties := make([]models.PoliticalPartyModel, 0, 4)
 		partidoNacional := models.PoliticalPartyModel{
@@ -63,7 +76,7 @@ func CustomGeneratorPoliticalParties() {
 	})
 }
 
-func CustomGeneratorCandidates() {
+func customGeneratorCandidates() {
 	_ = faker.AddProvider("custom_candidates", func(v reflect.Value) (interface{}, error) {
 		candidates := make([]models.CandidateModel, 0, 4)
 		candidate1NationalParty := models.CandidateModel{
@@ -86,7 +99,7 @@ func CustomGeneratorCandidates() {
 	})
 }
 
-func CustomGeneratorCircuits() {
+func customGeneratorCircuits() {
 	_ = faker.AddProvider("custom_circuits", func(v reflect.Value) (interface{}, error) {
 		departments := []string{"Montevideo", "Colonia", "Rocha", "Florida", "San Jose", "Soriano", "Salto", "Paysandu", "Treinta y Tres", "Artigas"}
 		circuits := make([]models.CircuitModel, 0, 10)

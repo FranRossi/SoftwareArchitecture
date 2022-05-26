@@ -1,10 +1,11 @@
 package main
 
-import "ElectoralService/UruguayanElection"
+import (
+	"ElectoralService/UruguayanElection/connections"
+	"fmt"
+)
 
 func main() {
-	//fmt.Println("Connecting")
-	//connections.Connection()
-
-	UruguayanElection.CreateElectionModel(10)
+	fmt.Println("Connecting")
+	connections.Connection()
 }
