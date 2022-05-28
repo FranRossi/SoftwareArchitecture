@@ -1,4 +1,4 @@
-package circuits
+package domain
 
 type circuit struct {
 	id         string

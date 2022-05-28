@@ -12,10 +12,7 @@ import (
 	"time"
 )
 
-func CheckVoterId(idVoter string) (*domain.User, error) {
-	//mongoParams := data_access.GetConnectionParameters()
-	//client := mongoParams.Client
-	//ctx := mongoParams.Ctx
+func RegisterUser(user *domain.User) error {
 	const uri = "mongodb://localhost:27017"
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
@@ -36,21 +33,15 @@ func CheckVoterId(idVoter string) (*domain.User, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	votesDatabase := client.Database("votes")
-	uruguayCollection := votesDatabase.Collection("uruguayVotes")
-	var result bson.M
-	err2 := uruguayCollection.FindOne(ctx, bson.D{{"id", idVoter}}).Decode(&result)
+	usersDatabase := client.Database("users")
+	uruguayVotersCollection := usersDatabase.Collection("uruguayVoters")
+	_, err2 := uruguayVotersCollection.InsertOne(ctx, bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword})
 	if err2 != nil {
-		fmt.Println("El error esta en mongo")
+		fmt.Println("error creating user")
 		if err2 == mongo.ErrNoDocuments {
-			return nil, nil
+			return nil
 		}
 		log.Fatal(err2)
 	}
-	user := &domain.User{
-		Id:             result["id"].(string),
-		Username:       result["username"].(string),
-		HashedPassword: result["hashedPassword"].(string),
-	}
-	return user, err2
+	return err2
 }

@@ -2,21 +2,22 @@ syntax = "proto3";
 option go_package = "./proto";
 package proto;
 
-// The greeting service definition.
+
 service VoteService {
-  // Sends a greeting
   rpc Vote (VoteRequest) returns (VoteReply) {}
 }
 
-// The request message containing the user's id and password.
 message VoteRequest {
   string id = 1;
-  string candidate = 2;
-  string politicalParty = 3;
-  string civicCredential = 4;
+  string username = 2;
+  string password = 3;
+  string token = 4;
+  string candidate = 5;
+  string politicalParty = 6;
+  string civicCredential = 7;
+  string circuit = 8;
 }
 
-// The response message containing the greetings
 message VoteReply {
   string message = 1;
 }

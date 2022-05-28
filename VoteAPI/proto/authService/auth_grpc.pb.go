@@ -4,7 +4,7 @@
 // - protoc             v3.20.1
 // source: proto/authService/auth.proto
 
-package authService
+package proto
 
 import (
 	context "context"

@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.20.1
-// source: proto/voter.proto
+// source: voteService/voter.proto
 
-package voteService
+package proto
 
 import (
 	context "context"
@@ -22,7 +22,6 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VoteServiceClient interface {
-	// Sends a greeting
 	Vote(ctx context.Context, in *VoteRequest, opts ...grpc.CallOption) (*VoteReply, error)
 }
 
@@ -47,7 +46,6 @@ func (c *voteServiceClient) Vote(ctx context.Context, in *VoteRequest, opts ...g
 // All implementations must embed UnimplementedVoteServiceServer
 // for forward compatibility
 type VoteServiceServer interface {
-	// Sends a greeting
 	Vote(context.Context, *VoteRequest) (*VoteReply, error)
 }
 
@@ -102,5 +100,5 @@ var VoteService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/voter.proto",
+	Metadata: "voteService/voter.proto",
 }

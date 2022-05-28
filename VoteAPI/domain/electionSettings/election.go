@@ -1,4 +1,4 @@
-package electionSettings
+package domain
 
 type election struct {
 	id            string

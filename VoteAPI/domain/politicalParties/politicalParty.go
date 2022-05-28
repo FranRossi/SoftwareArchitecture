@@ -1,4 +1,4 @@
-package politicalParties
+package domain
 
 type politicalParty struct {
 	id   string

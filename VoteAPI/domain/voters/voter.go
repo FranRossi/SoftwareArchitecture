@@ -1,4 +1,4 @@
-package voters
+package domain
 
 type voter struct {
 	id              string

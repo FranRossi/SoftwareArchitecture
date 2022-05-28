@@ -2,10 +2,12 @@ package connections
 
 import (
 	"VoteAPI/controllers"
+	"VoteAPI/logic"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"time"
 )
 
 func streamInterceptor(
@@ -18,6 +20,11 @@ func streamInterceptor(
 	return handler(srv, stream)
 }
 
+const (
+	secretKey     = "secret"
+	tokenDuration = 15 * time.Minute
+)
+
 func ConnectionGRPC() {
 	const addr = "localhost:50004"
 	conn, err := net.Listen("tcp", addr)
@@ -26,9 +33,12 @@ func ConnectionGRPC() {
 		log.Fatal("tcp connection err: ", err.Error())
 	}
 
-	grpcServer := grpc.NewServer()
-	controllers.RegisterVoteServiceServer(grpcServer)
-	controllers.RegisterAuthServiceServer(grpcServer)
+	jwtManager := logic.NewJWTManager(secretKey, tokenDuration)
+
+	grpcServer := grpc.NewServer(
+		grpc.StreamInterceptor(streamInterceptor),
+	)
+	controllers.RegisterServicesServer(grpcServer, jwtManager)
 
 	fmt.Println("Starting gRPC server at: ", addr)
 

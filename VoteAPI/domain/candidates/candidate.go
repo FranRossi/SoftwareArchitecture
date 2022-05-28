@@ -1,4 +1,4 @@
-package candidates
+package domain
 
 type candidate struct {
 	id               string
