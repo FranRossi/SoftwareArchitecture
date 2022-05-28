@@ -37,7 +37,11 @@ func createUser(id string, username string, password string) (*domain.User, erro
 		Username:       username,
 		HashedPassword: string(hashedPassword),
 	}
-	err = repository.RegisterUser(user)
+	return user, nil
+}
+
+func StoreUser(user *domain.User) (*domain.User, error) {
+	err := repository.RegisterUser(user)
 	if err != nil {
 		return nil, fmt.Errorf("user cannot be created: %w", err)
 	}

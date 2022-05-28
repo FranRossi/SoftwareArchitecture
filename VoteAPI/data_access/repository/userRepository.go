@@ -35,7 +35,7 @@ func RegisterUser(user *domain.User) error {
 	}
 	usersDatabase := client.Database("users")
 	uruguayVotersCollection := usersDatabase.Collection("uruguayVoters")
-	_, err2 := uruguayVotersCollection.InsertOne(ctx, bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword})
+	_, err2 := uruguayVotersCollection.InsertOne(ctx, bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword, "token": user.Token})
 	if err2 != nil {
 		fmt.Println("error creating user")
 		if err2 == mongo.ErrNoDocuments {

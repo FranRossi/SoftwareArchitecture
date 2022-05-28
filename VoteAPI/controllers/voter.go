@@ -40,6 +40,11 @@ func (server *AuthServer) Register(ctx context.Context, request *proto.RegisterR
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
 
+	user.Token = token
+	_, err = logic.StoreUser(user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot store user on data base: %v", err)
+	}
 	res := &proto.RegisterResponse{AccessToken: token}
 	return res, nil
 }
