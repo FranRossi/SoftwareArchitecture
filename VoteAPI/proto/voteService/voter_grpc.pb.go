@@ -4,7 +4,7 @@
 // - protoc             v3.20.1
 // source: proto/voter.proto
 
-package proto
+package voteService
 
 import (
 	context "context"
@@ -49,7 +49,6 @@ func (c *voteServiceClient) Vote(ctx context.Context, in *VoteRequest, opts ...g
 type VoteServiceServer interface {
 	// Sends a greeting
 	Vote(context.Context, *VoteRequest) (*VoteReply, error)
-	mustEmbedUnimplementedVoteServiceServer()
 }
 
 // UnimplementedVoteServiceServer must be embedded to have forward compatible implementations.

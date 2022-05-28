@@ -10,11 +10,23 @@ type ElectionRepo struct {
 	electionList []models.ElectionModel
 }
 
-func (electionRepo *ElectionRepo) GetElection(id string) (models.ElectionModel, error) {
-	const voterAmount = 10
-	election, err := UruguayanElection.CreateElectionMock(id, voterAmount)
+var electionUruguay models.ElectionModel
+
+func NewUruguayanElection() {
+	id, voterAmount := "1", 1000000
+	var err error
+	electionUruguay, err = UruguayanElection.CreateElectionMock(id, voterAmount)
 	if err != nil {
-		return election, fmt.Errorf("election not found: %s", id)
+		fmt.Println(err.Error())
 	}
-	return election, err
+}
+
+func (electionRepo *ElectionRepo) GetElection(id string) (models.ElectionModel, error) {
+	//const voterAmount = 10
+	//election, err := UruguayanElection.CreateElectionMock(id, voterAmount)
+	//if err != nil {
+	//	return election, fmt.Errorf("election not found: %s", id)
+	//}
+	//return election, err
+	return electionUruguay, nil
 }

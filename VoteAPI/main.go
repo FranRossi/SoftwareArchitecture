@@ -1,7 +1,9 @@
 package main
 
+import "VoteAPI/connections"
+
 func main() {
-	VoteAPI.Connection()
+	connections.ConnectionGRPC()
 	//data_access.MongoConnection()
 
 }
