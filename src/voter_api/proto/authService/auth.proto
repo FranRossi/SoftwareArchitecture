@@ -3,16 +3,17 @@ option go_package = "./proto";
 package proto;
 
 service AuthService {
-  rpc Register(RegisterRequest) returns (RegisterResponse) {};
+  rpc Login(LoginRequest) returns (LoginResponse) {};
 }
 
-message RegisterRequest {
+message LoginRequest {
   string id = 1;
   string username = 2;
   string password = 3;
+  string role = 4;
 }
 
-message RegisterResponse { string accessToken = 1; }
+message LoginResponse { string accessToken = 1; }
 
 
 // TODO

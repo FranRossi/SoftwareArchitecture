@@ -1,13 +1,13 @@
 package connections
 
 import (
-	"VoteAPI/controllers"
-	"VoteAPI/logic"
+	jwt "auth"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"time"
+	"voter_api/controllers"
 )
 
 func streamInterceptor(
@@ -33,7 +33,7 @@ func ConnectionGRPC() {
 		log.Fatal("tcp connection err: ", err.Error())
 	}
 
-	jwtManager := logic.NewJWTManager(secretKey, tokenDuration)
+	jwtManager := jwt.NewJWTManager(secretKey, tokenDuration)
 
 	grpcServer := grpc.NewServer(
 		grpc.StreamInterceptor(streamInterceptor),

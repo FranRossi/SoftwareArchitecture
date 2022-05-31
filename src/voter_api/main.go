@@ -1,6 +1,6 @@
 package main
 
-import "VoteAPI/connections"
+import "voter_api/connections"
 
 func main() {
 	connections.ConnectionGRPC()

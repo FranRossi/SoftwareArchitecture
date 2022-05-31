@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"VoteAPI/logic"
-	"VoteAPI/proto/authService"
-	pb "VoteAPI/proto/voteService"
+	jwt "auth"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"voter_api/logic"
+	proto "voter_api/proto/authService"
+	pb "voter_api/proto/voteService"
 )
 
 type VoterServer struct {
@@ -16,12 +17,12 @@ type VoterServer struct {
 
 type AuthServer struct {
 	server     proto.AuthServiceServer
-	jwtManager *logic.JWTManager
+	jwtManager *jwt.Manager
 }
 
 var voteReply pb.VoteReply
 
-func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *logic.JWTManager) {
+func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
 	voteServer := VoterServer{}
 	pb.RegisterVoteServiceServer(grpcServer, &voteServer)
 
@@ -29,23 +30,22 @@ func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *logic.JWTManage
 	proto.RegisterAuthServiceServer(grpcServer, &server)
 }
 
-func (server *AuthServer) Register(ctx context.Context, request *proto.RegisterRequest) (*proto.RegisterResponse, error) {
-	user, err := logic.RegisterUser(request.GetId(), request.GetUsername(), request.GetPassword())
+func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
+	user, err := logic.CheckVoter(request.GetId())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot create user: %v", err)
+		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
-	token, err := server.jwtManager.Generate(user)
+	if user == nil || !logic.IsCorrectPassword(user, request.GetPassword()) {
+		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
+	}
+
+	token, err := server.jwtManager.Generate(request.GetUsername(), request.GetId(), request.GetRole())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
 
-	user.Token = token
-	_, err = logic.StoreUser(user)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot store user on data base: %v", err)
-	}
-	res := &proto.RegisterResponse{AccessToken: token}
+	res := &proto.LoginResponse{AccessToken: token}
 	return res, nil
 }
 

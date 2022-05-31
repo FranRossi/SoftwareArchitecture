@@ -1,11 +1,11 @@
 package logic
 
 import (
-	"VoteAPI/data_access/repository"
-	domain "VoteAPI/domain/user"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"voter_api/data_access/repository"
+	domain "voter_api/domain/user"
 )
 
 func CheckVoter(idVoter string) (*domain.User, error) {
@@ -17,8 +17,8 @@ func CheckVoter(idVoter string) (*domain.User, error) {
 	return user, err
 }
 
-func RegisterUser(id string, username string, password string) (*domain.User, error) {
-	user, err := createUser(id, username, password)
+func RegisterUser(id string, username string, password string, role string) (*domain.User, error) {
+	user, err := createUser(id, username, password, role)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -26,7 +26,7 @@ func RegisterUser(id string, username string, password string) (*domain.User, er
 	return user, err
 }
 
-func createUser(id string, username string, password string) (*domain.User, error) {
+func createUser(id string, username string, password string, role string) (*domain.User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("cannot hash password: %w", err)
@@ -36,8 +36,9 @@ func createUser(id string, username string, password string) (*domain.User, erro
 		Id:             id,
 		Username:       username,
 		HashedPassword: string(hashedPassword),
+		Role:           role,
 	}
-	return user, nil
+	return StoreUser(user)
 }
 
 func StoreUser(user *domain.User) (*domain.User, error) {

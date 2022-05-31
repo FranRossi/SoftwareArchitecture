@@ -1,40 +1,47 @@
-package logic
+package jwt
 
 import (
-	domain "VoteAPI/domain/user"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
 
-type JWTManager struct {
+type Manager struct {
 	secretKey     string
 	tokenDuration time.Duration
 }
+type User struct {
+	Id       string
+	Username string
+	Role     string
+}
+
 type UserClaims struct {
 	jwt.StandardClaims
 	Username string `json:"username"`
 	Id       string `json:"id"`
+	Role     string `json:role`
 }
 
-func NewJWTManager(secretKey string, tokenDuration time.Duration) *JWTManager {
-	return &JWTManager{secretKey, tokenDuration}
+func NewJWTManager(secretKey string, tokenDuration time.Duration) *Manager {
+	return &Manager{secretKey, tokenDuration}
 }
 
-func (manager *JWTManager) Generate(user *domain.User) (string, error) {
+func (manager *Manager) Generate(username, id, role string) (string, error) {
 	claims := UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(manager.tokenDuration).Unix(),
 		},
-		Username: user.Username,
-		Id:       user.Id,
+		Username: username,
+		Id:       id,
+		Role:     role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(manager.secretKey))
 }
 
-func (manager *JWTManager) Verify(accessToken string) (*UserClaims, error) {
+func (manager *Manager) Verify(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
 		&UserClaims{},

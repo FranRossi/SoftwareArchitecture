@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
+    <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e6bf1cb5-8567-484b-b74b-7058fd63a081" name="Changes" comment="" />
+    <list default="true" id="e6bf1cb5-8567-484b-b74b-7058fd63a081" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../Auth/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Auth/models/userClaims.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connections/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/connections/connection.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/voter.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/voter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/domain/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/domain/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/jwtManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/../Auth/jwtManager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/authService/auth.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/proto/authService/auth.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/authService/auth.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/authService/auth.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/authService/auth_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/proto/authService/auth_grpc.pb.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +24,9 @@
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="29lErXM9RuqtTU0qp1gk23epFy9" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -24,8 +38,12 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
     "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
     "last_opened_file_path": "C:/Users/rossi"
   }
 }]]></component>
