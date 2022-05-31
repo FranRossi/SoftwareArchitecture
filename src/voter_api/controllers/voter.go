@@ -69,7 +69,7 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 	}
 
 	message := user.Username + " voted correctly"
-	return &pb.VoteReply{Message: message}, nil
+	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
 
 	// rabbitmq test
 	//api_voter.sendCertificate(idVoter)
