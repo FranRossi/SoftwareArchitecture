@@ -1,4 +1,4 @@
-module ElectoralService
+module electoral_service
 
 go 1.18
 

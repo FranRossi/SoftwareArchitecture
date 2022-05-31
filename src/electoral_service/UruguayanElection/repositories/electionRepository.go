@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"ElectoralService/UruguayanElection"
-	"ElectoralService/UruguayanElection/models"
+	"electoral_service/UruguayanElection"
+	"electoral_service/UruguayanElection/models"
 	"fmt"
 )
 

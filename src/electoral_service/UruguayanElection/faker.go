@@ -1,7 +1,7 @@
 package UruguayanElection
 
 import (
-	"ElectoralService/UruguayanElection/models"
+	"electoral_service/UruguayanElection/models"
 	"github.com/bxcodec/faker/v3"
 	"math/rand"
 	"reflect"

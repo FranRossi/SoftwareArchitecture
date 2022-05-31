@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ElectoralService/UruguayanElection/connections"
-	"ElectoralService/UruguayanElection/repositories"
+	"electoral_service/UruguayanElection/connections"
+	"electoral_service/UruguayanElection/repositories"
 	"fmt"
 )
 

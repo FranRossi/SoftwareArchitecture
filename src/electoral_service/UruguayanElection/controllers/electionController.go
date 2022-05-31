@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"ElectoralService/UruguayanElection/repositories"
+	"electoral_service/UruguayanElection/repositories"
 	"github.com/gofiber/fiber/v2"
 )
 
