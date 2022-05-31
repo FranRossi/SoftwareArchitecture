@@ -8,8 +8,8 @@ import (
 	domain "voter_api/domain/user"
 )
 
-func CheckVoter(idVoter string) (*domain.User, error) {
-	user, err := repository.CheckVoterId(idVoter)
+func FindVoter(idVoter string) (*domain.User, error) {
+	user, err := repository.FindVoter(idVoter)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

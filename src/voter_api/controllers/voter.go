@@ -31,7 +31,7 @@ func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
 }
 
 func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	user, err := logic.CheckVoter(request.GetId())
+	user, err := logic.FindVoter(request.GetId())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
@@ -40,7 +40,7 @@ func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest
 		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
 	}
 
-	token, err := server.jwtManager.Generate(request.GetUsername(), request.GetId(), request.GetRole())
+	token, err := server.jwtManager.Generate(user.Username, user.Id, user.Role)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
@@ -50,7 +50,7 @@ func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
-	user, err := logic.CheckVoter(req.GetId())
+	user, err := logic.FindVoter(req.GetId())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}

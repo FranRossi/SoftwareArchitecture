@@ -1,13 +1,10 @@
 package connections
 
 import (
-	jwt "auth"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"time"
-	"voter_api/controllers"
 )
 
 func streamInterceptor(
@@ -20,29 +17,27 @@ func streamInterceptor(
 	return handler(srv, stream)
 }
 
-const (
-	secretKey     = "secret"
-	tokenDuration = 15 * time.Minute
-)
+const addr = "localhost:50004"
 
-func ConnectionGRPC() {
-	const addr = "localhost:50004"
+var connection net.Listener
+
+func ConnectionGRPC() *grpc.Server {
 	conn, err := net.Listen("tcp", addr)
-
+	connection = conn
 	if err != nil {
 		log.Fatal("tcp connection err: ", err.Error())
 	}
 
-	jwtManager := jwt.NewJWTManager(secretKey, tokenDuration)
-
 	grpcServer := grpc.NewServer(
 		grpc.StreamInterceptor(streamInterceptor),
 	)
-	controllers.RegisterServicesServer(grpcServer, jwtManager)
 
 	fmt.Println("Starting gRPC server at: ", addr)
+	return grpcServer
+}
 
-	if err := grpcServer.Serve(conn); err != nil {
+func ServeGRPC(server *grpc.Server) {
+	if err := server.Serve(connection); err != nil {
 		log.Fatal(err)
 	}
 }

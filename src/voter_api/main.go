@@ -1,9 +1,13 @@
 package main
 
-import "voter_api/connections"
+import (
+	"voter_api/connections"
+	"voter_api/controllers"
+)
 
 func main() {
-	connections.ConnectionGRPC()
-	//data_access.MongoConnection()
-
+	grpcServer := connections.ConnectionGRPC()
+	jwt := connections.ConnectionJWT()
+	controllers.RegisterServicesServer(grpcServer, jwt)
+	connections.ServeGRPC(grpcServer)
 }
