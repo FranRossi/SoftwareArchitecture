@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	domain "voter_api/domain/vote"
 	"voter_api/logic"
 	proto "voter_api/proto/authService"
 	pb "voter_api/proto/voteService"
@@ -54,16 +55,23 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
-	if user == nil || !logic.IsCorrectPassword(user, req.GetPassword()) {
-		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
+	voteModel := &domain.VoteModel{
+		Id:              req.GetId(),
+		CivicCredential: req.GetCivicCredential(),
+		Department:      req.GetDepartment(),
+		Circuit:         req.GetCircuit(),
+		Candidate:       req.GetCandidate(),
+		PoliticalParty:  req.GetPoliticalParty(),
+	}
+	err = logic.StoreVote(voteModel)
+	if err != nil {
+		return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote: %v", err)
 	}
 
 	message := user.Username + " voted correctly"
-	vote := &pb.VoteReply{Message: message}
+	return &pb.VoteReply{Message: message}, nil
 
 	// rabbitmq test
 	//api_voter.sendCertificate(idVoter)
 	//api_voter.PrintCertificate()
-
-	return vote, err
 }

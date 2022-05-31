@@ -9,13 +9,11 @@ service VoteService {
 
 message VoteRequest {
   string id = 1;
-  string username = 2;
-  string password = 3;
-  string token = 4;
+  string civicCredential = 2;
+  string department = 3;
+  string circuit = 4;
   string candidate = 5;
   string politicalParty = 6;
-  string civicCredential = 7;
-  string circuit = 8;
 }
 
 message VoteReply {
@@ -24,4 +22,4 @@ message VoteReply {
 
 // TODO
 //Execute this command to create .pb files
-// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/voterService/voter.proto
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/voteService/voter.proto
