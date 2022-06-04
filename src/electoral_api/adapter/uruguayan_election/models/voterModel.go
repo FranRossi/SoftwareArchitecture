@@ -1,14 +1,14 @@
 package models
 
 type VoterModel struct {
-	Id              string
-	CivicCredential string
-	Name            string
-	LastName        string
-	Sex             string
-	BirthDate       string
-	Department      string
-	IdCircuit       string
-	Phone           string
-	Email           string
+	Id              string `bson:"id"`
+	CivicCredential string `bson:"civicCredential"`
+	Name            string `bson:"name"`
+	LastName        string `bson:"lastName"`
+	Sex             string `bson:"sex"`
+	BirthDate       string `bson:"birthDate"`
+	Department      string `bson:"department"`
+	IdCircuit       string `bson:"idCircuit"`
+	Phone           string `bson:"phone"`
+	Email           string `bson:"email"`
 }

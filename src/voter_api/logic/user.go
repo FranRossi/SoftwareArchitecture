@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"voter_api/data_access/repository"
 	domain "voter_api/domain/user"
+	"voter_api/repository/repository"
 )
 
 func FindVoter(idVoter string) (*domain.User, error) {

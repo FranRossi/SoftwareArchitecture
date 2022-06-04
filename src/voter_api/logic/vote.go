@@ -2,8 +2,8 @@ package logic
 
 import (
 	"fmt"
-	"voter_api/data_access/repository"
 	domain "voter_api/domain/vote"
+	"voter_api/repository/repository"
 )
 
 func StoreVote(vote *domain.VoteModel) error {

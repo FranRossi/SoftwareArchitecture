@@ -7,7 +7,7 @@ import (
 )
 
 type ElectionRepo struct {
-	electionList []models.ElectionModel
+	electionList models.ElectionModel
 }
 
 var electionUruguay models.ElectionModel

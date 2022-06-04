@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"electoral_api/adapter/uruguayan_election/logic"
 	models2 "electoral_api/adapter/uruguayan_election/models"
 	"encoding/json"
 	"fmt"
@@ -28,5 +29,13 @@ func GetElectionSettings() {
 	if er != nil {
 		log.Fatal(er)
 	}
-	fmt.Println(electionSettings.Election)
+	if electionSettings.Error {
+		log.Fatal(electionSettings.Msg)
+	} else {
+		err := logic.StoreElection(electionSettings.Election)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	fmt.Println("Election stored successfully")
 }
