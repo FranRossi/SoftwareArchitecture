@@ -28,8 +28,8 @@ func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, erro
 }
 
 func customGenerateDates(election *models.ElectionModel) {
-	election.StartingDate, _, _ = time.Now().Date()
-	election.StartingDate, _, _ = time.Now().AddDate(0, 0, 1).Date()
+	election.StartingDate = time.Now().Add(time.Minute * 10).String()
+	election.FinishingDate = time.Now().AddDate(0, 0, 1).String()
 }
 
 func customGeneratorVoter(amountVoters int) {
