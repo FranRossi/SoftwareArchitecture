@@ -3,6 +3,7 @@ package UruguayanElection
 import (
 	"electoral_service/UruguayanElection/models"
 	"github.com/bxcodec/faker/v3"
+
 	"math/rand"
 	"reflect"
 	"strconv"
@@ -18,11 +19,17 @@ func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, erro
 	_ = faker.AddProvider("customIdFaker", func(v reflect.Value) (interface{}, error) {
 		return id, nil
 	})
+	customGenerateDates(&electionModel)
 	err := faker.FakeData(&electionModel)
 	if err != nil {
 		return models.ElectionModel{}, err
 	}
 	return electionModel, err
+}
+
+func customGenerateDates(election *models.ElectionModel) {
+	election.StartingDate, _, _ = time.Now().Date()
+	election.StartingDate, _, _ = time.Now().AddDate(0, 0, 1).Date()
 }
 
 func customGeneratorVoter(amountVoters int) {

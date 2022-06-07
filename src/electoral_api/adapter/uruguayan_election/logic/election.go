@@ -23,7 +23,6 @@ func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 

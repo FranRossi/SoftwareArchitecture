@@ -3,8 +3,8 @@ package models
 type ElectionModel struct {
 	Id            string `faker:"customIdFaker"`
 	Description   string `faker:"sentence"`
-	StartingDate  string `faker:"date"`
-	FinishingDate string `faker:"date"`
+	StartingDate  string `faker:"-"`
+	FinishingDate string `faker:"-"`
 	ElectionMode  string `faker:"oneof: unico, multi"`
 
 	Voters           []VoterModel          `faker:"custom_voter"`
