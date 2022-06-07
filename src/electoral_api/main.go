@@ -1,9 +1,8 @@
 package main
 
-import (
-	"electoral_api/adapter/uruguayan_election/controller"
-)
+import connections "electoral_api/adapter/uruguayan_election/dependencies_injection"
 
 func main() {
+	controller := connections.Injection()
 	controller.GetElectionSettings()
 }

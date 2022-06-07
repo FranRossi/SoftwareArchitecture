@@ -6,8 +6,16 @@ import (
 	"fmt"
 )
 
-func StoreElection(election models2.ElectionModel) error {
-	err := repository.StoreElectionConfiguration(election)
+type ElectionLogic struct {
+	repo *repository.ElectionRepo
+}
+
+func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
+	return &ElectionLogic{repo: repo}
+}
+
+func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel) error {
+	err := logicElection.repo.StoreElectionConfiguration(election)
 	if err != nil {
 		return fmt.Errorf("election cannot be stored: %w", err)
 	}
@@ -20,12 +28,7 @@ func StoreElection(election models2.ElectionModel) error {
 }
 
 func storeVoters(voters []models2.VoterModel) error {
-	var votersInterface []interface{}
-
-	for _, v := range voters {
-		votersInterface = append(votersInterface, v)
-	}
-	err := repository.StoreElectionVoters(votersInterface)
+	err := repository.StoreElectionVoters(voters)
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
 	}

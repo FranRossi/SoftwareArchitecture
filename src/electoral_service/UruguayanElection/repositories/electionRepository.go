@@ -13,7 +13,7 @@ type ElectionRepo struct {
 var electionUruguay models.ElectionModel
 
 func NewUruguayanElection() {
-	id, voterAmount := "1", 1000
+	id, voterAmount := "1", 10000
 	var err error
 	electionUruguay, err = UruguayanElection.CreateElectionMock(id, voterAmount)
 	if err != nil {

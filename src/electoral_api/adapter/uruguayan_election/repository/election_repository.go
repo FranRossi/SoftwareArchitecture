@@ -10,7 +10,10 @@ import (
 	"log"
 )
 
-func StoreElectionConfiguration(election models2.ElectionModel) error {
+type ElectionRepo struct {
+}
+
+func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionModel) error {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguayan_election")
 	uruguayanElectionCollection := uruguayDataBase.Collection("configuration_election")
@@ -25,11 +28,12 @@ func StoreElectionConfiguration(election models2.ElectionModel) error {
 	return err
 }
 
-func StoreElectionVoters(voters []interface{}) error {
+func StoreElectionVoters(voters []models2.VoterModel) error {
+	votersInterface := convertModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguayan_election")
 	uruguayanVotersCollection := uruguayDataBase.Collection("voters")
-	_, err := uruguayanVotersCollection.InsertMany(context.TODO(), voters)
+	_, err := uruguayanVotersCollection.InsertMany(context.TODO(), votersInterface)
 	if err != nil {
 		fmt.Println("error storing voters")
 		if err == mongo.ErrNoDocuments {
@@ -38,4 +42,13 @@ func StoreElectionVoters(voters []interface{}) error {
 		log.Fatal(err)
 	}
 	return err
+}
+
+func convertModelToInterface(voters []models2.VoterModel) []interface{} {
+	var votersInterface []interface{}
+
+	for _, v := range voters {
+		votersInterface = append(votersInterface, v)
+	}
+	return votersInterface
 }

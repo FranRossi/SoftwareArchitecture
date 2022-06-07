@@ -12,7 +12,15 @@ import (
 
 const url = "http://localhost:8080/api/v1/election/uruguay/?id=1"
 
-func GetElectionSettings() {
+type ElectionController struct {
+	electionLogic *logic.ElectionLogic
+}
+
+func NewElectionController(logic *logic.ElectionLogic) *ElectionController {
+	return &ElectionController{electionLogic: logic}
+}
+
+func (controller *ElectionController) GetElectionSettings() error {
 	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -32,10 +40,11 @@ func GetElectionSettings() {
 	if electionSettings.Error {
 		log.Fatal(electionSettings.Msg)
 	} else {
-		err := logic.StoreElection(electionSettings.Election)
+		err := controller.electionLogic.StoreElection(electionSettings.Election)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 	fmt.Println("Election stored successfully")
+	return nil
 }
