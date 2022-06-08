@@ -1,10 +1,10 @@
 package connections
 
 import (
-	"electoral_service/UruguayanElection/connections/configs"
-	"electoral_service/UruguayanElection/connections/routes"
-	"electoral_service/UruguayanElection/controllers"
-	"electoral_service/UruguayanElection/repositories"
+	"external_electoral_api/uruguay_election/connections/configs"
+	"external_electoral_api/uruguay_election/connections/routes"
+	"external_electoral_api/uruguay_election/controllers"
+	"external_electoral_api/uruguay_election/repositories"
 	"github.com/gofiber/fiber/v2"
 )
 

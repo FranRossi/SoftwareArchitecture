@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	models2 "electoral_api/adapter/uruguayan_election/models"
-	"electoral_api/connections"
+	models2 "electoral_service/adapter/uruguayan_election/models"
+	"electoral_service/connections"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

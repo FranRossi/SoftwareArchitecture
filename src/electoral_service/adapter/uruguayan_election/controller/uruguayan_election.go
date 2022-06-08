@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"electoral_api/adapter/uruguayan_election/logic"
-	models2 "electoral_api/adapter/uruguayan_election/models"
+	"electoral_service/adapter/uruguayan_election/logic"
+	models2 "electoral_service/adapter/uruguayan_election/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -46,5 +46,6 @@ func (controller *ElectionController) GetElectionSettings() error {
 		}
 	}
 	fmt.Println("Election stored successfully")
+	logic.SetElectionDate(electionSettings.Election.StartingDate, electionSettings.Election.FinishingDate, len(electionSettings.Election.Voters))
 	return nil
 }

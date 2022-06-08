@@ -1,7 +1,7 @@
-package UruguayanElection
+package uruguay_election
 
 import (
-	"electoral_service/UruguayanElection/models"
+	"external_electoral_api/uruguay_election/models"
 	"github.com/bxcodec/faker/v3"
 
 	"math/rand"
@@ -28,8 +28,8 @@ func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, erro
 }
 
 func customGenerateDates(election *models.ElectionModel) {
-	election.StartingDate = time.Now().Add(time.Minute * 10).String()
-	election.FinishingDate = time.Now().AddDate(0, 0, 1).String()
+	election.StartingDate = time.Now().Add(time.Minute * 1).Format(time.RFC3339)
+	election.FinishingDate = time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
 }
 
 func customGeneratorVoter(amountVoters int) {

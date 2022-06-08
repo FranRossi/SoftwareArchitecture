@@ -1,13 +1,8 @@
 package main
 
-import (
-	"electoral_service/UruguayanElection/connections"
-	"electoral_service/UruguayanElection/repositories"
-	"fmt"
-)
+import connections "electoral_service/adapter/uruguayan_election/dependencies_injection"
 
 func main() {
-	repositories.NewUruguayanElection()
-	fmt.Println("Connecting")
-	connections.Connection()
+	controller := connections.Injection()
+	controller.GetElectionSettings()
 }

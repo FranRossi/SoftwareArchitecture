@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"electoral_service/UruguayanElection/controllers"
+	"external_electoral_api/uruguay_election/controllers"
 	"github.com/gofiber/fiber/v2"
 )
 

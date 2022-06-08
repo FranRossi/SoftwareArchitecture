@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"electoral_service/UruguayanElection"
-	"electoral_service/UruguayanElection/models"
+	"external_electoral_api/uruguay_election"
+	"external_electoral_api/uruguay_election/models"
 	"fmt"
 )
 
@@ -15,7 +15,7 @@ var electionUruguay models.ElectionModel
 func NewUruguayanElection() {
 	id, voterAmount := "1", 10000
 	var err error
-	electionUruguay, err = UruguayanElection.CreateElectionMock(id, voterAmount)
+	electionUruguay, err = uruguay_election.CreateElectionMock(id, voterAmount)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
