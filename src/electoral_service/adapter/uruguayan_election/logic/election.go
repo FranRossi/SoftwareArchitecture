@@ -79,8 +79,9 @@ func sendInitialAct(startDate time.Time, endDate time.Time, voters int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	println(jsonAct)
-	connections.ConnectionRabbit(jsonAct)
+	connections.ConnectionRabbit(act.starDate)
+	var test Act
+	json.Unmarshal(jsonAct, &test)
 }
 
 func endElection(endDate time.Time) func() {
