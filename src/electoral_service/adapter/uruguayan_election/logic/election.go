@@ -79,7 +79,6 @@ func sendInitialAct(startDate time.Time, endDate time.Time, voters int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(jsonAct))
 	connections.ConnectionRabbit(jsonAct)
 }
 
