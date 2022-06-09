@@ -15,9 +15,9 @@ type ElectionLogic struct {
 }
 
 type Act struct {
-	starDate string
-	endDate  string
-	voters   int
+	StarDate string `json:"startDate"`
+	EndDate  string `json:"endDate"`
+	Voters   int    `json:"voters"`
 }
 
 func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
@@ -71,17 +71,16 @@ func startElection(startDate time.Time, endDate time.Time, voters int) func() {
 
 func sendInitialAct(startDate time.Time, endDate time.Time, voters int) {
 	act := Act{
-		starDate: startDate.Format(time.RFC3339),
-		endDate:  endDate.Format(time.RFC3339),
-		voters:   voters,
+		StarDate: startDate.Format(time.RFC3339),
+		EndDate:  endDate.Format(time.RFC3339),
+		Voters:   voters,
 	}
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
 		log.Fatal(err)
 	}
-	connections.ConnectionRabbit(act.starDate)
-	var test Act
-	json.Unmarshal(jsonAct, &test)
+	fmt.Println(string(jsonAct))
+	connections.ConnectionRabbit(jsonAct)
 }
 
 func endElection(endDate time.Time) func() {

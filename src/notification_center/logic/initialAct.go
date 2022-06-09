@@ -9,22 +9,21 @@ import (
 )
 
 type Act struct {
-	starDate string
-	endDate  string
-	voters   int
+	StarDate string `json:"startDate"`
+	EndDate  string `json:"endDate"`
+	Voters   int    `json:"voters"`
 }
 
 func RecieveAct() {
 	worker := connections.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "election-settings-queue", func(message []byte) error {
-
 		var act Act
 		er := json.Unmarshal(message, &act)
 		if er != nil {
 			log.Fatal(er)
 		}
-		fmt.Println(act.starDate, act.endDate, act.voters)
+		fmt.Printf("%+v", act)
 		wg.Done()
 		return nil
 	})
