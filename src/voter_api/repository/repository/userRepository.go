@@ -27,14 +27,13 @@ func RegisterUser(user *domain.User) error {
 
 func FindVoter(idVoter string) (*domain.User, error) {
 	client := connections.GetInstanceMongoClient()
-	votesDatabase := client.Database("users")
-	uruguayCollection := votesDatabase.Collection("uruguayVoters")
+	votesDatabase := client.Database("uruguay_election")
+	uruguayCollection := votesDatabase.Collection("voters")
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
 	if err2 != nil {
 		fmt.Println(err2.Error())
-		fmt.Println(idVoter)
-		fmt.Println("El error esta en mongo")
+		fmt.Println("there is no voter habilitated to vote with that id")
 		if err2 == mongo.ErrNoDocuments {
 			return nil, nil
 		}

@@ -13,7 +13,7 @@ func RecieveAct() {
 	worker := connections.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "election-settings-queue", func(message []byte) error {
-		var act models.Act
+		var act models.InitialAct
 		er := json.Unmarshal(message, &act)
 		if er != nil {
 			log.Fatal(er)
@@ -25,6 +25,6 @@ func RecieveAct() {
 
 }
 
-func notifyEmails(act models.Act) {
+func notifyEmails(act models.InitialAct) {
 	managersElection.SendEmails(act)
 }

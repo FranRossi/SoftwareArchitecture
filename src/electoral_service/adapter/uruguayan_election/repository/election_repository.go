@@ -15,7 +15,7 @@ type ElectionRepo struct {
 
 func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionModel) error {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database("uruguayan_election")
+	uruguayDataBase := client.Database("uruguay_election")
 	uruguayanElectionCollection := uruguayDataBase.Collection("configuration_election")
 	_, err := uruguayanElectionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "description": election.Description, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode})
 	if err != nil {
@@ -31,7 +31,7 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionMo
 func StoreElectionVoters(voters []models2.VoterModel) error {
 	votersInterface := convertModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database("uruguayan_election")
+	uruguayDataBase := client.Database("uruguay_election")
 	uruguayanVotersCollection := uruguayDataBase.Collection("voters")
 	_, err := uruguayanVotersCollection.InsertMany(context.TODO(), votersInterface)
 	if err != nil {

@@ -12,8 +12,8 @@ import (
 
 func StoreVote(vote *domain.VoteModel) error {
 	client := connections.GetInstanceMongoClient()
-	usersDatabase := client.Database("votes")
-	uruguayVotersCollection := usersDatabase.Collection("uruguayVotes")
+	usersDatabase := client.Database("uruguay_votes")
+	uruguayVotersCollection := usersDatabase.Collection("votes")
 	_, err2 := uruguayVotersCollection.InsertOne(context.TODO(), bson.M{"department": vote.Department, "circuit": vote.Circuit, "candidate": vote.Candidate, "politicalParty": vote.PoliticalParty})
 	if err2 != nil {
 		fmt.Println("error storing vote")

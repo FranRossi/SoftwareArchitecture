@@ -78,17 +78,15 @@ func checkVoter(id, password string) (*domain2.User, error) {
 }
 
 func checkVote(req *pb.VoteRequest) (*domain.VoteModel, string, error) {
-	user, err := logic.FindVoter(req.GetId())
+	user, err := logic.FindVoter(req.GetIdVoter())
 	if err != nil {
 		return nil, "", status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 	voteModel := &domain.VoteModel{
-		Id:              req.GetId(),
-		CivicCredential: req.GetCivicCredential(),
-		Department:      req.GetDepartment(),
-		Circuit:         req.GetCircuit(),
-		Candidate:       req.GetCandidate(),
-		PoliticalParty:  req.GetPoliticalParty(),
+		IdElection:  req.GetIdElection(),
+		IdVoter:     req.GetIdVoter(),
+		Circuit:     req.GetCircuit(),
+		IdCandidate: req.GetIdCandidate(),
 	}
 	return voteModel, user.Username, nil
 }
