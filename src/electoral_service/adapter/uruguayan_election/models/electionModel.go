@@ -14,7 +14,7 @@ type ElectionModel struct {
 	ElectionMode  string `bson:"electionMode"`
 
 	Voters []VoterModel `json:"voters" bson:"voters"`
-	//TODO ver si incluir por separado los candidatos o no
+	// TODO ver si incluir por separado los candidatos o no
 	//Candidates       []CandidateModel      `json:"candidates" bson:"candidates"`
 	Circuits         []CircuitModel        `json:"circuits"`
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`

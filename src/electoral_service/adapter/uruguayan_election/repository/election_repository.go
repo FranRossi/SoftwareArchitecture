@@ -52,3 +52,38 @@ func convertModelToInterface(voters []models2.VoterModel) []interface{} {
 	}
 	return votersInterface
 }
+
+func StoreCandidates(candidates []models2.CandidateModel) error {
+	client := connections.GetInstanceMongoClient()
+	candidatesToStore := convertCandidateModelToInterface(candidates)
+	uruguayDataBase := client.Database("uruguay_votes")
+	uruguayanCandidatesCollection := uruguayDataBase.Collection("votes")
+	_, err := uruguayanCandidatesCollection.InsertMany(context.TODO(), candidatesToStore)
+	if err != nil {
+		fmt.Println("error storing candidates")
+		if err == mongo.ErrNoDocuments {
+			return nil
+		}
+		log.Fatal(err)
+	}
+	return err
+}
+
+type Candidate struct {
+	Id    string `bson:"id"`
+	Name  string `bson:"name"`
+	Votes int    `bson:"votes"`
+}
+
+func convertCandidateModelToInterface(candidates []models2.CandidateModel) []interface{} {
+	var candidatesResume []Candidate
+	for _, v := range candidates {
+		candidatesResume = append(candidatesResume, Candidate{Id: v.Id, Name: v.Name, Votes: 0})
+	}
+
+	var candidatesInterface []interface{}
+	for _, v := range candidatesResume {
+		candidatesInterface = append(candidatesInterface, v)
+	}
+	return candidatesInterface
+}

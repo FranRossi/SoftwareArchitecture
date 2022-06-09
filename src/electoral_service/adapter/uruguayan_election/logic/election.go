@@ -42,6 +42,7 @@ func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel
 	if err != nil {
 		return err
 	}
+	err = storeCandidates(election.PoliticalParties)
 	return nil
 }
 
@@ -49,6 +50,16 @@ func storeVoters(voters []models2.VoterModel) error {
 	err := repository.StoreElectionVoters(voters)
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
+	}
+	return nil
+}
+
+func storeCandidates(politicalParties []models2.PoliticalPartyModel) error {
+	candidates := politicalParties[0].Candidates
+	candidates = append(candidates, politicalParties[1].Candidates...)
+	err := repository.StoreCandidates(candidates)
+	if err != nil {
+		return fmt.Errorf("candidates cannot be stored: %w", err)
 	}
 	return nil
 }

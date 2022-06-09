@@ -36,7 +36,7 @@ func customGeneratorVoter(amountVoters int) {
 	_ = faker.AddProvider("custom_voter", func(v reflect.Value) (interface{}, error) {
 		rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 		departments := []string{"Montevideo", "Colonia", "Rocha", "Florida", "San Jose", "Soriano", "Salto", "Paysandu", "Treinta y Tres", "Artigas"}
-		voters := make([]models.VoterModel, 0, 100000)
+		voters := make([]models.VoterModel, 0, amountVoters)
 		for i := 0; i < amountVoters; i++ {
 			voterModel := models.VoterModel{}
 			voterModel.Id = strconv.FormatInt(int64(i+10000000), 10)
@@ -90,15 +90,15 @@ func customGeneratorCandidates() [][]models.CandidateModel {
 	candidatesRed := make([]models.CandidateModel, 0, 2)
 	candidatesBlue := make([]models.CandidateModel, 0, 3)
 	candidate1NationalParty := models.CandidateModel{
-		Id:               "1",
+		Id:               "10000020",
 		IdPoliticalParty: "1",
 	}
 	candidate2NationalParty := models.CandidateModel{
-		Id:               "2",
+		Id:               "10000030",
 		IdPoliticalParty: "1",
 	}
 	candidateRedParty := models.CandidateModel{
-		Id:               "2",
+		Id:               "10000040",
 		IdPoliticalParty: "2",
 	}
 	faker.FakeData(&candidate1NationalParty)
