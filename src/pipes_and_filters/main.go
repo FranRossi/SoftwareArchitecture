@@ -1,89 +1,13 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"sync"
+	l "pipes_and_filters/logic"
 )
 
-// TODO revisar si esta linea esta bien
-type any = interface{}
-
-type Filter func(any) error
-
-type Pipeline struct {
-	filters []Filter
-}
-
-func (p *Pipeline) Use(f ...Filter) {
-	p.filters = append(p.filters, f...)
-}
-
-func (p Pipeline) Run(input any) []error {
-
-	var wg sync.WaitGroup
-	wg.Add(len(p.filters))
-	out := make(chan error, len(p.filters))
-
-	// Runs each filters and saves the error to the out channel
-	for _, f := range p.filters {
-		filter := f
-		go func() {
-			out <- filter(input)
-			wg.Done()
-		}()
-	}
-
-	// Waits for all the filters to finish
-	wg.Wait()
-	close(out)
-	var errors []error
-
-	// Saves errors of all the filters
-	for err := range out {
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	return errors
-}
-
-func FilterCheckAge(input any) error {
-
-	println("Checking age Lower")
-	if data, ok := input.(int); ok {
-		if data < 18 {
-			return errors.New("underage")
-		}
-		return nil
-	} else {
-		return errors.New("Invalid data type")
-	}
-}
-
-func FilterCheckAgeUpper(input any) error {
-
-	println("Checking age Upper")
-	if data, ok := input.(int); ok {
-		if data > 60 {
-			return errors.New("Too old")
-		}
-		return nil
-	} else {
-		return errors.New("Invalid data type")
-	}
-}
-
-func FilterEchoInput(input any) error {
-	data, _ := input.(int)
-	fmt.Printf("Input Data: %d\n", data)
-	return nil
-}
-
 func main() {
-	p := Pipeline{}
-	p.Use(FilterEchoInput, FilterCheckAgeUpper, FilterCheckAge)
+	p := l.Pipeline{}
+	p.Use(l.FilterEchoInput, l.FilterCheckAgeUpper, l.FilterCheckAge)
 
 	validateNumber(70, &p)
 	fmt.Println("")
@@ -94,7 +18,7 @@ func main() {
 	println("Number validated - End")
 }
 
-func validateNumber(num int, p *Pipeline) {
+func validateNumber(num int, p *l.Pipeline) {
 	errors := p.Run(num)
 
 	if len(errors) == 0 {
@@ -105,4 +29,5 @@ func validateNumber(num int, p *Pipeline) {
 			println(err.Error())
 		}
 	}
+
 }
