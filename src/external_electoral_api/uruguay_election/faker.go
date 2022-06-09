@@ -90,15 +90,15 @@ func customGeneratorCandidates() [][]models.CandidateModel {
 	candidatesRed := make([]models.CandidateModel, 0, 2)
 	candidatesBlue := make([]models.CandidateModel, 0, 3)
 	candidate1NationalParty := models.CandidateModel{
-		Id:               "10000020",
+		Id:               "1",
 		IdPoliticalParty: "1",
 	}
 	candidate2NationalParty := models.CandidateModel{
-		Id:               "10000030",
+		Id:               "2",
 		IdPoliticalParty: "1",
 	}
 	candidateRedParty := models.CandidateModel{
-		Id:               "10000040",
+		Id:               "3",
 		IdPoliticalParty: "2",
 	}
 	faker.FakeData(&candidate1NationalParty)

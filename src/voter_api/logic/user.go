@@ -2,7 +2,6 @@ package logic
 
 import (
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	domain "voter_api/domain/user"
 	"voter_api/repository/repository"
@@ -27,18 +26,19 @@ func RegisterUser(id string, username string, password string, role string) (*do
 }
 
 func createUser(id string, username string, password string, role string) (*domain.User, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, fmt.Errorf("cannot hash password: %w", err)
-	}
-
-	user := &domain.User{
-		Id:             id,
-		Username:       username,
-		HashedPassword: string(hashedPassword),
-		Role:           role,
-	}
-	return StoreUser(user)
+	//hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	//if err != nil {
+	//	return nil, fmt.Errorf("cannot hash password: %w", err)
+	//}
+	//
+	//user := &domain.User{
+	//	Id:             id,
+	//	Username:       username,
+	//	HashedPassword: string(hashedPassword),
+	//	Role:           role,
+	//}
+	//return StoreUser(user)
+	return nil, nil
 }
 
 func StoreUser(user *domain.User) (*domain.User, error) {
@@ -50,6 +50,7 @@ func StoreUser(user *domain.User) (*domain.User, error) {
 }
 
 func IsCorrectPassword(user *domain.User, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
-	return err == nil
+	//err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
+	//return err == nil
+	return true
 }

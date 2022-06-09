@@ -11,5 +11,6 @@ func StoreVote(vote *domain.VoteModel) error {
 	if err != nil {
 		return fmt.Errorf("vote cannot be stored: %w", err)
 	}
+	err = repository.RegisterVote(vote.IdVoter)
 	return nil
 }
