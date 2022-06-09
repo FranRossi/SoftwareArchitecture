@@ -14,12 +14,19 @@ type ElectionLogic struct {
 	repo *repository.ElectionRepo
 }
 
-type Act struct {
+type InitialAct struct {
 	StarDate         string                        `json:"startDate"`
 	PoliticalParties []models2.PoliticalPartyModel `json:"politicalParties"`
-	EndDate          string                        `json:"endDate"`
 	Voters           int                           `json:"voters"`
 	Mode             string                        `json:"mode"`
+}
+
+type ClosingAct struct {
+	StarDate   string `json:"startDate"`
+	EndDate    string `json:"endDate"`
+	Voters     int    `json:"voters"`
+	TotalVotes int    `json:"totalVotes"`
+	Result     string `json:"result"`
 }
 
 func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
@@ -72,7 +79,7 @@ func startElection(startDate time.Time, politicalParties []models2.PoliticalPart
 }
 
 func sendInitialAct(startDate time.Time, politicalParties []models2.PoliticalPartyModel, voters int, electionMode string) {
-	act := Act{
+	act := InitialAct{
 		StarDate:         startDate.Format(time.RFC3339),
 		PoliticalParties: politicalParties,
 		Voters:           voters,
@@ -89,5 +96,6 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 	return func() {
 		fmt.Println("Election finished")
 		fmt.Println("Election will finish at: ", endDate)
+		//TODO: send closing act
 	}
 }
