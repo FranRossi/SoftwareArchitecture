@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
 
 // TODO revisar si esta linea esta bien
@@ -20,21 +21,21 @@ func (p *Pipeline) Use(f ...Filter) {
 
 func (p Pipeline) Run(input any) []error {
 
-	//	var wg sync.WaitGroup
+	var wg sync.WaitGroup
+	wg.Add(len(p.filters))
 	out := make(chan error, len(p.filters))
 
 	// Runs each filters and saves the error to the out channel
 	for _, f := range p.filters {
-		out <- f(input)
-		//wg.Done()
-		// go func() {
-		// 	out <- f(input)
-		// }()
+		filter := f
+		go func() {
+			out <- filter(input)
+			wg.Done()
+		}()
 	}
 
 	// Waits for all the filters to finish
-	//	wg.Add(len(p.filters))
-	//	wg.Wait()
+	wg.Wait()
 	close(out)
 	var errors []error
 
@@ -76,7 +77,6 @@ func FilterCheckAgeUpper(input any) error {
 
 func FilterEchoInput(input any) error {
 	data, _ := input.(int)
-	fmt.Println("")
 	fmt.Printf("Input Data: %d\n", data)
 	return nil
 }
@@ -86,7 +86,9 @@ func main() {
 	p.Use(FilterEchoInput, FilterCheckAgeUpper, FilterCheckAge)
 
 	validateNumber(70, &p)
+	fmt.Println("")
 	validateNumber(3, &p)
+	fmt.Println("")
 	validateNumber(50, &p)
 
 	println("Number validated - End")
