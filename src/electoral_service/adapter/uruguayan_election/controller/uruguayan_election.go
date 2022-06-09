@@ -46,6 +46,6 @@ func (controller *ElectionController) GetElectionSettings() error {
 		}
 	}
 	fmt.Println("Election stored successfully")
-	logic.SetElectionDate(electionSettings.Election.StartingDate, electionSettings.Election.FinishingDate, len(electionSettings.Election.Voters))
+	logic.SetElectionDate(electionSettings.Election)
 	return nil
 }

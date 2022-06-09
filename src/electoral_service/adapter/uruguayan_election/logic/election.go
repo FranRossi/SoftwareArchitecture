@@ -15,9 +15,11 @@ type ElectionLogic struct {
 }
 
 type Act struct {
-	StarDate string `json:"startDate"`
-	EndDate  string `json:"endDate"`
-	Voters   int    `json:"voters"`
+	StarDate         string                        `json:"startDate"`
+	PoliticalParties []models2.PoliticalPartyModel `json:"politicalParties"`
+	EndDate          string                        `json:"endDate"`
+	Voters           int                           `json:"voters"`
+	Mode             string                        `json:"mode"`
 }
 
 func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
@@ -44,11 +46,11 @@ func storeVoters(voters []models2.VoterModel) error {
 	return nil
 }
 
-func SetElectionDate(startingDate string, finishingDate string, voters int) {
-	startDate, _ := time.Parse(time.RFC3339, startingDate)
-	endDate, _ := time.Parse(time.RFC3339, finishingDate)
-	setTimer(startDate, startElection(startDate, endDate, voters))
-	setTimer(endDate, endElection(endDate))
+func SetElectionDate(election models2.ElectionModel) {
+	startDate, _ := time.Parse(time.RFC3339, election.StartingDate)
+	endDate, _ := time.Parse(time.RFC3339, election.FinishingDate)
+	setTimer(startDate, startElection(startDate, election.PoliticalParties, len(election.Voters), election.ElectionMode))
+	setTimer(endDate, endElection(startDate, endDate, len(election.Voters)))
 }
 
 func setTimer(timerDate time.Time, action func()) {
@@ -62,18 +64,19 @@ func setTimer(timerDate time.Time, action func()) {
 	action()
 }
 
-func startElection(startDate time.Time, endDate time.Time, voters int) func() {
+func startElection(startDate time.Time, politicalParties []models2.PoliticalPartyModel, voters int, electionMode string) func() {
 	return func() {
 		fmt.Println("Election started")
-		sendInitialAct(startDate, endDate, voters)
+		sendInitialAct(startDate, politicalParties, voters, electionMode)
 	}
 }
 
-func sendInitialAct(startDate time.Time, endDate time.Time, voters int) {
+func sendInitialAct(startDate time.Time, politicalParties []models2.PoliticalPartyModel, voters int, electionMode string) {
 	act := Act{
-		StarDate: startDate.Format(time.RFC3339),
-		EndDate:  endDate.Format(time.RFC3339),
-		Voters:   voters,
+		StarDate:         startDate.Format(time.RFC3339),
+		PoliticalParties: politicalParties,
+		Voters:           voters,
+		Mode:             electionMode,
 	}
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
@@ -82,7 +85,7 @@ func sendInitialAct(startDate time.Time, endDate time.Time, voters int) {
 	connections.ConnectionRabbit(jsonAct)
 }
 
-func endElection(endDate time.Time) func() {
+func endElection(startDate, endDate time.Time, voters int) func() {
 	return func() {
 		fmt.Println("Election finished")
 		fmt.Println("Election will finish at: ", endDate)

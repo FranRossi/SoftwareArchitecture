@@ -7,8 +7,8 @@ type ElectionModel struct {
 	FinishingDate string `faker:"-"`
 	ElectionMode  string `faker:"oneof: unico, multi"`
 
-	Voters           []VoterModel          `faker:"custom_voter"`
-	Candidates       []CandidateModel      `faker:"custom_candidates"`
+	Voters []VoterModel `faker:"custom_voter"`
+	//Candidates       []CandidateModel      `faker:"custom_candidates"`
 	Circuits         []CircuitModel        `faker:"custom_circuits"`
 	PoliticalParties []PoliticalPartyModel `faker:"custom_political_party"`
 }

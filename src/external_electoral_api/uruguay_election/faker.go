@@ -12,8 +12,8 @@ import (
 
 func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, error) {
 	customGeneratorVoter(amountVoters)
-	customGeneratorPoliticalParties()
-	customGeneratorCandidates()
+	candidates := customGeneratorCandidates()
+	customGeneratorPoliticalParties(candidates)
 	customGeneratorCircuits()
 	electionModel := models.ElectionModel{}
 	_ = faker.AddProvider("customIdFaker", func(v reflect.Value) (interface{}, error) {
@@ -67,43 +67,47 @@ func randomCivicCredential() string {
 	return string(b)
 }
 
-func customGeneratorPoliticalParties() {
+func customGeneratorPoliticalParties(candidates [][]models.CandidateModel) {
 	_ = faker.AddProvider("custom_political_party", func(v reflect.Value) (interface{}, error) {
 		politicalParties := make([]models.PoliticalPartyModel, 0, 4)
 		partidoNacional := models.PoliticalPartyModel{
-			Id:   "1",
-			Name: "Partido Nacional",
+			Id:         "1",
+			Name:       "Partido Nacional",
+			Candidates: candidates[0],
 		}
 		partidoColorado := models.PoliticalPartyModel{
-			Id:   "2",
-			Name: "Partido Colorado",
+			Id:         "2",
+			Name:       "Partido Colorado",
+			Candidates: candidates[1],
 		}
 		politicalParties = append(politicalParties, partidoNacional, partidoColorado)
 		return politicalParties, nil
 	})
 }
 
-func customGeneratorCandidates() {
-	_ = faker.AddProvider("custom_candidates", func(v reflect.Value) (interface{}, error) {
-		candidates := make([]models.CandidateModel, 0, 4)
-		candidate1NationalParty := models.CandidateModel{
-			Id:               "1",
-			IdPoliticalParty: "1",
-		}
-		candidate2NationalParty := models.CandidateModel{
-			Id:               "2",
-			IdPoliticalParty: "1",
-		}
-		candidateRedParty := models.CandidateModel{
-			Id:               "2",
-			IdPoliticalParty: "2",
-		}
-		faker.FakeData(&candidate1NationalParty)
-		faker.FakeData(&candidate2NationalParty)
-		faker.FakeData(&candidateRedParty)
-		candidates = append(candidates, candidate1NationalParty, candidate2NationalParty, candidateRedParty)
-		return candidates, nil
-	})
+func customGeneratorCandidates() [][]models.CandidateModel {
+	candidates := make([][]models.CandidateModel, 0, 4)
+	candidatesRed := make([]models.CandidateModel, 0, 2)
+	candidatesBlue := make([]models.CandidateModel, 0, 3)
+	candidate1NationalParty := models.CandidateModel{
+		Id:               "1",
+		IdPoliticalParty: "1",
+	}
+	candidate2NationalParty := models.CandidateModel{
+		Id:               "2",
+		IdPoliticalParty: "1",
+	}
+	candidateRedParty := models.CandidateModel{
+		Id:               "2",
+		IdPoliticalParty: "2",
+	}
+	faker.FakeData(&candidate1NationalParty)
+	faker.FakeData(&candidate2NationalParty)
+	faker.FakeData(&candidateRedParty)
+	candidatesRed = append(candidatesRed, candidateRedParty)
+	candidatesBlue = append(candidatesBlue, candidate1NationalParty, candidate2NationalParty)
+	candidates = append(candidates, candidatesBlue, candidatesRed)
+	return candidates
 }
 
 func customGeneratorCircuits() {

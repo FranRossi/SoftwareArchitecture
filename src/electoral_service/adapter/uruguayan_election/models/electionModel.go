@@ -13,8 +13,8 @@ type ElectionModel struct {
 	FinishingDate string `bson:"finishingDate"`
 	ElectionMode  string `bson:"electionMode"`
 
-	Voters           []VoterModel          `json:"voters" bson:"voters"`
-	Candidates       []CandidateModel      `json:"candidates"`
+	Voters []VoterModel `json:"voters" bson:"voters"`
+	//Candidates       []CandidateModel      `json:"candidates" bson:"candidates"`
 	Circuits         []CircuitModel        `json:"circuits"`
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`
 }
