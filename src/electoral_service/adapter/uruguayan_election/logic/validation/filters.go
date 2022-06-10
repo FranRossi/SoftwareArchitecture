@@ -16,25 +16,16 @@ func GetAvailableFilters() []p_f.FilterWithName {
 		},
 		{
 			Name:     "validate_party_list",
-			Function: FilterEchoData,
+			Function: FilterValidatePoliticalPartyList,
 		},
 		{
 			Name:     "validate_candidate_list",
-			Function: FilterEchoData,
-		},
-		{
-			Name:     "validate_voter_list",
-			Function: FilterEchoData,
-		},
-		{
-			Name:     "validate_party_candidates",
-			Function: FilterEchoData,
+			Function: FilterValidateCandidateList,
 		},
 		{
 			Name:     "validate_unique_party_per_candidate",
-			Function: FilterEchoData,
+			Function: FilterValidateUniquePartyPerCandidate,
 		},
-
 		{
 			Name:     "validate_election_mode",
 			Function: FilterElectionMode,
@@ -43,10 +34,40 @@ func GetAvailableFilters() []p_f.FilterWithName {
 	return availableFilters
 }
 
-func FilterEchoData(data any, params map[string]any) error {
-	electionData := data.(models2.ElectionModel)
-	fmt.Printf("data Data: %s\n", electionData.Description)
-	return fmt.Errorf("Failed")
+func FilterValidatePoliticalPartyList(data any, params map[string]any) error {
+	election := data.(models2.ElectionModel)
+	if len(election.PoliticalParties) == 0 {
+		return fmt.Errorf("politicalPartyList is nil")
+	}
+	return nil
+}
+
+func FilterValidateCandidateList(data any, params map[string]any) error {
+	election := data.(models2.ElectionModel)
+	for _, party := range election.PoliticalParties {
+		if len(party.Candidates) == 0 {
+			return fmt.Errorf("candidateList is nil")
+		}
+	}
+	if len(election.Voters) == 0 {
+		return fmt.Errorf("voterList is nil")
+	}
+	return nil
+}
+
+func FilterValidateUniquePartyPerCandidate(data any, params map[string]any) error {
+	election := data.(models2.ElectionModel)
+	candidatesToCheck := make(map[string]bool)
+	for _, party := range election.PoliticalParties {
+		for _, candidate := range party.Candidates {
+			if _, ok := candidatesToCheck[candidate.Id]; ok {
+				return fmt.Errorf("candidate %s is in more than one party", candidate.Id)
+			} else {
+				candidatesToCheck[candidate.Id] = true
+			}
+		}
+	}
+	return nil
 }
 
 func FilterValidateDate(data any, params map[string]any) error {
