@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	var availableFilters = []l.FilterFunctionWithName{
+	var availableFilters = []l.FilterWithName{
 		{
 			Name:     "check_age_lower",
 			Function: FilterCheckAge,
