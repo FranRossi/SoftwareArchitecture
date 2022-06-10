@@ -60,7 +60,19 @@ func RegisterVote(idVoter string) error {
 	update := bson.D{{"$inc", bson.D{{"voted", 1}}}}
 	_, err2 := uruguayCollection.UpdateOne(context.TODO(), filter, update)
 	if err2 != nil {
-		fmt.Println("error registering new vote")
+		fmt.Println("error registering new vote for candidate")
+		if err2 == mongo.ErrNoDocuments {
+			return nil
+		}
+		log.Fatal(err2)
+	}
+
+	uruguayCollection = uruguayDataBase.Collection("total_votes")
+	filter = bson.D{{"id", 1}}
+	update = bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
+	_, err2 = uruguayCollection.UpdateOne(context.TODO(), filter, update)
+	if err2 != nil {
+		fmt.Println("error registering new vote for candidate")
 		if err2 == mongo.ErrNoDocuments {
 			return nil
 		}

@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func RecieveAct() {
+func ReceiveAct() {
 	worker := connections.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "election-settings-queue", func(message []byte) error {
@@ -22,7 +22,6 @@ func RecieveAct() {
 		wg.Done()
 		return nil
 	})
-
 }
 
 func notifyEmails(act models.InitialAct) {

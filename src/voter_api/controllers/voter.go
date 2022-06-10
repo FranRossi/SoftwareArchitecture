@@ -48,6 +48,18 @@ func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest
 	return &proto.LoginResponse{AccessToken: "Falso Token 1234"}, nil
 }
 
+func checkVoter(id, password string) (*domain2.User, error) {
+	user, err := logic.FindVoter(id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
+	}
+
+	if user == nil || !logic.IsCorrectPassword(user, password) {
+		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
+	}
+	return user, nil
+}
+
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
 	voteModel, username, err := checkVote(req)
 	if err != nil {
@@ -64,18 +76,6 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 	// rabbitmq test
 	//api_voter.sendCertificate(idVoter)
 	//api_voter.PrintCertificate()
-}
-
-func checkVoter(id, password string) (*domain2.User, error) {
-	user, err := logic.FindVoter(id)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
-	}
-
-	if user == nil || !logic.IsCorrectPassword(user, password) {
-		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
-	}
-	return user, nil
 }
 
 func checkVote(req *pb.VoteRequest) (*domain.VoteModel, string, error) {

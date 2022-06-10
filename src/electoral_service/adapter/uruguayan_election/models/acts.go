@@ -1,7 +1,7 @@
 package models
 
 type InitialAct struct {
-	StartDate        string                `json:"startDate"`
+	StarDate         string                `json:"startDate"`
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`
 	Voters           int                   `json:"voters"`
 	Mode             string                `json:"mode"`
@@ -17,10 +17,4 @@ type ClosingAct struct {
 type ResultElection struct {
 	AmountVoted int                  `json:"amount_voted"`
 	Candidates  []CandidateEssential `json:"candidates"`
-}
-
-type CandidateEssential struct {
-	Id    string `bson:"id"`
-	Name  string `bson:"name"`
-	Votes int    `bson:"votes"`
 }

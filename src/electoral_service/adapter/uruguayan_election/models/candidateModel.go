@@ -8,3 +8,9 @@ type CandidateModel struct {
 	BirthDate        string
 	IdPoliticalParty string
 }
+
+type CandidateEssential struct {
+	Id    string `bson:"id"`
+	Name  string `bson:"name"`
+	Votes int    `bson:"votes"`
+}
