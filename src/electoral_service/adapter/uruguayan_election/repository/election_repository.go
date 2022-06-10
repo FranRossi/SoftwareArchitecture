@@ -13,6 +13,14 @@ import (
 type ElectionRepo struct {
 }
 
+func DropDataBases() {
+	client := connections.GetInstanceMongoClient()
+	uruguayDataBase := client.Database("uruguay_election")
+	uruguayDataBase.Drop(context.TODO())
+	uruguayDataBase = client.Database("uruguay_votes")
+	uruguayDataBase.Drop(context.TODO())
+}
+
 func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionModel) error {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_election")

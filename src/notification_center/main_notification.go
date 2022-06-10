@@ -4,4 +4,5 @@ import "notification_center/logic"
 
 func main() {
 	logic.ReceiveAct()
+	logic.ReceiveClosingAct()
 }

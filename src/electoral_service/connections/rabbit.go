@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func ConnectionRabbit(initialAct []byte) {
+func ConnectionRabbit(act []byte, queue string) {
 	worker, err := BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		panic(err)
 	}
-	err = worker.Send("election-settings-queue", initialAct)
+	err = worker.Send(queue, act)
 	if err != nil {
 		panic(err)
 	}

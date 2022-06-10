@@ -95,7 +95,8 @@ func sendInitialAct(startDate time.Time, politicalParties []models2.PoliticalPar
 	if err != nil {
 		log.Fatal(err)
 	}
-	connections.ConnectionRabbit(jsonAct)
+	queue := "initial-election-queue"
+	connections.ConnectionRabbit(jsonAct, queue)
 }
 
 func endElection(startDate, endDate time.Time, voters int) func() {
@@ -107,11 +108,11 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 		//TODO chequear las validaciones del REQ 2
 		fmt.Println("Election finished")
 		fmt.Println("Election will finish at: ", endDate)
-		sendIEndingAct(startDate, endDate, voters, resultElection)
+		sendEndingAct(startDate, endDate, voters, resultElection)
 	}
 }
 
-func sendIEndingAct(startDate time.Time, endDate time.Time, voters int, resultElection models2.ResultElection) {
+func sendEndingAct(startDate time.Time, endDate time.Time, voters int, resultElection models2.ResultElection) {
 	act := models2.ClosingAct{
 		StarDate: startDate.Format(time.RFC3339),
 		EndDate:  endDate.Format(time.RFC3339),
@@ -122,5 +123,10 @@ func sendIEndingAct(startDate time.Time, endDate time.Time, voters int, resultEl
 	if err != nil {
 		log.Fatal(err)
 	}
-	connections.ConnectionRabbit(jsonAct)
+	queue := "closing-election-queue"
+	connections.ConnectionRabbit(jsonAct, queue)
+}
+
+func DropDataBases() {
+	repository.DropDataBases()
 }

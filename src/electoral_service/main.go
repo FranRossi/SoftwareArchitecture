@@ -4,5 +4,6 @@ import dependencyinjection "electoral_service/adapter/uruguayan_election/depende
 
 func main() {
 	controller := dependencyinjection.Injection()
+	controller.DropDataBases()
 	controller.GetElectionSettings()
 }

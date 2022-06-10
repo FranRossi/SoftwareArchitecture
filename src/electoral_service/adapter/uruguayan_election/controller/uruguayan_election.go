@@ -49,3 +49,7 @@ func (controller *ElectionController) GetElectionSettings() error {
 	logic.SetElectionDate(electionSettings.Election)
 	return nil
 }
+
+func (controller *ElectionController) DropDataBases() {
+	logic.DropDataBases()
+}

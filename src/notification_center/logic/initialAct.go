@@ -12,7 +12,7 @@ import (
 func ReceiveAct() {
 	worker := connections.ConnectionRabbit()
 	wg := sync.WaitGroup{}
-	worker.Listen(50, "election-settings-queue", func(message []byte) error {
+	worker.Listen(50, "initial-election-queue", func(message []byte) error {
 		var act models.InitialAct
 		er := json.Unmarshal(message, &act)
 		if er != nil {
@@ -26,4 +26,23 @@ func ReceiveAct() {
 
 func notifyEmails(act models.InitialAct) {
 	managersElection.SendInitialEmails(act)
+}
+
+func ReceiveClosingAct() {
+	worker := connections.ConnectionRabbit()
+	wg := sync.WaitGroup{}
+	worker.Listen(50, "closing-election-queue", func(message []byte) error {
+		var act models.ClosingAct
+		er := json.Unmarshal(message, &act)
+		if er != nil {
+			log.Fatal(er)
+		}
+		notifyEmailsClosing(act)
+		wg.Done()
+		return nil
+	})
+}
+
+func notifyEmailsClosing(act models.ClosingAct) {
+	managersElection.SendClosingEmails(act)
 }
