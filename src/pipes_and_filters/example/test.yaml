@@ -1,0 +1,11 @@
+- name: echo
+- name: age_lower
+  params: 
+    min_age:  18
+- name: age_upper
+  params:
+    max_age: 60
+  # params: 
+  #   - lessThan: "30"
+  #   - moreThan: "20"
+

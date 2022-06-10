@@ -1,5 +1,0 @@
-- name: isBetween
-  params: 
-    - lessThan: 30
-    - moreThan: 20
-
