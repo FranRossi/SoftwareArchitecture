@@ -6,18 +6,18 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type SelectedFilterFromYaml struct {
-	Name   string         `yaml:"name"`
-	Params map[string]any `yaml:"params"`
-}
-
-type FilterFunctionWithName struct {
+type FilterWithName struct {
 	Name     string
 	Function FilterWithParams
 }
 type FilterWithParams func(data any, params map[string]any) error
 
-func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters []FilterFunctionWithName) {
+type SelectedFilterFromYaml struct {
+	Name   string         `yaml:"name"`
+	Params map[string]any `yaml:"params"`
+}
+
+func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters []FilterWithName) {
 
 	// Array to map
 	filtersMap := make(map[string]FilterWithParams)
