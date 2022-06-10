@@ -12,9 +12,11 @@ import (
 
 func StoreVote(vote *domain.VoteModel) error {
 	client := connections.GetInstanceMongoClient()
-	usersDatabase := client.Database("votes")
-	uruguayVotersCollection := usersDatabase.Collection("uruguayVotes")
-	_, err2 := uruguayVotersCollection.InsertOne(context.TODO(), bson.M{"department": vote.Department, "circuit": vote.Circuit, "candidate": vote.Candidate, "politicalParty": vote.PoliticalParty})
+	usersDatabase := client.Database("uruguay_votes")
+	uruguayVotersCollection := usersDatabase.Collection("votes")
+	filter := bson.D{{"id", vote.IdCandidate}}
+	update := bson.D{{"$inc", bson.D{{"votes", 1}}}}
+	_, err2 := uruguayVotersCollection.UpdateOne(context.TODO(), filter, update)
 	if err2 != nil {
 		fmt.Println("error storing vote")
 		if err2 == mongo.ErrNoDocuments {
@@ -22,5 +24,5 @@ func StoreVote(vote *domain.VoteModel) error {
 		}
 		log.Fatal(err2)
 	}
-	return err2
+	return nil
 }

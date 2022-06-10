@@ -11,4 +11,5 @@ type VoterModel struct {
 	IdCircuit       string `bson:"idCircuit"`
 	Phone           string `bson:"phone"`
 	Email           string `bson:"email"`
+	Voted           int    `bson:"voted"`
 }

@@ -1,16 +1,16 @@
 package models
 
 type PoliticalPartyModel struct {
-	Id         string
-	Name       string
-	Candidates []CandidateModel
+	Id         string           `json:"id"`
+	Name       string           `json:"name"`
+	Candidates []CandidateModel `json:"candidates"`
 }
 
 type CandidateModel struct {
-	Id               string
-	Name             string
-	LastName         string
-	Sex              string
-	BirthDate        string
-	IdPoliticalParty string
+	Id               string `json:"id"`
+	Name             string `json:"name"`
+	LastName         string `json:"lastName"`
+	Sex              string `json:"sex"`
+	BirthDate        string `json:"birthDate"`
+	IdPoliticalParty string `json:"idPoliticalParty"`
 }

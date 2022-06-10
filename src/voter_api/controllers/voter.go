@@ -33,18 +33,31 @@ func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
 }
 
 func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	user, err := checkVoter(request.GetId(), request.GetPassword())
+	//user, err := checkVoter(request.GetId(), request.GetPassword())
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//token, err := server.jwtManager.Generate(user.Username, user.Id, user.Role)
+	//if err != nil {
+	//	return nil, status.Errorf(codes.Internal, "cannot generate access token")
+	//}
+	//
+	//res := &proto.LoginResponse{AccessToken: token}
+	//return res, nil
+	return &proto.LoginResponse{AccessToken: "Falso Token 1234"}, nil
+}
+
+func checkVoter(id, password string) (*domain2.User, error) {
+	user, err := logic.FindVoter(id)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
-	token, err := server.jwtManager.Generate(user.Username, user.Id, user.Role)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot generate access token")
+	if user == nil || !logic.IsCorrectPassword(user, password) {
+		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
 	}
-
-	res := &proto.LoginResponse{AccessToken: token}
-	return res, nil
+	return user, nil
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
@@ -65,30 +78,16 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 	//api_voter.PrintCertificate()
 }
 
-func checkVoter(id, password string) (*domain2.User, error) {
-	user, err := logic.FindVoter(id)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
-	}
-
-	if user == nil || !logic.IsCorrectPassword(user, password) {
-		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
-	}
-	return user, nil
-}
-
 func checkVote(req *pb.VoteRequest) (*domain.VoteModel, string, error) {
-	user, err := logic.FindVoter(req.GetId())
+	user, err := logic.FindVoter(req.GetIdVoter())
 	if err != nil {
 		return nil, "", status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 	voteModel := &domain.VoteModel{
-		Id:              req.GetId(),
-		CivicCredential: req.GetCivicCredential(),
-		Department:      req.GetDepartment(),
-		Circuit:         req.GetCircuit(),
-		Candidate:       req.GetCandidate(),
-		PoliticalParty:  req.GetPoliticalParty(),
+		IdElection:  req.GetIdElection(),
+		IdVoter:     req.GetIdVoter(),
+		Circuit:     req.GetCircuit(),
+		IdCandidate: req.GetIdCandidate(),
 	}
-	return voteModel, user.Username, nil
+	return voteModel, user.Name + user.LastName, nil
 }

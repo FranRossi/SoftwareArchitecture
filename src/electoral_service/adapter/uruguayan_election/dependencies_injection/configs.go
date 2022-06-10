@@ -1,4 +1,4 @@
-package connections
+package dependencies_injection
 
 import (
 	conntroller "electoral_service/adapter/uruguayan_election/controller"

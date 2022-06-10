@@ -8,12 +8,10 @@ service VoteService {
 }
 
 message VoteRequest {
-  string id = 1;
-  string civicCredential = 2;
-  string department = 3;
-  string circuit = 4;
-  string candidate = 5;
-  string politicalParty = 6;
+  string id_election = 1;
+  string id_voter = 2;
+  string circuit = 3;
+  string id_candidate = 4;
 }
 
 message VoteReply {
