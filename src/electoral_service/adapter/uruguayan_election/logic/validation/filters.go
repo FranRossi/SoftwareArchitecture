@@ -1,4 +1,4 @@
-package logic
+package validation
 
 import (
 	models2 "electoral_service/adapter/uruguayan_election/models"

@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"electoral_service/adapter/uruguayan_election/logic/validation"
 	models2 "electoral_service/adapter/uruguayan_election/models"
 	"electoral_service/adapter/uruguayan_election/repository"
 	"electoral_service/connections"
@@ -20,7 +21,7 @@ func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
 
 func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel) error {
 
-	validationError := ValidateInitial(election)
+	validationError := validation.ValidateInitial(election)
 	if validationError != nil {
 		return validationError
 	}
