@@ -1,7 +1,5 @@
 - name: validate_election_date
 - name: validate_party_list
-- name: validate_candidate_list
-- name: validate_voter_list
-- name: validate_party_candidates
+- name: validate_voter_candidate_list
 - name: validate_unique_party_per_candidate
 - name: validate_election_mode

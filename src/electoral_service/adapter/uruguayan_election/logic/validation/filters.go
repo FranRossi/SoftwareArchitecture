@@ -19,7 +19,7 @@ func GetAvailableFilters() []p_f.FilterWithName {
 			Function: FilterValidatePoliticalPartyList,
 		},
 		{
-			Name:     "validate_candidate_list",
+			Name:     "validate_voter_candidate_list",
 			Function: FilterValidateCandidateList,
 		},
 		{
