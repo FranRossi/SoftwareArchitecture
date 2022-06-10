@@ -19,6 +19,12 @@ func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
 }
 
 func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel) error {
+
+	validationError := ValidateInitial(election)
+	if validationError != nil {
+		return validationError
+	}
+
 	err := logicElection.repo.StoreElectionConfiguration(election)
 	if err != nil {
 		return fmt.Errorf("election cannot be stored: %w", err)
