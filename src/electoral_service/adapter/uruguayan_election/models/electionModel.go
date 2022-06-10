@@ -11,7 +11,7 @@ type ElectionModel struct {
 	Description   string `bson:"description"`
 	StartingDate  string `bson:"startingDate"`
 	FinishingDate string `bson:"finishingDate"`
-	ElectionMode  string `bson:"electionMode"`
+	ElectionMode  string `bson:"electionMode"` // "unico" o "multi"
 
 	Voters []VoterModel `json:"voters" bson:"voters"`
 	// TODO ver si incluir por separado los candidatos o no
