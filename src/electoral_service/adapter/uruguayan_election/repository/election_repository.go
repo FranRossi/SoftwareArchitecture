@@ -108,7 +108,7 @@ func GetVotes() (models2.ResultElection, error) {
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("total_votes")
 	const initialAmountVotesId = 1
-	var amountVotes int
+	var amountVotes bson.M
 	err := uruguayanVotesCollection.FindOne(context.TODO(), bson.D{{"id", initialAmountVotesId}}).Decode(&amountVotes)
 	if err != nil {
 		fmt.Println("error getting amount of votes")
@@ -117,12 +117,13 @@ func GetVotes() (models2.ResultElection, error) {
 		}
 		log.Fatal(err)
 	}
+	amountVotesCounted := int(amountVotes["votes_counted"].(int32))
 	votesCandidatesResult, err := getEachCandidatesVotes()
 	if err != nil {
 		return models2.ResultElection{}, err
 	}
 	voterPerParties := getVotesPerParties(votesCandidatesResult)
-	electionResult := models2.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotes, VotesPerParties: voterPerParties}
+	electionResult := models2.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotesCounted, VotesPerParties: voterPerParties}
 
 	return electionResult, nil
 }
@@ -157,7 +158,7 @@ func getEachCandidatesVotes() ([]models2.CandidateEssential, error) {
 }
 
 func getVotesPerParties(votesCandidates []models2.CandidateEssential) []models2.PoliticalPartyEssentials {
-	votesPerParties := make(map[string]int)
+	votesPerParties := make(map[string]int, len(votesCandidates))
 	for _, candidate := range votesCandidates {
 		votesPerParties[candidate.PoliticalParty] += candidate.Votes
 	}

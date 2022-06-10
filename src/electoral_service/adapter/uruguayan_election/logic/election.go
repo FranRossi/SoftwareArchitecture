@@ -111,9 +111,8 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		//TODO chequear las validaciones del REQ 2
+		// TODO chequear las validaciones del REQ 2
 		fmt.Println("Election finished")
-		fmt.Println("Election will finish at: ", endDate)
 		sendEndingAct(startDate, endDate, voters, resultElection)
 	}
 }
