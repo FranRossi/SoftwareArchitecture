@@ -85,7 +85,7 @@ func StoreCandidates(candidates []models2.CandidateModel) error {
 func convertCandidateModelToInterface(candidates []models2.CandidateModel) []interface{} {
 	var candidatesResume []models2.CandidateEssential
 	for _, v := range candidates {
-		candidatesResume = append(candidatesResume, models2.CandidateEssential{Id: v.Id, Name: v.Name, Votes: 0})
+		candidatesResume = append(candidatesResume, models2.CandidateEssential{Id: v.Id, Name: v.Name, Votes: 0, PoliticalParty: v.PoliticalParty})
 	}
 
 	var candidatesInterface []interface{}
@@ -109,11 +109,12 @@ func GetVotes() (models2.ResultElection, error) {
 		}
 		log.Fatal(err)
 	}
-	votesResult, err := getEachCandidatesVotes()
+	votesCandidatesResult, err := getEachCandidatesVotes()
 	if err != nil {
 		return models2.ResultElection{}, err
 	}
-	electionResult := models2.ResultElection{Candidates: votesResult, AmountVoted: amountVotes}
+	voterPerParties := getVotesPerParties(votesCandidatesResult)
+	electionResult := models2.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotes, VotesPerParties: voterPerParties}
 
 	return electionResult, nil
 }
@@ -137,11 +138,25 @@ func getEachCandidatesVotes() ([]models2.CandidateEssential, error) {
 	votesCandidates := make([]models2.CandidateEssential, len(results))
 	for _, result := range results {
 		candidate := &models2.CandidateEssential{
-			Votes: int(result["votes"].(int32)),
-			Name:  result["name"].(string),
-			Id:    result["id"].(string),
+			Votes:          int(result["votes"].(int32)),
+			Name:           result["name"].(string),
+			Id:             result["id"].(string),
+			PoliticalParty: result["politicalParty"].(string),
 		}
 		votesCandidates = append(votesCandidates, *candidate)
 	}
 	return votesCandidates, nil
+}
+
+func getVotesPerParties(votesCandidates []models2.CandidateEssential) []models2.PoliticalPartyEssentials {
+	votesPerParties := make(map[string]int)
+	for _, candidate := range votesCandidates {
+		votesPerParties[candidate.PoliticalParty] += candidate.Votes
+	}
+	var votesPerPartiesResume []models2.PoliticalPartyEssentials
+	for key, value := range votesPerParties {
+		votesPerPartiesResume = append(votesPerPartiesResume, models2.PoliticalPartyEssentials{Name: key, Votes: value})
+	}
+
+	return votesPerPartiesResume
 }

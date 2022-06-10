@@ -15,6 +15,12 @@ type ClosingAct struct {
 }
 
 type ResultElection struct {
-	AmountVoted int                  `json:"amount_voted"`
-	Candidates  []CandidateEssential `json:"candidates"`
+	AmountVoted        int                        `json:"amount_voted"`
+	VotesPerCandidates []CandidateEssential       `json:"votes_per_candidates"`
+	VotesPerParties    []PoliticalPartyEssentials `json:"votes_per_parties"`
+}
+
+type PoliticalPartyEssentials struct {
+	Name  string `bson:"name"`
+	Votes int    `bson:"votes"`
 }

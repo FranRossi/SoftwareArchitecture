@@ -40,6 +40,7 @@ func storeVoters(voters []models2.VoterModel) error {
 }
 
 func storeCandidates(politicalParties []models2.PoliticalPartyModel) error {
+	setPoliticalPartiesNamesToCandidates(politicalParties)
 	candidates := politicalParties[0].Candidates
 	candidates = append(candidates, politicalParties[1].Candidates...)
 	err := repository.StoreCandidates(candidates)
@@ -47,6 +48,15 @@ func storeCandidates(politicalParties []models2.PoliticalPartyModel) error {
 		return fmt.Errorf("candidates cannot be stored: %w", err)
 	}
 	return nil
+}
+
+func setPoliticalPartiesNamesToCandidates(politicalParties []models2.PoliticalPartyModel) []models2.PoliticalPartyModel {
+	for _, politicalParty := range politicalParties {
+		for i, _ := range politicalParty.Candidates {
+			politicalParty.Candidates[i].PoliticalParty = politicalParty.Name
+		}
+	}
+	return politicalParties
 }
 
 func SetElectionDate(election models2.ElectionModel) {
