@@ -10,6 +10,23 @@ import (
 
 func main() {
 
+	multiplicarPor2 := fijarParametro(multiplicar, 2)
+	result := multiplicarPor2(34)
+	fmt.Println(result)
+
+}
+
+func fijarParametro(function func(a int, b int) int, x int) func(b int) int {
+	return func(b int) int {
+		return function(x, b)
+	}
+}
+
+func multiplicar(a int, b int) int {
+	return a * b
+}
+
+func pruebaTime() {
 	startDate := time.Now()
 	// add 10 seconds to current time
 	startDate = startDate.Add(6 * time.Second)
