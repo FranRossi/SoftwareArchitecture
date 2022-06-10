@@ -6,9 +6,9 @@ import (
 	p_f "pipes_and_filters"
 )
 
-func ValidateInitial(election models2.ElectionModel) error {
+func GetAvailableFilters() []p_f.FilterWithName {
 
-	var availableFilters = []p_f.FilterWithName{
+	availableFilters := []p_f.FilterWithName{
 		{
 			Name:     "validate_election_date",
 			Function: FilterEchoData,
@@ -39,19 +39,7 @@ func ValidateInitial(election models2.ElectionModel) error {
 			Function: FilterEchoData,
 		},
 	}
-
-	p := p_f.Pipeline{}
-
-	p.LoadFiltersFromYaml("initialValidations.yaml", availableFilters)
-
-	errors := p.Run(election)
-
-	if len(errors) > 0 {
-		// TODO add error code
-		return fmt.Errorf("election is not valid: %v", errors)
-	}
-
-	return nil
+	return availableFilters
 }
 
 func FilterEchoData(data any, params map[string]any) error {
