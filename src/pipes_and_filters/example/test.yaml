@@ -1,11 +1,11 @@
-- name: echo
-- name: age_lower
+- name: echo_data
+- name: check_age_lower
   params: 
     min_age:  18
-- name: age_upper
+- name: check_age_upper
   params:
     max_age: 60
-  # params: 
-  #   - lessThan: "30"
-  #   - moreThan: "20"
-
+- name: check_age_between
+  params:
+    min_age: 45
+    max_age: 55

@@ -10,21 +10,24 @@ import (
 
 func main() {
 
-	// Insert all the filters you may want to use:
-	availableFilters := make(map[string]l.FilterFromYaml)
-
-	FilterEcho := l.FilterFromYaml{}
-	FilterEcho.Function = FilterEchoData
-
-	FilterLowerAge := l.FilterFromYaml{}
-	FilterLowerAge.Function = FilterCheckAge
-
-	FilterUpperAge := l.FilterFromYaml{}
-	FilterUpperAge.Function = FilterCheckAgeUpper
-
-	availableFilters["echo"] = FilterEcho
-	availableFilters["age_lower"] = FilterLowerAge
-	availableFilters["age_upper"] = FilterUpperAge
+	var availableFilters = []l.FilterFunctionWithName{
+		{
+			Name:     "check_age_lower",
+			Function: FilterCheckAge,
+		},
+		{
+			Name:     "check_age_upper",
+			Function: FilterCheckAgeUpper,
+		},
+		{
+			Name:     "check_age_between",
+			Function: FilterCheckAgeBetween,
+		},
+		{
+			Name:     "echo_data",
+			Function: FilterEchoData,
+		},
+	}
 
 	fmt.Println("Test")
 
@@ -115,7 +118,7 @@ func FilterCheckAgeBetween(data any, params map[string]any) error {
 
 	println("Checking age between")
 	if input, ok := data.(int); ok {
-		if input < minAge && input > maxAge {
+		if input < minAge || input > maxAge {
 			return errors.New("Either too young or too old")
 		}
 		return nil

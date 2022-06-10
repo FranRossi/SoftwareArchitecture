@@ -11,19 +11,27 @@ type SelectedFilterFromYaml struct {
 	Params map[string]any `yaml:"params"`
 }
 
-type FilterFromYaml struct {
+type FilterFunctionWithName struct {
 	Name     string
 	Function FilterWithParams
 }
 type FilterWithParams func(data any, params map[string]any) error
 
-func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[string]FilterFromYaml) {
+func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters []FilterFunctionWithName) {
 
+	// Array to map
+	filtersMap := make(map[string]FilterWithParams)
+	for _, filter := range availableFilters {
+		filtersMap[filter.Name] = filter.Function
+	}
+
+	// Read yaml file
 	yamlFile, errReadingFile := ioutil.ReadFile(yamlPath)
 	if errReadingFile != nil {
 		panic(errReadingFile)
 	}
 
+	// Parse yaml file
 	var selectedFilters []SelectedFilterFromYaml
 	errParsingYaml := yaml.Unmarshal(yamlFile, &selectedFilters)
 
@@ -31,14 +39,18 @@ func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[str
 		panic(errParsingYaml)
 	}
 
+	// Insert filters in Pipe
 	for _, selectedFilter := range selectedFilters {
-		p.Use(insertParamters(availableFilters[selectedFilter.Name].Function, selectedFilter.Params))
+		filterName, filterExists := filtersMap[selectedFilter.Name]
+		if !filterExists {
+			panic("Filter " + selectedFilter.Name + " not found")
+		}
+		p.Use(insertParamters(filterName, selectedFilter.Params))
 	}
-
 }
 
-func insertParamters(missingParamterFilter FilterWithParams, params map[string]any) Filter {
+func insertParamters(missingParameterFilter FilterWithParams, params map[string]any) Filter{
 	return func(data any) error {
-		return missingParamterFilter(data, params)
+		return missingParameterFilter(data, params)
 	}
 }
