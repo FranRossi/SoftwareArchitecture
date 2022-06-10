@@ -25,5 +25,5 @@ func ReceiveAct() {
 }
 
 func notifyEmails(act models.InitialAct) {
-	managersElection.SendEmails(act)
+	managersElection.SendInitialEmails(act)
 }
