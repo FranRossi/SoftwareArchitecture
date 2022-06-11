@@ -5,6 +5,7 @@ import (
 	"electoral_service/service/logic"
 	"fmt"
 	"log"
+	"time"
 )
 
 const url = "http://localhost:8080/api/v1/election/uruguay/?id=1"
@@ -20,6 +21,9 @@ func NewElectionService(logic *logic.ElectionLogic) *ElectionService {
 
 func (service *ElectionService) GetElectionSettings() error {
 	election := service.adapter.GetElectionSettings()
+	// TODO fix external service and remove following lines:
+	election.StartingDate = time.Now().Add(time.Second * 30).Format(time.RFC3339)
+	election.FinishingDate = time.Now().Add(time.Minute * 1).Format(time.RFC3339)
 	err := service.electionLogic.StoreElection(election)
 	if err != nil {
 		log.Fatal(err)
