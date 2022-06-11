@@ -1,13 +1,12 @@
 package main
 
 import (
-	"voter_api/connections"
-	"voter_api/controllers"
+	"certificate_api/connections"
+	"certificate_api/repositories"
 )
 
-func main() {
-	grpcServer := connections.ConnectionGRPC()
-	jwt := connections.ConnectionJWT()
-	controllers.RegisterServicesServer(grpcServer, jwt)
-	connections.ServeGRPC(grpcServer)
+
+func main {
+	repositories.Certificates()
+	connections.Connection()
 }
