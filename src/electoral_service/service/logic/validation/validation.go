@@ -16,3 +16,14 @@ func ValidateInitial(election models.ElectionModelEssential) error {
 	}
 	return nil
 }
+
+func ValidateEndAct(act models.ClosingAct) error {
+	p := p_f.Pipeline{}
+	p.LoadFiltersFromYaml("endValidations.yaml", GetAvailableFilters())
+	errors := p.Run(act)
+	if len(errors) > 0 {
+		// TODO add error code
+		return fmt.Errorf("end final: %v", errors)
+	}
+	return nil
+}

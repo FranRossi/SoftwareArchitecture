@@ -74,7 +74,7 @@ func SetElectionDate(election *models.ElectionModelEssential) {
 }
 
 func setTimer(timerDate time.Time, action func()) {
-	timer := time.NewTimer(timerDate.Sub(time.Now()))
+	timer := time.NewTimer(time.Until(timerDate))
 	done := make(chan bool)
 	go func() {
 		<-timer.C
@@ -112,19 +112,25 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// TODO chequear las validaciones del REQ 2
+
+		act := models.ClosingAct{
+			StarDate:            startDate.Format(time.RFC3339),
+			EndDate:             endDate.Format(time.RFC3339),
+			TotalAmountOfVoters: voters,
+			Result:              resultElection,
+		}
+
+		// validationError := validation.ValidateEndAct(act)
+		// if validationError != nil {
+		// 	log.Fatal(validationError)
+		// }
+
 		fmt.Println("Election finished")
-		sendEndingAct(startDate, endDate, voters, resultElection)
+		sendEndingAct(act)
 	}
 }
 
-func sendEndingAct(startDate time.Time, endDate time.Time, voters int, resultElection models.ResultElection) {
-	act := models.ClosingAct{
-		StarDate: startDate.Format(time.RFC3339),
-		EndDate:  endDate.Format(time.RFC3339),
-		Voters:   voters,
-		Result:   resultElection,
-	}
+func sendEndingAct(act models.ClosingAct) {
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
 		log.Fatal(err)

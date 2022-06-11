@@ -124,7 +124,7 @@ func GetVotes() (models.ResultElection, error) {
 		return models.ResultElection{}, err
 	}
 	voterPerParties := getVotesPerParties(votesCandidatesResult)
-	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotesCounted, VotesPerParties: voterPerParties}
+	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountOfVotes: amountVotesCounted, VotesPerParties: voterPerParties}
 
 	return electionResult, nil
 }

@@ -8,14 +8,14 @@ type InitialAct struct {
 }
 
 type ClosingAct struct {
-	StarDate string         `json:"startDate"`
-	EndDate  string         `json:"endDate"`
-	Voters   int            `json:"voters"`
-	Result   ResultElection `json:"result"`
+	StarDate            string         `json:"startDate"`
+	EndDate             string         `json:"endDate"`
+	TotalAmountOfVoters int            `json:"voters"`
+	Result              ResultElection `json:"result"`
 }
 
 type ResultElection struct {
-	AmountVoted        int                        `json:"amount_voted"`
+	AmountOfVotes      int                        `json:"amount_voted"`
 	VotesPerCandidates []CandidateEssential       `json:"votes_per_candidates"`
 	VotesPerParties    []PoliticalPartyEssentials `json:"votes_per_parties"`
 }

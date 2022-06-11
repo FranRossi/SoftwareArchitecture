@@ -2,6 +2,7 @@ package uruguay_election
 
 import (
 	"external_electoral_api/uruguay_election/models"
+
 	"github.com/bxcodec/faker/v3"
 
 	"math/rand"
@@ -29,7 +30,7 @@ func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, erro
 
 func customGenerateDates(election *models.ElectionModel) {
 	election.StartingDate = time.Now().Add(time.Minute * 1).Format(time.RFC3339)
-	election.FinishingDate = time.Now().Add(time.Minute * 3).Format(time.RFC3339)
+	election.FinishingDate = time.Now().Add(time.Minute * 2).Format(time.RFC3339)
 	//election.FinishingDate = time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
 }
 
@@ -73,12 +74,12 @@ func customGeneratorPoliticalParties(candidates [][]models.CandidateModel) {
 		politicalParties := make([]models.PoliticalPartyModel, 0, 4)
 		partidoNacional := models.PoliticalPartyModel{
 			Id:         "1",
-			Name:       "Partido Nacional",
+			Name:       "Partido Gaviota",
 			Candidates: candidates[0],
 		}
 		partidoColorado := models.PoliticalPartyModel{
 			Id:         "2",
-			Name:       "Partido Colorado",
+			Name:       "Partido Orangutan",
 			Candidates: candidates[1],
 		}
 		politicalParties = append(politicalParties, partidoNacional, partidoColorado)

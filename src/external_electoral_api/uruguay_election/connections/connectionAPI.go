@@ -1,10 +1,14 @@
 package connections
 
 import (
+	"bufio"
 	"external_electoral_api/uruguay_election/connections/configs"
 	"external_electoral_api/uruguay_election/connections/routes"
 	"external_electoral_api/uruguay_election/controllers"
 	"external_electoral_api/uruguay_election/repositories"
+	"fmt"
+	"os"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -34,4 +38,8 @@ func Connection() {
 
 	// Aqui inicializamos el servidor en el puerto 8080
 	app.Listen(":8080")
+
+	fmt.Print("Press Enter to exit")
+	input := bufio.NewScanner(os.Stdin)
+	input.Scan()
 }
