@@ -59,7 +59,7 @@ func storeCandidates(politicalParties []models.PoliticalPartyModel) error {
 
 func setPoliticalPartiesNamesToCandidates(politicalParties []models.PoliticalPartyModel) []models.PoliticalPartyModel {
 	for _, politicalParty := range politicalParties {
-		for i, _ := range politicalParty.Candidates {
+		for i := range politicalParty.Candidates {
 			politicalParty.Candidates[i].NamePoliticalParty = politicalParty.Name
 		}
 	}

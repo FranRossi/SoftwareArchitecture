@@ -5,9 +5,10 @@ import (
 	"electoral_service/connections"
 	"electoral_service/models"
 	"fmt"
+	"log"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 type ElectionRepo struct {

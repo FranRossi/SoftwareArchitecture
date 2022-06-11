@@ -58,7 +58,7 @@ func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.Elect
 }
 
 func convertVoters(voters []models2.VoterModel) []modelsGeneric.VoterModel {
-	votersGeneric := make([]modelsGeneric.VoterModel, len(voters))
+	var votersGeneric []modelsGeneric.VoterModel
 	for _, voter := range voters {
 		voterGeneric := modelsGeneric.VoterModel{
 			Id:          voter.Id,
@@ -76,12 +76,12 @@ func convertVoters(voters []models2.VoterModel) []modelsGeneric.VoterModel {
 }
 
 func convertPoliticalParties(politicalParties []models2.PoliticalPartyModel) []modelsGeneric.PoliticalPartyModel {
-	politicalPartiesGeneric := make([]modelsGeneric.PoliticalPartyModel, len(politicalParties))
+	var politicalPartiesGeneric []modelsGeneric.PoliticalPartyModel
 	for _, politicalParty := range politicalParties {
 		politicalPartyGeneric := modelsGeneric.PoliticalPartyModel{
 			Id:          politicalParty.Id,
 			Name:        politicalParty.Name,
-			Candidates:  convertCandidates(politicalParty.Candidates),
+			Candidates:  convertCandidates(politicalParty.Candidates, politicalParty.Name),
 			OtherFields: map[string]any{},
 		}
 		politicalPartiesGeneric = append(politicalPartiesGeneric, politicalPartyGeneric)
@@ -89,8 +89,8 @@ func convertPoliticalParties(politicalParties []models2.PoliticalPartyModel) []m
 	return politicalPartiesGeneric
 }
 
-func convertCandidates(candidates []models2.CandidateModel) []modelsGeneric.CandidateModel {
-	candidatesGeneric := make([]modelsGeneric.CandidateModel, len(candidates))
+func convertCandidates(candidates []models2.CandidateModel, politicalParty string) []modelsGeneric.CandidateModel {
+	var candidatesGeneric []modelsGeneric.CandidateModel
 	for _, candidate := range candidates {
 		candidateGeneric := modelsGeneric.CandidateModel{
 			Id:                 candidate.Id,
@@ -98,7 +98,7 @@ func convertCandidates(candidates []models2.CandidateModel) []modelsGeneric.Cand
 			Sex:                candidate.Sex,
 			BirthDate:          candidate.BirthDate,
 			IdPoliticalParty:   candidate.IdPoliticalParty,
-			NamePoliticalParty: candidate.PoliticalParty,
+			NamePoliticalParty: politicalParty,
 			OtherFields:        map[string]any{"lastname": candidate.LastName},
 		}
 		candidatesGeneric = append(candidatesGeneric, candidateGeneric)
