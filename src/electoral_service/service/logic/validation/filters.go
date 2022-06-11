@@ -7,29 +7,14 @@ import (
 	"time"
 )
 
-func GetAvailableFilters() []p_f.FilterWithName {
+func GetAvailableFilters() map[string]p_f.FilterWithParams {
 
-	availableFilters := []p_f.FilterWithName{
-		{
-			Name:     "validate_election_date",
-			Function: FilterValidateDate,
-		},
-		{
-			Name:     "validate_party_list",
-			Function: FilterValidatePoliticalPartyList,
-		},
-		{
-			Name:     "validate_voter_candidate_list",
-			Function: FilterValidateCandidateList,
-		},
-		{
-			Name:     "validate_unique_party_per_candidate",
-			Function: FilterValidateUniquePartyPerCandidate,
-		},
-		{
-			Name:     "validate_election_mode",
-			Function: FilterElectionMode,
-		},
+	availableFilters := map[string]p_f.FilterWithParams{
+		"validate_election_date":              FilterValidateDate,
+		"validate_party_list":                 FilterValidatePoliticalPartyList,
+		"validate_voter_candidate_list":       FilterValidateCandidateList,
+		"validate_unique_party_per_candidate": FilterValidateUniquePartyPerCandidate,
+		"validate_election_mode":              FilterElectionMode,
 	}
 	return availableFilters
 }

@@ -10,23 +10,11 @@ import (
 
 func main() {
 
-	var availableFilters = []l.FilterWithName{
-		{
-			Name:     "check_age_lower",
-			Function: FilterCheckAge,
-		},
-		{
-			Name:     "check_age_upper",
-			Function: FilterCheckAgeUpper,
-		},
-		{
-			Name:     "check_age_between",
-			Function: FilterCheckAgeBetween,
-		},
-		{
-			Name:     "echo_data",
-			Function: FilterEchoData,
-		},
+	var availableFilters = map[string]l.FilterWithParams{
+		"check_age_lower":   FilterCheckAge,
+		"check_age_upper":   FilterCheckAgeUpper,
+		"check_age_between": FilterCheckAgeBetween,
+		"echo_data":         FilterEchoData,
 	}
 
 	fmt.Println("Test")
