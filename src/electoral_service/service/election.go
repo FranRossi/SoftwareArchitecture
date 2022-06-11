@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const url = "http://localhost:8080/api/v1/election/uruguay/?id=1"
+const url = "http://localhost:8080/api/v1/election/uruguay/?id=1" // TODO poner en un .env?
 
 type ElectionService struct {
 	adapter       *controller.ElectionController // TODO change to interface, and use dependency injection, to inject the adapter
