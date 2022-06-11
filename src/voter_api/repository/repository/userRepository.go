@@ -49,7 +49,24 @@ func FindVoter(idVoter string) (*domain.User, error) {
 		////Role:           result["role"].(string),
 		//HashedPassword: result["password"].(string),
 	}
-	return user, err2
+	return user, nil
+}
+
+func FindCandidate(idCandidate string) (string, error) {
+	client := connections.GetInstanceMongoClient()
+	votesDatabase := client.Database("uruguay_votes")
+	uruguayCollection := votesDatabase.Collection("votes")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idCandidate}}).Decode(&result)
+	if err2 != nil {
+		fmt.Println(err2.Error())
+		fmt.Println("there is no candidate with such id")
+		if err2 == mongo.ErrNoDocuments {
+			return "", err2
+		}
+		log.Fatal(err2)
+	}
+	return result["id"].(string), nil
 }
 
 func RegisterVote(idVoter string) error {

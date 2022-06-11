@@ -1,0 +1,5 @@
+- name: validate_voter
+- name: validate_circuit
+- name: validate_vote_unique_candidate
+- name: validate_candidate
+- name: validate_vote_mode
