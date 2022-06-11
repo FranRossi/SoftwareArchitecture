@@ -1,0 +1,40 @@
+# version: '3.9'
+
+# services:
+#   mongodb:
+#     image: mongo:5.0
+#     ports:
+#       - 27017:27017
+#     volumes:
+#       - ~/apps/mongo:/data/db
+#     environment:
+#       - MONGO_INITDB_ROOT_USERNAME=citizix
+#       - MONGO_INITDB_ROOT_PASSWORD=S3cret
+
+# docker-compose up --build
+# Para correrlo como proceso de fondo es: docker-compose up --build -d
+
+version: "3.7"
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:5.0
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - "./dockercompose/mongo/:/data/db"
+    ports:
+      - "27017:27017"
+    networks:
+      - sa-network
+  # redis:
+  #   container_name: redis
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - sa-network
+networks:
+  sa-network:
+    name: sa-network
