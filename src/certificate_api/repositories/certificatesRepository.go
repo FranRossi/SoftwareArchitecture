@@ -8,8 +8,3 @@ import (
 type CertificatesRepo struct {
 	certificatesList models.CertificateModel
 }
-
-type CertificateRequestsRepo struct {
-	requestsList models.CertificateRequestsModel
-}
-

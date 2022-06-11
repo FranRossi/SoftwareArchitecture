@@ -17,7 +17,7 @@ func Connection() {
 
 	// Creo una instancia de mis controladores con mi instancia de repo
 	controller := controllers.CertificatesController(repo)
-	controller2 := controllers.CertificatesRequestController(repo2)
+	controller2 := controllers.CertificateRequestsController(repo2)
 
 	// Routes.
 	// Aqui defino cuales van a ser las rutas accesibles
