@@ -21,7 +21,7 @@ func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
 
 func (logicElection *ElectionLogic) StoreElection(election *models.ElectionModelEssential) error {
 
-	validationError := validation.ValidateInitial(election)
+	validationError := validation.ValidateInitial(*election)
 	if validationError != nil {
 		return validationError
 	}
@@ -133,6 +133,6 @@ func sendEndingAct(startDate time.Time, endDate time.Time, voters int, resultEle
 	connections.ConnectionRabbit(jsonAct, queue)
 }
 
-func DropDataBases() {
+func (logicElection *ElectionLogic) DropDataBases() {
 	repository.DropDataBases()
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	controller := dependencyinjection.Injection()
-	controller.DropDataBases()
-	controller.GetElectionSettings()
+	electoral_service := dependencyinjection.Injection()
+	electoral_service.DropDataBases()
+	electoral_service.GetElectionSettings()
 }

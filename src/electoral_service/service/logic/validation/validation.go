@@ -6,7 +6,7 @@ import (
 	p_f "pipes_and_filters"
 )
 
-func ValidateInitial(election *models.ElectionModelEssential) error {
+func ValidateInitial(election models.ElectionModelEssential) error {
 	p := p_f.Pipeline{}
 	p.LoadFiltersFromYaml("initialValidations.yaml", GetAvailableFilters())
 	errors := p.Run(election)

@@ -1,7 +1,7 @@
 package validation
 
 import (
-	models2 "electoral_service/adapter/uruguayan_election/models"
+	"electoral_service/models"
 	"fmt"
 	p_f "pipes_and_filters"
 	"time"
@@ -35,7 +35,7 @@ func GetAvailableFilters() []p_f.FilterWithName {
 }
 
 func FilterValidatePoliticalPartyList(data any, params map[string]any) error {
-	election := data.(models2.ElectionModel)
+	election := data.(models.ElectionModelEssential)
 	if len(election.PoliticalParties) == 0 {
 		return fmt.Errorf("politicalPartyList is nil")
 	}
@@ -43,7 +43,7 @@ func FilterValidatePoliticalPartyList(data any, params map[string]any) error {
 }
 
 func FilterValidateCandidateList(data any, params map[string]any) error {
-	election := data.(models2.ElectionModel)
+	election := data.(models.ElectionModelEssential)
 	for _, party := range election.PoliticalParties {
 		if len(party.Candidates) == 0 {
 			return fmt.Errorf("candidateList is nil")
@@ -56,7 +56,7 @@ func FilterValidateCandidateList(data any, params map[string]any) error {
 }
 
 func FilterValidateUniquePartyPerCandidate(data any, params map[string]any) error {
-	election := data.(models2.ElectionModel)
+	election := data.(models.ElectionModelEssential)
 	candidatesToCheck := make(map[string]bool)
 	for _, party := range election.PoliticalParties {
 		for _, candidate := range party.Candidates {
@@ -71,7 +71,7 @@ func FilterValidateUniquePartyPerCandidate(data any, params map[string]any) erro
 }
 
 func FilterValidateDate(data any, params map[string]any) error {
-	election := data.(models2.ElectionModel)
+	election := data.(models.ElectionModelEssential)
 	StartingDate, _ := time.Parse(time.RFC3339, election.StartingDate)
 	EndDate, _ := time.Parse(time.RFC3339, election.FinishingDate)
 
@@ -82,7 +82,7 @@ func FilterValidateDate(data any, params map[string]any) error {
 }
 
 func FilterElectionMode(data any, params map[string]any) error {
-	election := data.(models2.ElectionModel)
+	election := data.(models.ElectionModelEssential)
 	if election.ElectionMode != "unico" && election.ElectionMode != "multi" {
 		return fmt.Errorf("election mode is not valid")
 	}

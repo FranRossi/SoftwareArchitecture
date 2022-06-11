@@ -45,10 +45,6 @@ func (controller *ElectionController) GetElectionSettings() *modelsGeneric.Elect
 	return nil
 }
 
-func (controller *ElectionController) DropDataBases() {
-	logic.DropDataBases()
-}
-
 func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.ElectionModelEssential {
 	electionGeneric := &modelsGeneric.ElectionModelEssential{
 		Id:               election.Id,
