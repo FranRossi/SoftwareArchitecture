@@ -12,3 +12,4 @@ type CertificatesRepo struct {
 type CertificateRequestsRepo struct {
 	requestsList models.CertificateRequestsModel
 }
+
