@@ -3,6 +3,7 @@ package validation
 import (
 	"fmt"
 	p_f "pipes_and_filters"
+	"time"
 	domain "voter_api/domain/vote"
 	"voter_api/logic"
 )
@@ -15,6 +16,7 @@ func GetAvailableFilters() map[string]p_f.FilterWithParams {
 		"validate_vote_unique_candidate": FilterValidateUniqueCandidate,
 		"validate_candidate":             FilterValidateCandidate,
 		"validate_vote_mode":             FilterVoteMode,
+		"validate_voting_time":           FilterValidateVotingTime,
 	}
 	return availableFilters
 }
@@ -58,9 +60,38 @@ func FilterValidateCandidate(data any, params map[string]any) error {
 }
 
 func FilterVoteMode(data any, params map[string]any) error {
-	//vote := data.(domain.VoteModel)
-	//if vote. != "vote" && vote.Mode != "unvote" {
-	//	return fmt.Errorf("vote mode is not valid: %v", vote.Mode)
-	//}
+	vote := data.(domain.VoteModel)
+	modeExpected := "unico"
+	mode, err := logic.FindElectionMode(vote.IdElection)
+	if err == nil && mode == modeExpected {
+		howManyVotesHasAVoter := logic.HowManyVotesHasAVoter(vote.IdVoter)
+		if howManyVotesHasAVoter > 0 {
+			return fmt.Errorf("voter has already voted: %v")
+		}
+	}
+	if err != nil {
+		return fmt.Errorf("election mode is not valid: %v", err)
+	}
+	return nil
+}
+
+func FilterValidateVotingTime(data any, params map[string]any) error {
+	vote := data.(domain.VoteModel)
+	startingDate, closingDate, err := logic.FindElectionTime(vote.IdElection)
+	if err != nil {
+		return fmt.Errorf("election does not exist: %v", err)
+	}
+	startingDateAsDate, err := time.Parse(time.RFC3339, startingDate)
+	closingDateAsDate, err := time.Parse(time.RFC3339, closingDate)
+	if err != nil {
+		return fmt.Errorf("election date are misconfigured: %v", err)
+	}
+	now := time.Now()
+	if now.Before(startingDateAsDate) {
+		return fmt.Errorf("voting is not yet started: %v", err)
+	}
+	if now.After(closingDateAsDate) {
+		return fmt.Errorf("voting is over: %v", err)
+	}
 	return nil
 }

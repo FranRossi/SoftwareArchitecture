@@ -66,27 +66,18 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 		Circuit:     req.GetCircuit(),
 		IdCandidate: req.GetIdCandidate(),
 	}
-	username, err := checkVote(req)
-	if err != nil {
-		return nil, err
-	}
-	err = logic.StoreVote(voteModel)
+	err := logic.StoreVote(voteModel)
 	if err != nil {
 		return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote: %v", err)
 	}
-
-	message := username + " voted correctly"
+	message := "voted correctly"
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
-
-	// rabbitmq test
-	//api_voter.sendCertificate(idVoter)
-	//api_voter.PrintCertificate()
 }
 
 func checkVote(req *pb.VoteRequest) (string, error) {
 	user, err := logic.FindVoter(req.GetIdVoter())
 	if err != nil {
-		return nil, "", status.Errorf(codes.Internal, "cannot find user: %v", err)
+		return "", status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
 	return user.Name + user.LastName, nil

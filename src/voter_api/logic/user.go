@@ -7,24 +7,6 @@ import (
 	"voter_api/repository/repository"
 )
 
-func FindVoter(idVoter string) (*domain.User, error) {
-	user, err := repository.FindVoter(idVoter)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	return user, err
-}
-
-func FindCandidate(idVoter string) (string, error) {
-	candidate, err := repository.FindCandidate(idVoter)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-	return candidate, err
-}
-
 func RegisterUser(id string, username string, password string, role string) (*domain.User, error) {
 	user, err := createUser(id, username, password, role)
 	if err != nil {

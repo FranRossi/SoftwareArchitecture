@@ -69,31 +69,52 @@ func FindCandidate(idCandidate string) (string, error) {
 	return result["id"].(string), nil
 }
 
-func RegisterVote(idVoter string) error {
+func FindElectionMode(idElection string) (string, error) {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database("uruguay_election")
-	uruguayCollection := uruguayDataBase.Collection("voters")
-	filter := bson.D{{"id", idVoter}}
-	update := bson.D{{"$inc", bson.D{{"voted", 1}}}}
-	_, err2 := uruguayCollection.UpdateOne(context.TODO(), filter, update)
+	electionDatabase := client.Database("uruguay_election")
+	uruguayCollection := electionDatabase.Collection("configuration_election")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idElection}}).Decode(&result)
 	if err2 != nil {
-		fmt.Println("error registering new vote for candidate")
+		fmt.Println(err2.Error())
+		fmt.Println("wrong election mode")
 		if err2 == mongo.ErrNoDocuments {
-			return nil
+			return "", err2
 		}
 		log.Fatal(err2)
 	}
+	return result["electionMode"].(string), nil
+}
 
-	uruguayCollection = uruguayDataBase.Collection("total_votes")
-	filter = bson.D{{"id", 1}}
-	update = bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
-	_, err2 = uruguayCollection.UpdateOne(context.TODO(), filter, update)
+func FindElectionTime(idElection string) (string, string, error) {
+	client := connections.GetInstanceMongoClient()
+	electionDatabase := client.Database("uruguay_election")
+	uruguayCollection := electionDatabase.Collection("configuration_election")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idElection}}).Decode(&result)
 	if err2 != nil {
-		fmt.Println("error registering new vote for candidate")
+		fmt.Println(err2.Error())
+		fmt.Println("wrong election mode")
 		if err2 == mongo.ErrNoDocuments {
-			return nil
+			return "", "", err2
 		}
 		log.Fatal(err2)
 	}
-	return nil
+	return result["startTime"].(string), result["endTime"].(string), nil
+}
+
+func HowManyVotesHasAVoter(idVoter string) int {
+	client := connections.GetInstanceMongoClient()
+	votesDatabase := client.Database("uruguay_election")
+	uruguayCollection := votesDatabase.Collection("voters")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
+	if err2 != nil {
+		fmt.Println(err2.Error())
+		fmt.Println("there is no voter habilitated to vote with that id")
+		if err2 == mongo.ErrNoDocuments {
+			return 0
+		}
+	}
+	return int(result["votes"].(int32))
 }
