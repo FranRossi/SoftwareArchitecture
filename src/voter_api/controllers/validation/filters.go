@@ -5,7 +5,7 @@ import (
 	p_f "pipes_and_filters"
 	"time"
 	domain "voter_api/domain/vote"
-	"voter_api/logic"
+	"voter_api/repository/repository"
 )
 
 func GetAvailableFilters() map[string]p_f.FilterWithParams {
@@ -23,7 +23,7 @@ func GetAvailableFilters() map[string]p_f.FilterWithParams {
 
 func FilterValidateVoter(data any, params map[string]any) error {
 	voter := data.(domain.VoteModel)
-	_, err := logic.FindVoter(voter.IdVoter)
+	_, err := repository.FindVoter(voter.IdVoter)
 	if err != nil {
 		return fmt.Errorf("voter is not valid: %v", err)
 	}
@@ -31,14 +31,14 @@ func FilterValidateVoter(data any, params map[string]any) error {
 }
 
 func FilterValidateCircuit(data any, params map[string]any) error {
-	vote := data.(domain.VoteModel)
-	usr, err := logic.FindVoter(vote.IdVoter)
-	if err != nil {
-		return fmt.Errorf("voter is not valid: %v", err)
-	}
-	if usr.IdCircuit != vote.Circuit {
-		return fmt.Errorf("voter is not voting on the rigth circuit: %v", err)
-	}
+	//vote := data.(domain.VoteModel)
+	//usr, err := repository.FindVoter(vote.IdVoter)
+	//if err != nil {
+	//	return fmt.Errorf("voter is not valid: %v", err)
+	//}
+	//if usr.OtherFields["circuit"].(string) != vote.Circuit {
+	//	return fmt.Errorf("voter is not voting on the rigth circuit: %v", err)
+	//}
 	return nil
 }
 
@@ -52,7 +52,7 @@ func FilterValidateUniqueCandidate(data any, params map[string]any) error {
 
 func FilterValidateCandidate(data any, params map[string]any) error {
 	vote := data.(domain.VoteModel)
-	_, err := logic.FindCandidate(vote.IdCandidate)
+	_, err := repository.FindCandidate(vote.IdCandidate)
 	if err != nil {
 		return fmt.Errorf("candidate is not valid: %v", err)
 	}
@@ -62,9 +62,9 @@ func FilterValidateCandidate(data any, params map[string]any) error {
 func FilterVoteMode(data any, params map[string]any) error {
 	vote := data.(domain.VoteModel)
 	modeExpected := "unico"
-	mode, err := logic.FindElectionMode(vote.IdElection)
+	mode, err := repository.FindElectionMode(vote.IdElection)
 	if err == nil && mode == modeExpected {
-		howManyVotesHasAVoter := logic.HowManyVotesHasAVoter(vote.IdVoter)
+		howManyVotesHasAVoter := repository.HowManyVotesHasAVoter(vote.IdVoter)
 		if howManyVotesHasAVoter > 0 {
 			return fmt.Errorf("voter has already voted: %v")
 		}
@@ -77,7 +77,7 @@ func FilterVoteMode(data any, params map[string]any) error {
 
 func FilterValidateVotingTime(data any, params map[string]any) error {
 	vote := data.(domain.VoteModel)
-	startingDate, closingDate, err := logic.FindElectionTime(vote.IdElection)
+	startingDate, closingDate, err := repository.FindElectionTime(vote.IdElection)
 	if err != nil {
 		return fmt.Errorf("election does not exist: %v", err)
 	}
@@ -88,10 +88,10 @@ func FilterValidateVotingTime(data any, params map[string]any) error {
 	}
 	now := time.Now()
 	if now.Before(startingDateAsDate) {
-		return fmt.Errorf("voting is not yet started: %v", err)
+		return fmt.Errorf("election has not yet started: %v", err)
 	}
 	if now.After(closingDateAsDate) {
-		return fmt.Errorf("voting is over: %v", err)
+		return fmt.Errorf("election is over: %v", err)
 	}
 	return nil
 }

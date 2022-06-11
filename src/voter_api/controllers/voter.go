@@ -73,12 +73,3 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 	message := "voted correctly"
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
 }
-
-func checkVote(req *pb.VoteRequest) (string, error) {
-	user, err := logic.FindVoter(req.GetIdVoter())
-	if err != nil {
-		return "", status.Errorf(codes.Internal, "cannot find user: %v", err)
-	}
-
-	return user.Name + user.LastName, nil
-}

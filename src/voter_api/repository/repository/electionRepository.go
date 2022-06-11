@@ -2,31 +2,31 @@ package repository
 
 import (
 	"context"
+	m "electoral_service/models"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"voter_api/connections"
-	domain "voter_api/domain/user"
 )
 
-func RegisterUser(user *domain.User) error {
-	//client := connections.GetInstanceMongoClient()
-	//usersDatabase := client.Database("users")
-	//uruguayVotersCollection := usersDatabase.Collection("uruguayVoters")
-	//_, err2 := uruguayVotersCollection.InsertOne(context.TODO(), bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword, "role": user.Role})
-	//if err2 != nil {
-	//	fmt.Println("error creating user")
-	//	if err2 == mongo.ErrNoDocuments {
-	//		return nil
-	//	}
-	//	log.Fatal(err2)
-	//}
-	//return err2
-	return nil
-}
+//func RegisterUser(user *domain.User) error {
+//	client := connections.GetInstanceMongoClient()
+//	usersDatabase := client.Database("users")
+//	uruguayVotersCollection := usersDatabase.Collection("uruguayVoters")
+//	_, err2 := uruguayVotersCollection.InsertOne(context.TODO(), bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword, "role": user.Role})
+//	if err2 != nil {
+//		fmt.Println("error creating user")
+//		if err2 == mongo.ErrNoDocuments {
+//			return nil
+//		}
+//		log.Fatal(err2)
+//	}
+//	return err2
+//	return nil
+//}
 
-func FindVoter(idVoter string) (*domain.User, error) {
+func FindVoter(idVoter string) (*m.VoterModel, error) {
 	client := connections.GetInstanceMongoClient()
 	votesDatabase := client.Database("uruguay_election")
 	uruguayCollection := votesDatabase.Collection("voters")
@@ -40,12 +40,16 @@ func FindVoter(idVoter string) (*domain.User, error) {
 		}
 		log.Fatal(err2)
 	}
-	user := &domain.User{
+	user := &m.VoterModel{
 		Id:        result["id"].(string),
-		IdCircuit: result["idCircuit"].(string),
-		Name:      result["name"].(string),
-		LastName:  result["lastName"].(string),
+		FullName:  result["name"].(string),
+		Sex:       result["sex"].(string),
+		BirthDate: result["birthDate"].(string),
+		Phone:     result["phone"].(string),
+		Email:     result["email"].(string),
 		Voted:     int(result["voted"].(int32)),
+		//OtherFields: result["otherFields"],
+
 		////Role:           result["role"].(string),
 		//HashedPassword: result["password"].(string),
 	}
@@ -100,7 +104,7 @@ func FindElectionTime(idElection string) (string, string, error) {
 		}
 		log.Fatal(err2)
 	}
-	return result["startTime"].(string), result["endTime"].(string), nil
+	return result["startingDate"].(string), result["finishingDate"].(string), nil
 }
 
 func HowManyVotesHasAVoter(idVoter string) int {
@@ -116,5 +120,5 @@ func HowManyVotesHasAVoter(idVoter string) int {
 			return 0
 		}
 	}
-	return int(result["votes"].(int32))
+	return int(result["voted"].(int32))
 }

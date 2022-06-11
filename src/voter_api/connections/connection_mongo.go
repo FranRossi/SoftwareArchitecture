@@ -46,12 +46,7 @@ func GetInstanceMongoClient() *mongo.Client {
 		if mongoClientInstance == nil {
 			fmt.Println("Creating mongo client instance now.")
 			mongoClientInstance = connectionMongo()
-		} else {
-			fmt.Println("mongo client instance already created.")
 		}
-	} else {
-		fmt.Println("mongo client instance already created.")
 	}
-
 	return mongoClientInstance
 }
