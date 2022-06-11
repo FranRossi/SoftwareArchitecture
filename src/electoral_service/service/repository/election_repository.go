@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	models2 "electoral_service/adapter/uruguayan_election/models"
 	"electoral_service/connections"
+	"electoral_service/models"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,11 +21,11 @@ func DropDataBases() {
 	uruguayDataBase.Drop(context.TODO())
 }
 
-func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionModel) error {
+func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionModelEssential) error {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_election")
 	uruguayanElectionCollection := uruguayDataBase.Collection("configuration_election")
-	_, err := uruguayanElectionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "description": election.Description, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode})
+	_, err := uruguayanElectionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode, "otherField": election.OtherFields})
 	if err != nil {
 		fmt.Println("error storing election configuration")
 		if err == mongo.ErrNoDocuments {
@@ -36,7 +36,7 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election models2.ElectionMo
 	return err
 }
 
-func StoreElectionVoters(voters []models2.VoterModel) error {
+func StoreElectionVoters(voters []models.VoterModel) error {
 	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_election")
@@ -52,7 +52,7 @@ func StoreElectionVoters(voters []models2.VoterModel) error {
 	return err
 }
 
-func convertVotersModelToInterface(voters []models2.VoterModel) []interface{} {
+func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {
 	var votersInterface []interface{}
 
 	for _, v := range voters {
@@ -61,7 +61,7 @@ func convertVotersModelToInterface(voters []models2.VoterModel) []interface{} {
 	return votersInterface
 }
 
-func StoreCandidates(candidates []models2.CandidateModel) error {
+func StoreCandidates(candidates []models.CandidateModel) error {
 	client := connections.GetInstanceMongoClient()
 	candidatesToStore := convertCandidateModelToInterface(candidates)
 	uruguayDataBase := client.Database("uruguay_votes")
@@ -90,10 +90,10 @@ func StoreCandidates(candidates []models2.CandidateModel) error {
 	return nil
 }
 
-func convertCandidateModelToInterface(candidates []models2.CandidateModel) []interface{} {
-	var candidatesResume []models2.CandidateEssential
+func convertCandidateModelToInterface(candidates []models.CandidateModel) []interface{} {
+	var candidatesResume []models.CandidateEssential
 	for _, v := range candidates {
-		candidatesResume = append(candidatesResume, models2.CandidateEssential{Id: v.Id, Name: v.Name, Votes: 0, PoliticalParty: v.PoliticalParty})
+		candidatesResume = append(candidatesResume, models.CandidateEssential{Id: v.Id, Name: v.FullName, Votes: 0, PoliticalParty: v.NamePoliticalParty})
 	}
 
 	var candidatesInterface []interface{}
@@ -103,7 +103,7 @@ func convertCandidateModelToInterface(candidates []models2.CandidateModel) []int
 	return candidatesInterface
 }
 
-func GetVotes() (models2.ResultElection, error) {
+func GetVotes() (models.ResultElection, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("total_votes")
@@ -113,22 +113,22 @@ func GetVotes() (models2.ResultElection, error) {
 	if err != nil {
 		fmt.Println("error getting amount of votes")
 		if err == mongo.ErrNoDocuments {
-			return models2.ResultElection{}, nil
+			return models.ResultElection{}, nil
 		}
 		log.Fatal(err)
 	}
 	amountVotesCounted := int(amountVotes["votes_counted"].(int32))
 	votesCandidatesResult, err := getEachCandidatesVotes()
 	if err != nil {
-		return models2.ResultElection{}, err
+		return models.ResultElection{}, err
 	}
 	voterPerParties := getVotesPerParties(votesCandidatesResult)
-	electionResult := models2.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotesCounted, VotesPerParties: voterPerParties}
+	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotesCounted, VotesPerParties: voterPerParties}
 
 	return electionResult, nil
 }
 
-func getEachCandidatesVotes() ([]models2.CandidateEssential, error) {
+func getEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("votes")
@@ -144,9 +144,9 @@ func getEachCandidatesVotes() ([]models2.CandidateEssential, error) {
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		log.Fatal(err)
 	}
-	votesCandidates := make([]models2.CandidateEssential, len(results))
+	votesCandidates := make([]models.CandidateEssential, len(results))
 	for _, result := range results {
-		candidate := &models2.CandidateEssential{
+		candidate := &models.CandidateEssential{
 			Votes:          int(result["votes"].(int32)),
 			Name:           result["name"].(string),
 			Id:             result["id"].(string),
@@ -157,14 +157,14 @@ func getEachCandidatesVotes() ([]models2.CandidateEssential, error) {
 	return votesCandidates, nil
 }
 
-func getVotesPerParties(votesCandidates []models2.CandidateEssential) []models2.PoliticalPartyEssentials {
+func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.PoliticalPartyEssentials {
 	votesPerParties := make(map[string]int, len(votesCandidates))
 	for _, candidate := range votesCandidates {
 		votesPerParties[candidate.PoliticalParty] += candidate.Votes
 	}
-	var votesPerPartiesResume []models2.PoliticalPartyEssentials
+	var votesPerPartiesResume []models.PoliticalPartyEssentials
 	for key, value := range votesPerParties {
-		votesPerPartiesResume = append(votesPerPartiesResume, models2.PoliticalPartyEssentials{Name: key, Votes: value})
+		votesPerPartiesResume = append(votesPerPartiesResume, models.PoliticalPartyEssentials{Name: key, Votes: value})
 	}
 
 	return votesPerPartiesResume

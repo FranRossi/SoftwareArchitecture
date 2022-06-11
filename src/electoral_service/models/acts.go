@@ -10,8 +10,8 @@ type InitialAct struct {
 type ClosingAct struct {
 	StarDate string         `json:"startDate"`
 	EndDate  string         `json:"endDate"`
-	Voters int            `json:"voters"`
-	Result ResultElection `json:"result"`
+	Voters   int            `json:"voters"`
+	Result   ResultElection `json:"result"`
 }
 
 type ResultElection struct {
@@ -23,4 +23,11 @@ type ResultElection struct {
 type PoliticalPartyEssentials struct {
 	Name  string `bson:"name"`
 	Votes int    `bson:"votes"`
+}
+
+type CandidateEssential struct {
+	Id             string `bson:"id"`
+	Name           string `bson:"name"`
+	Votes          int    `bson:"votes"`
+	PoliticalParty string `bson:"politicalParty"`
 }

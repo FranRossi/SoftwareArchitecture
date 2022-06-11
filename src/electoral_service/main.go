@@ -1,6 +1,8 @@
 package main
 
-import dependencyinjection "electoral_service/adapter/uruguayan_election/dependencies_injection"
+import (
+	dependencyinjection "electoral_service/service/dependencies_injection"
+)
 
 func main() {
 	controller := dependencyinjection.Injection()

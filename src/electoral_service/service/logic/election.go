@@ -1,10 +1,10 @@
 package logic
 
 import (
-	"electoral_service/adapter/uruguayan_election/logic/validation"
-	models2 "electoral_service/adapter/uruguayan_election/models"
-	"electoral_service/adapter/uruguayan_election/repository"
 	"electoral_service/connections"
+	"electoral_service/models"
+	"electoral_service/service/logic/validation"
+	"electoral_service/service/repository"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -19,7 +19,7 @@ func NewLogicElection(repo *repository.ElectionRepo) *ElectionLogic {
 	return &ElectionLogic{repo: repo}
 }
 
-func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel) error {
+func (logicElection *ElectionLogic) StoreElection(election *models.ElectionModelEssential) error {
 
 	validationError := validation.ValidateInitial(election)
 	if validationError != nil {
@@ -38,7 +38,7 @@ func (logicElection *ElectionLogic) StoreElection(election models2.ElectionModel
 	return nil
 }
 
-func storeVoters(voters []models2.VoterModel) error {
+func storeVoters(voters []models.VoterModel) error {
 	err := repository.StoreElectionVoters(voters)
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
@@ -46,7 +46,7 @@ func storeVoters(voters []models2.VoterModel) error {
 	return nil
 }
 
-func storeCandidates(politicalParties []models2.PoliticalPartyModel) error {
+func storeCandidates(politicalParties []models.PoliticalPartyModel) error {
 	setPoliticalPartiesNamesToCandidates(politicalParties)
 	candidates := politicalParties[0].Candidates
 	candidates = append(candidates, politicalParties[1].Candidates...)
@@ -57,16 +57,16 @@ func storeCandidates(politicalParties []models2.PoliticalPartyModel) error {
 	return nil
 }
 
-func setPoliticalPartiesNamesToCandidates(politicalParties []models2.PoliticalPartyModel) []models2.PoliticalPartyModel {
+func setPoliticalPartiesNamesToCandidates(politicalParties []models.PoliticalPartyModel) []models.PoliticalPartyModel {
 	for _, politicalParty := range politicalParties {
 		for i, _ := range politicalParty.Candidates {
-			politicalParty.Candidates[i].PoliticalParty = politicalParty.Name
+			politicalParty.Candidates[i].NamePoliticalParty = politicalParty.Name
 		}
 	}
 	return politicalParties
 }
 
-func SetElectionDate(election models2.ElectionModel) {
+func SetElectionDate(election *models.ElectionModelEssential) {
 	startDate, _ := time.Parse(time.RFC3339, election.StartingDate)
 	endDate, _ := time.Parse(time.RFC3339, election.FinishingDate)
 	setTimer(startDate, startElection(startDate, election.PoliticalParties, len(election.Voters), election.ElectionMode))
@@ -84,15 +84,15 @@ func setTimer(timerDate time.Time, action func()) {
 	action()
 }
 
-func startElection(startDate time.Time, politicalParties []models2.PoliticalPartyModel, voters int, electionMode string) func() {
+func startElection(startDate time.Time, politicalParties []models.PoliticalPartyModel, voters int, electionMode string) func() {
 	return func() {
 		fmt.Println("Election started")
 		sendInitialAct(startDate, politicalParties, voters, electionMode)
 	}
 }
 
-func sendInitialAct(startDate time.Time, politicalParties []models2.PoliticalPartyModel, voters int, electionMode string) {
-	act := models2.InitialAct{
+func sendInitialAct(startDate time.Time, politicalParties []models.PoliticalPartyModel, voters int, electionMode string) {
+	act := models.InitialAct{
 		StarDate:         startDate.Format(time.RFC3339),
 		PoliticalParties: politicalParties,
 		Voters:           voters,
@@ -118,8 +118,8 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 	}
 }
 
-func sendEndingAct(startDate time.Time, endDate time.Time, voters int, resultElection models2.ResultElection) {
-	act := models2.ClosingAct{
+func sendEndingAct(startDate time.Time, endDate time.Time, voters int, resultElection models.ResultElection) {
+	act := models.ClosingAct{
 		StarDate: startDate.Format(time.RFC3339),
 		EndDate:  endDate.Format(time.RFC3339),
 		Voters:   voters,
