@@ -120,10 +120,10 @@ func endElection(startDate, endDate time.Time, voters int) func() {
 			Result:              resultElection,
 		}
 
-		// validationError := validation.ValidateEndAct(act)
-		// if validationError != nil {
-		// 	log.Fatal(validationError)
-		// }
+		validationError := validation.ValidateEndAct(act)
+		if validationError != nil {
+			log.Fatal(validationError)
+		}
 
 		fmt.Println("Election finished")
 		sendEndingAct(act)
