@@ -15,9 +15,8 @@ func CertificateRequestsController(repo *repositories.CertificateRequestsRepo) *
 
 func (controller *CertificateRequestsController) RequestCertificate(c *fiber.Ctx) error {
 	var request models.CertificateRequestsModel
-	fmt.Println(string(c.Body()))
 
-	request.Timestamp = time.Now().String()
+	request.Timestamp = time.Now().Format(time.RFC3339)
 	err := json.Unmarshal(c.Body(), &request)
 	if err != nil {
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
