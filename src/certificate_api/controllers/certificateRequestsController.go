@@ -13,3 +13,32 @@ func CertificateRequestsController(repo *repositories.CertificateRequestsRepo) *
 	return &CertificateController{repo: repo}
 }
 
+func (controller *CertificateRequestsController) RequestCertificate(c *fiber.Ctx) error {
+	var request models.CertificateRequestsModel
+	fmt.Println(string(c.Body()))
+
+	request.Timestamp = time.Now().String()
+	err := json.Unmarshal(c.Body(), &request)
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+			"request":  nil,
+		})
+	}
+
+	err = controller.repo.AddRequest(request)
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+			"request":  nil,
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"error": false,
+		"msg":   "Request created succesfully!",
+		"request":  request,
+	})
+}

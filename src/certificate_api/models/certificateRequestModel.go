@@ -1,6 +1,6 @@
 package models
 
 type CertificateRequestModel struct {
-	VoterId       string `faker:"customIdFaker"`
+	VoterId       string 
 	Timestamp	  string
 }

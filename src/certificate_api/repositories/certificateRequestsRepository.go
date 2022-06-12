@@ -7,6 +7,6 @@ import (
 
 
 type CertificateRequestsRepo struct {
-	requestsList models.CertificateRequestsModel
+	requestsList models.CertificateRequestModel
 }
 
