@@ -26,7 +26,7 @@ func (controller *CertificateRequestsController) RequestCertificate(c *fiber.Ctx
 		})
 	}
 
-	err = controller.repo.AddRequest(request)
+	err = controller.repo.StoreRequest(request)
 	if err != nil {
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
