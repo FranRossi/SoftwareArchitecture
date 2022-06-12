@@ -1,6 +1,7 @@
 package dependencies_injection
 
 import (
+	"electoral_service/adapter/uruguayan_election/controller"
 	"electoral_service/service"
 	"electoral_service/service/logic"
 	"electoral_service/service/repository"
@@ -8,7 +9,8 @@ import (
 
 func Injection() *service.ElectionService {
 	repo := &repository.ElectionRepo{}
+	adapter := &controller.ElectionController{}
 	logic := logic.NewLogicElection(repo)
-	service := service.NewElectionService(logic)
+	service := service.NewElectionService(logic, adapter)
 	return service
 }

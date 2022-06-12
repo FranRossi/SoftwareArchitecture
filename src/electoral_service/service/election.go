@@ -7,15 +7,16 @@ import (
 	"log"
 )
 
-const url = "http://localhost:8080/api/v1/election/uruguay/?id=1" // TODO poner en un .env?
-
 type ElectionService struct {
 	adapter       *controller.ElectionController // TODO change to interface, and use dependency injection, to inject the adapter
 	electionLogic *logic.ElectionLogic
 }
 
-func NewElectionService(logic *logic.ElectionLogic) *ElectionService {
-	return &ElectionService{electionLogic: logic}
+func NewElectionService(logic *logic.ElectionLogic, adapter *controller.ElectionController) *ElectionService {
+	return &ElectionService{
+		electionLogic: logic,
+		adapter:       adapter,
+	}
 }
 
 func (service *ElectionService) GetElectionSettings() error {

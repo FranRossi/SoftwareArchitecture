@@ -3,21 +3,15 @@ package controller
 import (
 	models2 "electoral_service/adapter/uruguayan_election/models"
 	modelsGeneric "electoral_service/models"
-	"electoral_service/service/logic"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-const url = "http://localhost:8080/api/v1/election/uruguay/?id=1"
+const url = "http://localhost:8080/api/v1/election/uruguay/?id=1" // TODO poner en .env
 
 type ElectionController struct {
-	electionLogic *logic.ElectionLogic
-}
-
-func NewElectionController(logic *logic.ElectionLogic) *ElectionController {
-	return &ElectionController{electionLogic: logic}
 }
 
 func (controller *ElectionController) GetElectionSettings() *modelsGeneric.ElectionModelEssential {
