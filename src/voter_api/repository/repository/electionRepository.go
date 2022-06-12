@@ -40,15 +40,16 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 		}
 		log.Fatal(err2)
 	}
+	other := result["otherFields"].(bson.M)
 	user := &m.VoterModel{
-		Id:        result["id"].(string),
-		FullName:  result["name"].(string),
-		Sex:       result["sex"].(string),
-		BirthDate: result["birthDate"].(string),
-		Phone:     result["phone"].(string),
-		Email:     result["email"].(string),
-		Voted:     int(result["voted"].(int32)),
-		//OtherFields: result["otherFields"],
+		Id:          result["id"].(string),
+		FullName:    result["name"].(string),
+		Sex:         result["sex"].(string),
+		BirthDate:   result["birthDate"].(string),
+		Phone:       result["phone"].(string),
+		Email:       result["email"].(string),
+		Voted:       int(result["voted"].(int32)),
+		OtherFields: other,
 
 		////Role:           result["role"].(string),
 		//HashedPassword: result["password"].(string),

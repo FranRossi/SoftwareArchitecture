@@ -31,14 +31,14 @@ func FilterValidateVoter(data any, params map[string]any) error {
 }
 
 func FilterValidateCircuit(data any, params map[string]any) error {
-	//vote := data.(domain.VoteModel)
-	//usr, err := repository.FindVoter(vote.IdVoter)
-	//if err != nil {
-	//	return fmt.Errorf("voter is not valid: %v", err)
-	//}
-	//if usr.OtherFields["circuit"].(string) != vote.Circuit {
-	//	return fmt.Errorf("voter is not voting on the rigth circuit: %v", err)
-	//}
+	vote := data.(domain.VoteModel)
+	usr, err := repository.FindVoter(vote.IdVoter)
+	if err != nil {
+		return fmt.Errorf("voter is not valid: %v", err)
+	}
+	if usr.OtherFields["circuit"].(string) != vote.Circuit {
+		return fmt.Errorf("voter is not voting on the rigth circuit")
+	}
 	return nil
 }
 
@@ -88,10 +88,10 @@ func FilterValidateVotingTime(data any, params map[string]any) error {
 	}
 	now := time.Now()
 	if now.Before(startingDateAsDate) {
-		return fmt.Errorf("election has not yet started: %v", err)
+		return fmt.Errorf("election has not yet started")
 	}
 	if now.After(closingDateAsDate) {
-		return fmt.Errorf("election is over: %v", err)
+		return fmt.Errorf("election is over")
 	}
 	return nil
 }
