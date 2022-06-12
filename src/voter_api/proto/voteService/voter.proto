@@ -12,7 +12,7 @@ message VoteRequest {
   string id_voter = 2;
   string circuit = 3;
   string id_candidate = 4;
-  string signature = 5;
+  bytes signature = 5;
 }
 
 message VoteReply {

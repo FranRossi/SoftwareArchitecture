@@ -6,5 +6,5 @@ type VoteModel struct {
 	Circuit        string
 	IdCandidate    string
 	PoliticalParty string
-	Signature      string
+	Signature      []byte
 }

@@ -72,6 +72,7 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 		IdVoter:     req.GetIdVoter(),
 		Circuit:     req.GetCircuit(),
 		IdCandidate: req.GetIdCandidate(),
+		Signature:   req.GetSignature(),
 	}
 	failed := verifyVote(voteModel)
 	if failed != nil {
@@ -98,17 +99,15 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 }
 
 func verifyVote(vote *domain.VoteModel) error {
-	signature := vote.Signature
-	publicKeyPEM := validation.ReadKeyFromFile("pubkey.pem")
+	publicKeyPEM := validation.ReadKeyFromFile("./controllers/validation/pubkey.pem")
 	publicKey := validation.ExportPEMStrToPubKey(publicKeyPEM)
 	candidate := []byte(vote.IdCandidate)
 	msgHash := sha256.New()
 	msgHash.Write(candidate)
 	msgHashSBytes := msgHash.Sum(nil)
-	err := rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSBytes, []byte(signature), nil)
+	err := rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSBytes, vote.Signature, nil)
 	if err != nil {
 		return fmt.Errorf("verification failed")
-
 	}
 	return nil
 }

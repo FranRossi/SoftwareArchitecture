@@ -10,7 +10,9 @@ import (
 	"encoding/pem"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"io/ioutil"
+	"log"
 	"voting_simulator/proto"
 )
 
@@ -55,21 +57,32 @@ func saveKeyToFile(keyPem, filename string) {
 
 func main() {
 	// Generate a 2048-bits key
-	privateKey, publicKey := generateKeyPair(2048)
-
-	fmt.Printf("Private key: %v\n", privateKey)
-	fmt.Printf("Public Key: %v", publicKey)
-
+	//privateKey, publicKey := generateKeyPair(2048)
+	//publicKey = publicKey
 	// Create PEM string
-	privKeyStr := exportPrivKeyAsPEMStr(privateKey)
-	pubKeyStr := exportPubKeyAsPEMStr(publicKey)
+	//privKeyStr := exportPrivKeyAsPEMStr(privateKey)
+	//pubKeyStr := exportPubKeyAsPEMStr(publicKey)
 
-	fmt.Println(privKeyStr)
-	fmt.Println(pubKeyStr)
-
-	saveKeyToFile(privKeyStr, "privkey.pem")
-	saveKeyToFile(pubKeyStr, "pubkey.pem")
+	//saveKeyToFile(privKeyStr, "privkey.pem")
+	//saveKeyToFile(pubKeyStr, "pubkey.pem")
+	privateKeyPEM := ReadKeyFromFile("./privkey.pem")
+	privateKey := ExportPEMStrToPrivKey(privateKeyPEM)
 	SignVote(privateKey)
+}
+
+func ExportPEMStrToPrivKey(priv []byte) *rsa.PrivateKey {
+	block, _ := pem.Decode(priv)
+	key, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
+	return key
+}
+
+// Read data from file
+func ReadKeyFromFile(filename string) []byte {
+	key, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("Error on Reading file:", err)
+	}
+	return key
 }
 
 func SignVote(privateKey *rsa.PrivateKey) {
@@ -77,14 +90,14 @@ func SignVote(privateKey *rsa.PrivateKey) {
 		IdElection:  "1",
 		IdVoter:     "10000000",
 		IdCandidate: "1",
-		Circuit:     "5",
+		Circuit:     "3",
 	}
 	candidate := []byte(vote.IdCandidate)
 	msgHash := sha256.New()
 	msgHash.Write(candidate)
 	msgHashSBytes := msgHash.Sum(nil)
 	signature, _ := rsa.SignPSS(rand.Reader, privateKey, crypto.SHA256, msgHashSBytes, nil)
-	vote.Signature = string(signature)
+	vote.Signature = signature
 	Vote(vote)
 
 }
@@ -94,18 +107,19 @@ type VoteModel struct {
 	IdVoter     string
 	Circuit     string
 	IdCandidate string
-	Signature   string
+	Signature   []byte
 }
 
 const addr = "localhost:50004"
 
 func Vote(vote VoteModel) {
-	var opts []grpc.DialOption
-	conn, err := grpc.Dial(addr, opts...)
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		fmt.Println("Error: ", err)
+		log.Fatalf("cannot connect: %s", err)
 	}
-	conn.Connect()
+	defer conn.Close()
+
 	client := proto.NewVoteServiceClient(conn)
 	request := &proto.VoteRequest{
 		IdElection:  vote.IdElection,
@@ -114,5 +128,9 @@ func Vote(vote VoteModel) {
 		IdCandidate: vote.IdCandidate,
 		Signature:   vote.Signature,
 	}
-	client.Vote(context.Background(), request)
+	response, err2 := client.Vote(context.Background(), request)
+	if err2 != nil {
+		log.Fatalf("could not vote: %v", err2)
+	}
+	fmt.Printf("Vote: %s\n", response.Message)
 }
