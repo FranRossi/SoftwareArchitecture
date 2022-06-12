@@ -3,9 +3,15 @@ package controllers
 import (
 	jwt "auth"
 	"context"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"time"
+	"voter_api/controllers/validation"
 	domain "voter_api/domain/vote"
 	"voter_api/logic"
 	proto "voter_api/proto/authService"
@@ -60,16 +66,49 @@ func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest
 //}
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
+	timeFrontEnd := time.Now()
 	voteModel := &domain.VoteModel{
 		IdElection:  req.GetIdElection(),
 		IdVoter:     req.GetIdVoter(),
 		Circuit:     req.GetCircuit(),
 		IdCandidate: req.GetIdCandidate(),
 	}
+	failed := verifyVote(voteModel)
+	if failed != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid vote")
+	}
 	err := logic.StoreVote(voteModel)
 	if err != nil {
 		return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote: %v", err)
 	}
-	message := "voted correctly"
-	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
+	timeBackEnd := time.Now()
+	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
+		logic.DeleteVote(voteModel)
+		messageFailed := "vote cannot processed"
+		return &pb.VoteReply{Message: messageFailed}, status.Errorf(codes.ResourceExhausted, "vote failed")
+	} else {
+		voteIdentification, err2 := logic.StoreVoteInfo(req.GetIdVoter(), req.GetIdElection(), timeFrontEnd, timeBackEnd)
+		if err2 != nil {
+			return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote info: %v", err)
+		}
+		go logic.SendCertificateSMS(voteModel, voteIdentification, timeFrontEnd)
+		message := "voted correctly"
+		return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
+	}
+}
+
+func verifyVote(vote *domain.VoteModel) error {
+	signature := vote.Signature
+	publicKeyPEM := validation.ReadKeyFromFile("pubkey.pem")
+	publicKey := validation.ExportPEMStrToPubKey(publicKeyPEM)
+	candidate := []byte(vote.IdCandidate)
+	msgHash := sha256.New()
+	msgHash.Write(candidate)
+	msgHashSBytes := msgHash.Sum(nil)
+	err := rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSBytes, []byte(signature), nil)
+	if err != nil {
+		return fmt.Errorf("verification failed")
+
+	}
+	return nil
 }

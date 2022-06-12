@@ -85,7 +85,7 @@ func FilterValidateEndTime(data any, params map[string]any) error {
 	if now.Before(endDate) {
 		return fmt.Errorf("election time is not yet over")
 	}
-	fmt.Println("Election end time is valid") // TODO eliminar o pasar a un log propio
+	// TODO eliminar o pasar a un log propio
 	return nil
 }
 
@@ -95,7 +95,7 @@ func FilterValidateVotesQuantity(data any, params map[string]any) error {
 	if act.Result.AmountOfVotes > act.TotalAmountOfVoters {
 		return fmt.Errorf("amount of votes is greater than total amount of voters")
 	}
-	fmt.Println("Votes quantity is valid") // TODO eliminar o pasar a un log propio
+	// TODO eliminar o pasar a un log propio
 
 	return nil
 }
