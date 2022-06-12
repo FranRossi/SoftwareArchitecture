@@ -2,15 +2,12 @@ module electoral_service
 
 go 1.18
 
-replace pipes_and_filters => ./../pipes_and_filters
-
 require (
 	github.com/google/uuid v1.3.0
 	github.com/streadway/amqp v1.0.0
 	go.mongodb.org/mongo-driver v1.9.1
+	pipes_and_filters v0.0.0-00010101000000-000000000000
 )
-
-require gopkg.in/yaml.v2 v2.4.0 // indirect
 
 require (
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -24,5 +21,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/text v0.3.7 // indirect
-	pipes_and_filters v0.0.0-00010101000000-000000000000
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+
 )
+
+replace pipes_and_filters => ./../pipes_and_filters
