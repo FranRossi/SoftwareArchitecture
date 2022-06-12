@@ -20,5 +20,8 @@ type VoteInfo struct {
 
 func GenerateCertificate(voteinfo VoteInfo) error{
 	var certificate models.CertificateModel
-	
+	certificate.IdVoter= voteinfo.IdVoter
+	certificate.IdElection = voteinfo.IdElection 
+	certificate.TimeVoted = voteinfo.TimeVoted 
+	certificate.VoteIdentification= voteinfo.VoteIdentification
 }
