@@ -1,4 +1,8 @@
-package connections
+package mq
+
+import (
+	"log"
+)
 
 // Worker defines the worker interface
 type Worker interface {
@@ -28,8 +32,18 @@ type Channel interface {
 	Close() error
 }
 
+var mqWorkerInstance Worker
+
 func BuildRabbitWorker(address string) (worker Worker, err error) {
 	worker = new(rabbitWorker)
 	err = worker.Config(address)
+	mqWorkerInstance = worker
 	return
+}
+
+func GetMQWorker() Worker {
+	if mqWorkerInstance == nil {
+		log.Fatal("MQ Worker not initialized, use BuildRabbitWoker for initializing it")
+	}
+	return mqWorkerInstance
 }

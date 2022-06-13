@@ -1,10 +1,11 @@
-package connections
+package mq
 
 import (
-	"github.com/google/uuid"
-	"github.com/streadway/amqp"
 	"net"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/streadway/amqp"
 )
 
 func ConnectionRabbit(act []byte, queue string) {
