@@ -27,7 +27,7 @@ func StoreVote(vote *domain.VoteModel) error {
 	totalVotesCollection := electionDatabase.Collection("total_votes")
 	filter2 := bson.D{{"id", vote.IdElection}}
 	update2 := bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
-	result, err3 := totalVotesCollection.UpdateOne(context.TODO(), filter2, update2)
+	_, err3 := totalVotesCollection.UpdateOne(context.TODO(), filter2, update2)
 	if err3 != nil {
 		fmt.Println("error registering new vote on election")
 		if err3 == mongo.ErrNoDocuments {
