@@ -2,22 +2,19 @@ module electoral_service
 
 go 1.18
 
-replace pipes_and_filters => ./../pipes_and_filters
-
-replace mq => ./../mq
-
 require (
-	github.com/google/uuid v1.3.0
-	github.com/streadway/amqp v1.0.0
 	go.mongodb.org/mongo-driver v1.9.1
+	message_queue v0.0.0-00010101000000-000000000000
 	pipes_and_filters v0.0.0-00010101000000-000000000000
 )
 
 require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
@@ -26,8 +23,8 @@ require (
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	mq v0.0.0-00010101000000-000000000000
-	pipes_and_filters v0.0.0-00010101000000-000000000000
 )
 
 replace pipes_and_filters => ./../pipes_and_filters
+
+replace message_queue => ./../message_queue

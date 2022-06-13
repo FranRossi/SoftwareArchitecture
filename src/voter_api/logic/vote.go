@@ -1,11 +1,13 @@
 package logic
 
 import (
+	"encoding/json"
 	"fmt"
+	mq "message_queue"
 	"strconv"
 	"time"
 	"voter_api/controllers/validation"
-	domain "voter_api/domain/vote"
+	"voter_api/domain"
 	"voter_api/repository/repository"
 )
 
@@ -22,6 +24,8 @@ func StoreVote(vote *domain.VoteModel) error {
 	}
 	err = repository.RegisterVote(vote.IdVoter)
 	generateElectionSession(vote.IdElection)
+	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
+	go checkMaxVotes(howManyTimesVoted, vote)
 	return nil
 }
 
@@ -72,11 +76,33 @@ func SendCertificateSMS(vote *domain.VoteModel, voteIdentification string, timeF
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
 	}
-	sendToMQ(certificate)
+	sendCertificateSMSToMQ(certificate)
 }
 
-func sendToMQ(certificate VoteInfo) {
-	// TODO send to MQ
-	fmt.Println("Sending to MQ")
-	fmt.Println(certificate)
+func sendCertificateSMSToMQ(certificate VoteInfo) {
+	queue := "certificate-sms-queue"
+	certificateBytes, _ := json.Marshal(certificate)
+	mq.GetMQWorker().Send(queue, certificateBytes)
+}
+
+func checkMaxVotes(howManyTimesVoted int, vote *domain.VoteModel) {
+	maxVotes, _, err := repository.GetMaximumValuesBeforeAlert(vote.IdElection)
+	if err != nil {
+		fmt.Println(err)
+	}
+	if howManyTimesVoted >= maxVotes {
+		sendAlertToMQ(vote.IdVoter, vote.IdElection, howManyTimesVoted, maxVotes)
+	}
+}
+
+func sendAlertToMQ(idVoter, idElection string, howManyTimesVoted int, maxVotes int) {
+	queue := "alert-queue"
+	alert := domain.Alert{
+		IdVoter:    idVoter,
+		IdElection: idElection,
+		MaxVotes:   maxVotes,
+		Votes:      howManyTimesVoted,
+	}
+	alertBytes, _ := json.Marshal(alert)
+	mq.GetMQWorker().Send(queue, alertBytes)
 }

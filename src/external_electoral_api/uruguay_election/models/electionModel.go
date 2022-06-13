@@ -5,7 +5,7 @@ type ElectionModel struct {
 	Description   string `faker:"sentence"`
 	StartingDate  string `faker:"-"`
 	FinishingDate string `faker:"-"`
-	ElectionMode  string `faker:"oneof: unico, multi"`
+	ElectionMode  string `faker:"oneof: multi" //"oneof: unico, multi"`
 
 	Voters []VoterModel `faker:"custom_voter"`
 	//Candidates       []CandidateModel      `faker:"custom_candidates"`

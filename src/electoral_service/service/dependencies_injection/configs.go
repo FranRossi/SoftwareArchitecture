@@ -5,7 +5,8 @@ import (
 	"electoral_service/service"
 	"electoral_service/service/logic"
 	"electoral_service/service/repository"
-	"mq"
+	"message_queue"
+	"os"
 )
 
 func Injection() *service.ElectionService {
@@ -13,6 +14,6 @@ func Injection() *service.ElectionService {
 	adapter := &controller.ElectionController{}
 	logic := logic.NewLogicElection(repo)
 	service := service.NewElectionService(logic, adapter)
-	mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/") // TODO .env
+	mq.BuildRabbitWorker(os.Getenv("mq_address"))
 	return service
 }

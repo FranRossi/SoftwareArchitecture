@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
 )
 
 func streamInterceptor(
@@ -17,12 +18,11 @@ func streamInterceptor(
 	return handler(srv, stream)
 }
 
-const addr = "localhost:50004"
-
 var connection net.Listener
 
 func ConnectionGRPC() *grpc.Server {
-	conn, err := net.Listen("tcp", addr)
+	address := os.Getenv("grpc_address")
+	conn, err := net.Listen("tcp", address)
 	connection = conn
 	if err != nil {
 		log.Fatal("tcp connection err: ", err.Error())
@@ -32,7 +32,7 @@ func ConnectionGRPC() *grpc.Server {
 		grpc.StreamInterceptor(streamInterceptor),
 	)
 
-	fmt.Println("Starting gRPC server at: ", addr)
+	fmt.Println("Starting gRPC server at: ", address)
 	return grpcServer
 }
 

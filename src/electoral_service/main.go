@@ -2,7 +2,7 @@ package main
 
 import (
 	dependencyinjection "electoral_service/service/dependencies_injection"
-	"mq"
+	mq "message_queue"
 )
 
 func main() {

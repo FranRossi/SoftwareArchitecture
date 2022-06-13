@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"mq"
+	mq "message_queue"
 	"time"
 )
 

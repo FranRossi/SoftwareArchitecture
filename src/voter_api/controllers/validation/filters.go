@@ -4,7 +4,7 @@ import (
 	"fmt"
 	p_f "pipes_and_filters"
 	"time"
-	domain "voter_api/domain/vote"
+	"voter_api/domain"
 	"voter_api/repository/repository"
 )
 

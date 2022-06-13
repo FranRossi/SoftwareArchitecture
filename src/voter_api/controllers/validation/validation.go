@@ -3,7 +3,7 @@ package validation
 import (
 	"fmt"
 	p_f "pipes_and_filters"
-	domain "voter_api/domain/vote"
+	"voter_api/domain"
 )
 
 func ValidateVote(vote domain.VoteModel) error {

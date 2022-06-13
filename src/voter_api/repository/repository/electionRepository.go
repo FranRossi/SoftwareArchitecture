@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"strconv"
 	"voter_api/connections"
 )
 
@@ -122,4 +123,28 @@ func HowManyVotesHasAVoter(idVoter string) int {
 		}
 	}
 	return int(result["voted"].(int32))
+}
+
+func GetMaximumValuesBeforeAlert(idElection string) (int, int, error) {
+	client := connections.GetInstanceMongoClient()
+	electionDatabase := client.Database("uruguay_election")
+	uruguayCollection := electionDatabase.Collection("configuration_election")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idElection}}).Decode(&result)
+	if err2 != nil {
+		fmt.Println(err2.Error())
+		fmt.Println("wrong election mode")
+		if err2 == mongo.ErrNoDocuments {
+			return 0, 0, err2
+		}
+		log.Fatal(err2)
+	}
+	maxVotesString := result["otherField"].(bson.M)["maxVotes"].(string)
+	maxVotes, err3 := strconv.Atoi(maxVotesString)
+	maxCertificatesString := result["otherField"].(bson.M)["maxCertificate"].(string)
+	maxCertificates, err4 := strconv.Atoi(maxCertificatesString)
+	if err3 != nil || err4 != nil {
+		return -1, -1, fmt.Errorf("worng maximum values")
+	}
+	return maxVotes, maxCertificates, nil
 }

@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"voter_api/connections"
-	domain "voter_api/domain/vote"
+	"voter_api/domain"
 )
 
 func StoreVote(vote *domain.VoteModel) error {
@@ -27,13 +27,13 @@ func StoreVote(vote *domain.VoteModel) error {
 	totalVotesCollection := electionDatabase.Collection("total_votes")
 	filter2 := bson.D{{"id", vote.IdElection}}
 	update2 := bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
-	_, err2 = totalVotesCollection.UpdateOne(context.TODO(), filter2, update2)
-	if err2 != nil {
+	result, err3 := totalVotesCollection.UpdateOne(context.TODO(), filter2, update2)
+	if err3 != nil {
 		fmt.Println("error registering new vote on election")
-		if err2 == mongo.ErrNoDocuments {
+		if err3 == mongo.ErrNoDocuments {
 			return nil
 		}
-		log.Fatal(err2)
+		log.Fatal(err3)
 	}
 	return nil
 }

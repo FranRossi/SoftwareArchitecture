@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 	"time"
 	"voter_api/controllers/validation"
-	domain "voter_api/domain/vote"
+	"voter_api/domain"
 	"voter_api/logic"
 	proto "voter_api/proto/authService"
 	pb "voter_api/proto/voteService"

@@ -7,14 +7,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"os"
 	"sync"
 	"time"
 )
 
 func connectionMongo() *mongo.Client {
-	const uri = "mongodb://localhost:27017"
-
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	address := os.Getenv("mongo_address")
+	client, err := mongo.NewClient(options.Client().ApplyURI(address))
 
 	if err != nil {
 		log.Fatal(err)
