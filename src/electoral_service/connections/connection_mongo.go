@@ -3,16 +3,33 @@ package connections
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"sync"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+var lockDB = &sync.Mutex{}
+
+var mongoClientInstance *mongo.Client
+
+func GetInstanceMongoClient() *mongo.Client {
+	if mongoClientInstance == nil {
+		lockDB.Lock()
+		defer lockDB.Unlock()
+		if mongoClientInstance == nil {
+			fmt.Println("Creating mongo client instance now.")
+			mongoClientInstance = connectionMongo()
+		}
+	}
+	return mongoClientInstance
+}
+
 func connectionMongo() *mongo.Client {
-	const uri = "mongodb://localhost:27017"
+	const uri = "mongodb://localhost:27017" // TODO .env
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 
@@ -33,20 +50,4 @@ func connectionMongo() *mongo.Client {
 		log.Fatal(err)
 	}
 	return client
-}
-
-var lock = &sync.Mutex{}
-
-var mongoClientInstance *mongo.Client
-
-func GetInstanceMongoClient() *mongo.Client {
-	if mongoClientInstance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if mongoClientInstance == nil {
-			fmt.Println("Creating mongo client instance now.")
-			mongoClientInstance = connectionMongo()
-		}
-	}
-	return mongoClientInstance
 }

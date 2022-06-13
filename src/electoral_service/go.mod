@@ -4,6 +4,8 @@ go 1.18
 
 replace pipes_and_filters => ./../pipes_and_filters
 
+replace mq => ./../mq
+
 require (
 	github.com/google/uuid v1.3.0
 	github.com/streadway/amqp v1.0.0
@@ -24,5 +26,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/text v0.3.7 // indirect
+	mq v0.0.0-00010101000000-000000000000
 	pipes_and_filters v0.0.0-00010101000000-000000000000
 )

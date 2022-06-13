@@ -1,13 +1,13 @@
 package logic
 
 import (
-	"electoral_service/connections"
 	"electoral_service/models"
 	"electoral_service/service/logic/validation"
 	"electoral_service/service/repository"
 	"encoding/json"
 	"fmt"
 	"log"
+	"mq"
 	"time"
 )
 
@@ -102,8 +102,9 @@ func sendInitialAct(startDate time.Time, politicalParties []models.PoliticalPart
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	queue := "initial-election-queue"
-	connections.ConnectionRabbit(jsonAct, queue)
+	mq.GetMQWorker().Send(queue, jsonAct)
 }
 
 func endElection(startDate, endDate time.Time, voters int) func() {
@@ -136,7 +137,7 @@ func sendEndingAct(act models.ClosingAct) {
 		log.Fatal(err)
 	}
 	queue := "closing-election-queue"
-	connections.ConnectionRabbit(jsonAct, queue)
+	mq.GetMQWorker().Send(queue, jsonAct)
 }
 
 func (logicElection *ElectionLogic) DropDataBases() {
