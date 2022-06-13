@@ -3,11 +3,16 @@ package logic
 import (
 	"encoding/json"
 	"log"
-	managersElection "notification_center/ManagersElection"
+	managersElection "notification_center/ManagersElection/uruguay"
 	connections "notification_center/connection"
 	"notification_center/models"
 	"sync"
 )
+
+func RecieveActs() {
+	ReceiveAct()
+	ReceiveClosingAct()
+}
 
 func ReceiveAct() {
 	worker := connections.ConnectionRabbit()
@@ -25,7 +30,7 @@ func ReceiveAct() {
 }
 
 func notifyEmails(act models.InitialAct) {
-	managersElection.SendInitialEmails(act)
+	managersElection.SendInitialActsEmails(act)
 }
 
 func ReceiveClosingAct() {

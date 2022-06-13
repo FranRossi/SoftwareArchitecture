@@ -34,6 +34,18 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 		}
 		log.Fatal(err)
 	}
+
+	uruguayVotesDataBase := client.Database("uruguay_votes")
+	collectionTotalVotes := uruguayVotesDataBase.Collection("total_votes")
+	amountVotes := bson.D{{"votes_counted", 0}, {"id", election.Id}}
+	_, err = collectionTotalVotes.InsertOne(context.TODO(), amountVotes)
+	if err != nil {
+		fmt.Println("error storing initial amount of votes")
+		if err == mongo.ErrNoDocuments {
+			return nil
+		}
+		log.Fatal(err)
+	}
 	return err
 }
 
@@ -75,19 +87,6 @@ func StoreCandidates(candidates []models.CandidateModel) error {
 		}
 		log.Fatal(err)
 	}
-
-	const initialAmountVotesId = 1
-	uruguayanCandidatesCollection = uruguayDataBase.Collection("total_votes")
-	amountVotes := bson.D{{"votes_counted", 0}, {"id", initialAmountVotesId}}
-	_, err = uruguayanCandidatesCollection.InsertOne(context.TODO(), amountVotes)
-	if err != nil {
-		fmt.Println("error storing initial amount of votes")
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err)
-	}
-
 	return nil
 }
 
@@ -124,7 +123,7 @@ func GetVotes() (models.ResultElection, error) {
 		return models.ResultElection{}, err
 	}
 	voterPerParties := getVotesPerParties(votesCandidatesResult)
-	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountVoted: amountVotesCounted, VotesPerParties: voterPerParties}
+	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountOfVotes: amountVotesCounted, VotesPerParties: voterPerParties}
 
 	return electionResult, nil
 }

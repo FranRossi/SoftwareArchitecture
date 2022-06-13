@@ -14,7 +14,9 @@ func GetAvailableFilters() map[string]p_f.FilterWithParams {
 		"validate_party_list":                 FilterValidatePoliticalPartyList,
 		"validate_voter_candidate_list":       FilterValidateCandidateList,
 		"validate_unique_party_per_candidate": FilterValidateUniquePartyPerCandidate,
-		"validate_election_mode":              FilterElectionMode,
+		"validate_election_mode":              FilterValidateElectionMode,
+		"validate_end_time":                   FilterValidateEndTime,
+		"validate_votes_quantity":             FilterValidateVotesQuantity,
 	}
 	return availableFilters
 }
@@ -66,10 +68,34 @@ func FilterValidateDate(data any, params map[string]any) error {
 	return nil
 }
 
-func FilterElectionMode(data any, params map[string]any) error {
+func FilterValidateElectionMode(data any, params map[string]any) error {
 	election := data.(models.ElectionModelEssential)
 	if election.ElectionMode != "unico" && election.ElectionMode != "multi" {
 		return fmt.Errorf("election mode is not valid")
 	}
+	return nil
+}
+
+func FilterValidateEndTime(data any, params map[string]any) error {
+	act := data.(models.ClosingAct)
+
+	endDate, _ := time.Parse(time.RFC3339, act.EndDate)
+	now := time.Now()
+
+	if now.Before(endDate) {
+		return fmt.Errorf("election time is not yet over")
+	}
+	// TODO eliminar o pasar a un log propio
+	return nil
+}
+
+func FilterValidateVotesQuantity(data any, params map[string]any) error {
+	act := data.(models.ClosingAct)
+
+	if act.Result.AmountOfVotes > act.TotalAmountOfVoters {
+		return fmt.Errorf("amount of votes is greater than total amount of voters")
+	}
+	// TODO eliminar o pasar a un log propio
+
 	return nil
 }

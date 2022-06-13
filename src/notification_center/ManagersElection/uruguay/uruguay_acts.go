@@ -1,4 +1,4 @@
-package managersElection
+package uruguay
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 var emails = []string{"montevideo@intendencia.com", "montevideo@presidencia.com", "colonia@intendencia.com"}
 
-func SendInitialEmails(act models.InitialAct) {
+func SendInitialActsEmails(act models.InitialAct) {
 	for _, email := range emails {
 		sendInitialEmailTo(email, act)
 	}

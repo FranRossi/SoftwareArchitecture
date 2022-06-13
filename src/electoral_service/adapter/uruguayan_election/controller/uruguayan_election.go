@@ -1,26 +1,22 @@
 package controller
 
 import (
+	"electoral_service/adapter/uruguayan_election"
 	models2 "electoral_service/adapter/uruguayan_election/models"
 	modelsGeneric "electoral_service/models"
-	"electoral_service/service/logic"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
-const url = "http://localhost:8080/api/v1/election/uruguay/?id=1"
-
 type ElectionController struct {
-	electionLogic *logic.ElectionLogic
-}
-
-func NewElectionController(logic *logic.ElectionLogic) *ElectionController {
-	return &ElectionController{electionLogic: logic}
 }
 
 func (controller *ElectionController) GetElectionSettings() *modelsGeneric.ElectionModelEssential {
+	uruguayan_election.ConfigEnvironment()
+	url := os.Getenv("electoral_service_url")
 	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -39,10 +35,9 @@ func (controller *ElectionController) GetElectionSettings() *modelsGeneric.Elect
 	}
 	if electionSettings.Error {
 		log.Fatal(electionSettings.Msg)
-	} else {
-		return convertToElectionModel(electionSettings.Election)
 	}
-	return nil
+	return convertToElectionModel(electionSettings.Election)
+
 }
 
 func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.ElectionModelEssential {
@@ -53,8 +48,18 @@ func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.Elect
 		ElectionMode:     election.ElectionMode,
 		Voters:           convertVoters(election.Voters),
 		PoliticalParties: convertPoliticalParties(election.PoliticalParties),
+		OtherFields:      convertMaximumVotesAndCertificate(),
 	}
 	return electionGeneric
+}
+
+func convertMaximumVotesAndCertificate() map[string]any {
+	maximum := map[string]any{
+		"maxVotes":       os.Getenv("maxVotes"),
+		"maxCertificate": os.Getenv("maxCertificate"),
+	}
+	return maximum
+
 }
 
 func convertVoters(voters []models2.VoterModel) []modelsGeneric.VoterModel {
