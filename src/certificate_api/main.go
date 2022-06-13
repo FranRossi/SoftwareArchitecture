@@ -1,27 +1,23 @@
 package main
 
 import (
+	"certificate_api/api"
 	"certificate_api/connections"
+	"certificate_api/controllers"
+	"certificate_api/repositories"
+	mq "message_queue"
 )
 
+func main() {
 
-func main {
-	connections.Connection()
+	mongoClient := connections.GetInstanceMongoClient()
+	mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
 
-}
+	repo := repositories.NewRequestsRepo(mongoClient, "certificates")
+	controller := controllers.CertificateRequestsController(repo)
+	controllers.ListenerForNewCertificates()
+	api.ConnectionAPI(controller)
 
-//funcion que recibe el modelo de info de la votacion y genera el certificado
-type VoteInfo struct {
-	IdVoter            string
-	IdElection         string
-	TimeVoted          string
-	VoteIdentification string
-}
-
-func GenerateCertificate(voteinfo VoteInfo) error{
-	var certificate models.CertificateModel
-	certificate.IdVoter= voteinfo.IdVoter
-	certificate.IdElection = voteinfo.IdElection 
-	certificate.TimeVoted = voteinfo.TimeVoted 
-	certificate.VoteIdentification= voteinfo.VoteIdentification
+	mq.GetMQWorker().Close()
+	mongoClient.Disconnect()
 }
