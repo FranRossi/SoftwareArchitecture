@@ -102,9 +102,9 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 func verifyVote(vote *domain.VoteModel) error {
 	publicKeyPEM := validation.ReadKeyFromFile("./controllers/validation/pubkey.pem")
 	publicKey := validation.ExportPEMStrToPubKey(publicKeyPEM)
-	candidate := []byte(vote.IdCandidate)
+	voter := []byte(vote.IdVoter)
 	msgHash := sha256.New()
-	msgHash.Write(candidate)
+	msgHash.Write(voter)
 	msgHashSBytes := msgHash.Sum(nil)
 	err := rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSBytes, vote.Signature, nil)
 	if err != nil {

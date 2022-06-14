@@ -92,9 +92,9 @@ func SignVote(privateKey *rsa.PrivateKey) {
 		IdCandidate: "1",
 		Circuit:     "4",
 	}
-	candidate := []byte(vote.IdCandidate)
+	voter := []byte(vote.IdVoter)
 	msgHash := sha256.New()
-	msgHash.Write(candidate)
+	msgHash.Write(voter)
 	msgHashSBytes := msgHash.Sum(nil)
 	signature, _ := rsa.SignPSS(rand.Reader, privateKey, crypto.SHA256, msgHashSBytes, nil)
 	vote.Signature = signature
