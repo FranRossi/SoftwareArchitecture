@@ -124,11 +124,11 @@ func DeleteVote(vote *domain.VoteModel) error {
 	return nil
 }
 
-func StoreVoteInfo(idVoter, timeFrontEnd, timeBackEnd, timePassed, voteIdentification string) error {
+func StoreVoteInfo(idVoter, idElection, timeFrontEnd, timeBackEnd, timePassed, voteIdentification string) error {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayCollection := uruguayDataBase.Collection("votes_info")
-	_, err := uruguayCollection.InsertOne(context.TODO(), bson.D{{"voter", idVoter}, {"time_front_end", timeFrontEnd}, {"time_back_end", timeBackEnd}, {"time_passed", timePassed}, {"vote_identificator", voteIdentification}})
+	_, err := uruguayCollection.InsertOne(context.TODO(), bson.D{{"voter", idVoter}, {"election", idElection}, {"time_front_end", timeFrontEnd}, {"time_back_end", timeBackEnd}, {"time_passed", timePassed}, {"vote_identification", voteIdentification}})
 	if err != nil {
 		return fmt.Errorf("error storing vote info: %v", err)
 	}

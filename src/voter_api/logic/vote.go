@@ -70,7 +70,7 @@ func StoreVoteInfo(idVoter, idElection string, timeFrontEnd, timeBackEnd time.Ti
 	timeBack := timeBackEnd.Format(time.RFC3339)
 	timePassed := timeBackEnd.Sub(timeFrontEnd).String()
 	voteIdentification := generateRandomVoteIdentification(idElection)
-	err := repository.StoreVoteInfo(idVoter, timeFront, timeBack, timePassed, voteIdentification)
+	err := repository.StoreVoteInfo(idVoter, idElection, timeFront, timeBack, timePassed, voteIdentification)
 	if err != nil {
 		return "", fmt.Errorf("vote info cannot be stored: %w", err)
 	}
