@@ -8,3 +8,10 @@ type VoteModel struct {
 	PoliticalParty string
 	Signature      []byte
 }
+
+type VoteInfo struct {
+	IdVoter            string
+	IdElection         string
+	TimeVoted          string
+	VoteIdentification string
+}

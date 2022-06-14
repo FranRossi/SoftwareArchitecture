@@ -25,7 +25,7 @@ func StoreVote(vote *domain.VoteModel) error {
 	err = repository.RegisterVote(vote.IdVoter)
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
-	go checkMaxVotes(howManyTimesVoted, vote)
+	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	return nil
 }
 
@@ -61,31 +61,27 @@ func generateRandomVoteIdentification(idElection string) string {
 	return sessionNumber + randomNumber
 }
 
-type VoteInfo struct {
-	IdVoter            string
-	IdElection         string
-	TimeVoted          string
-	VoteIdentification string
-}
-
-func SendCertificate(vote *domain.VoteModel, voteIdentification string, timeFront time.Time) {
+func SendCertificate(vote *domain.VoteModel, voteIdentification string, timeFront time.Time, err error) {
 	timeVoted := timeFront.Format(time.RFC3339)
-	certificate := VoteInfo{
+	certificate := domain.VoteInfo{
 		IdVoter:            vote.IdVoter,
 		IdElection:         vote.IdElection,
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
 	}
-	sendCertificateToMQ(certificate)
+	queue := "voting-certificates"
+	if err != nil {
+		queue = "voting-certificates-error"
+	}
+	sendCertificateToMQ(certificate, queue)
 }
 
-func sendCertificateToMQ(certificate VoteInfo) {
-	queue := "voting-certificates"
+func sendCertificateToMQ(certificate domain.VoteInfo, queue string) {
 	certificateBytes, _ := json.Marshal(certificate)
 	mq.GetMQWorker().Send(queue, certificateBytes)
 }
 
-func checkMaxVotes(howManyTimesVoted int, vote *domain.VoteModel) {
+func checkMaxVotesAndSendAlert(howManyTimesVoted int, vote *domain.VoteModel) {
 	maxVotes, _, err := repository.GetMaximumValuesBeforeAlert(vote.IdElection)
 	if err != nil {
 		fmt.Println(err)
