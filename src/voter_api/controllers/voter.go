@@ -68,6 +68,12 @@ func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
 	timeFrontEnd := time.Now()
+	message := "We received your vote, we will validate it shortly and send you a notification"
+	go processVoteAndSendEmail(timeFrontEnd, req)
+	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "voted send for processing", nil)
+}
+
+func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 	voteModel := &domain.VoteModel{
 		IdElection:  req.GetIdElection(),
 		IdVoter:     req.GetIdVoter(),
@@ -75,31 +81,43 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 		IdCandidate: req.GetIdCandidate(),
 		Signature:   req.GetSignature(),
 	}
-	failed := verifyVote(voteModel)
+	voteIdentification, err := processVote(timeFrontEnd, voteModel)
+	if err != nil {
+		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
+	}
+	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
+}
+
+func processVote(timeFrontEnd time.Time, voteModel *domain.VoteModel) (string, error) {
+	failed := verifySignatureVote(voteModel)
 	if failed != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid vote")
+		_ = fmt.Errorf("signature verification failed: %v", failed)
+		return "", failed
 	}
 	err := logic.StoreVote(voteModel)
 	if err != nil {
-		return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote: %v", err)
+		_ = fmt.Errorf("cannot store vote: %v", err)
+		return "", err
 	}
 	timeBackEnd := time.Now()
 	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
-		logic.DeleteVote(voteModel)
-		messageFailed := "vote cannot processed"
-		return &pb.VoteReply{Message: messageFailed}, status.Errorf(codes.ResourceExhausted, "vote failed")
-	} else {
-		voteIdentification, err2 := logic.StoreVoteInfo(req.GetIdVoter(), req.GetIdElection(), timeFrontEnd, timeBackEnd)
+		err2 := logic.DeleteVote(voteModel)
 		if err2 != nil {
-			return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote info: %v", err)
+			_ = fmt.Errorf("cannot delete vote: %v", err2)
+			return "", err2
 		}
-		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd)
-		message := "voted correctly"
-		return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
+		messageFailed := "vote cannot processed under 2 seconds"
+		return "", fmt.Errorf(messageFailed)
+	} else {
+		voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
+		if err2 != nil {
+			return "", fmt.Errorf("cannot store vote info: %v", err)
+		}
+		return voteIdentification, nil
 	}
 }
 
-func verifyVote(vote *domain.VoteModel) error {
+func verifySignatureVote(vote *domain.VoteModel) error {
 	publicKeyPEM := validation.ReadKeyFromFile("./controllers/validation/pubkey.pem")
 	publicKey := validation.ExportPEMStrToPubKey(publicKeyPEM)
 	voter := []byte(vote.IdVoter)

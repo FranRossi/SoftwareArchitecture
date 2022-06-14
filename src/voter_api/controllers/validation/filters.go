@@ -66,7 +66,7 @@ func FilterVoteMode(data any, params map[string]any) error {
 	if err == nil && mode == modeExpected {
 		howManyVotesHasAVoter := repository.HowManyVotesHasAVoter(vote.IdVoter)
 		if howManyVotesHasAVoter > 0 {
-			return fmt.Errorf("voter has already voted: %v")
+			return fmt.Errorf("voter has already voted")
 		}
 	}
 	if err != nil {
