@@ -61,7 +61,7 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 func FindCandidate(idCandidate string) (string, error) {
 	client := connections.GetInstanceMongoClient()
 	votesDatabase := client.Database("uruguay_votes")
-	uruguayCollection := votesDatabase.Collection("votes")
+	uruguayCollection := votesDatabase.Collection("votes_per_candidate")
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idCandidate}}).Decode(&result)
 	if err2 != nil {

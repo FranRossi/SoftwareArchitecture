@@ -78,7 +78,7 @@ func StoreCandidates(candidates []models.CandidateModel) error {
 	client := connections.GetInstanceMongoClient()
 	candidatesToStore := convertCandidateModelToInterface(candidates)
 	uruguayDataBase := client.Database("uruguay_votes")
-	uruguayanCandidatesCollection := uruguayDataBase.Collection("votes")
+	uruguayanCandidatesCollection := uruguayDataBase.Collection("votes_per_candidate")
 	_, err := uruguayanCandidatesCollection.InsertMany(context.TODO(), candidatesToStore)
 	if err != nil {
 		fmt.Println("error storing initial candidates")
@@ -131,7 +131,7 @@ func GetVotes() (models.ResultElection, error) {
 func getEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
-	uruguayanVotesCollection := uruguayDataBase.Collection("votes")
+	uruguayanVotesCollection := uruguayDataBase.Collection("votes_per_candidate")
 	var results []bson.M
 	cursor, err := uruguayanVotesCollection.Find(context.TODO(), bson.D{})
 	if err != nil {

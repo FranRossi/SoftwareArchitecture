@@ -13,7 +13,7 @@ import (
 func StoreVote(vote *domain.VoteModel) error {
 	client := connections.GetInstanceMongoClient()
 	electionDatabase := client.Database("uruguay_votes")
-	uruguayVotersCollection := electionDatabase.Collection("votes")
+	uruguayVotersCollection := electionDatabase.Collection("votes_per_candidate")
 	filter := bson.D{{"id", vote.IdCandidate}}
 	update := bson.D{{"$inc", bson.D{{"votes", 1}}}}
 	_, err2 := uruguayVotersCollection.UpdateOne(context.TODO(), filter, update)
@@ -58,7 +58,7 @@ func RegisterVote(idVoter string) error {
 func DeleteVote(vote *domain.VoteModel) error {
 	client := connections.GetInstanceMongoClient()
 	electionDatabase := client.Database("uruguay_votes")
-	uruguayVotersCollection := electionDatabase.Collection("votes")
+	uruguayVotersCollection := electionDatabase.Collection("votes_per_candidate")
 	filter := bson.D{{"id", vote.IdCandidate}}
 	update := bson.D{{"$inc", bson.D{{"votes", -1}}}}
 	_, err2 := uruguayVotersCollection.UpdateOne(context.TODO(), filter, update)
