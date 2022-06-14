@@ -26,7 +26,7 @@ func StoreVote(vote *domain.VoteModel) error {
 		log.Fatal(err2)
 	}
 	totalVotesCollection := electionDatabase.Collection("total_votes")
-	filter2 := bson.D{{"id", vote.IdElection}}
+	filter2 := bson.D{{"election_id", vote.IdElection}}
 	update2 := bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
 	_, err3 := totalVotesCollection.UpdateOne(context.TODO(), filter2, update2)
 	if err3 != nil {
@@ -98,7 +98,7 @@ func DeleteVote(vote *domain.VoteModel) error {
 	}
 
 	totalVotesCollection := electionDatabase.Collection("total_votes")
-	filter = bson.D{{"id", vote.IdElection}}
+	filter = bson.D{{"election_id", vote.IdElection}}
 	update = bson.D{{"$inc", bson.D{{"votes_counted", -1}}}}
 	_, err2 = totalVotesCollection.UpdateOne(context.TODO(), filter, update)
 	if err2 != nil {

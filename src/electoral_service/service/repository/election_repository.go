@@ -37,7 +37,7 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 
 	uruguayVotesDataBase := client.Database("uruguay_votes")
 	collectionTotalVotes := uruguayVotesDataBase.Collection("total_votes")
-	amountVotes := bson.D{{"votes_counted", 0}, {"id", election.Id}}
+	amountVotes := bson.D{{"votes_counted", 0}, {"election_id", election.Id}}
 	_, err = collectionTotalVotes.InsertOne(context.TODO(), amountVotes)
 	if err != nil {
 		fmt.Println("error storing initial amount of votes")
@@ -103,13 +103,12 @@ func convertCandidateModelToInterface(candidates []models.CandidateModel) []inte
 	return candidatesInterface
 }
 
-func GetVotes() (models.ResultElection, error) {
+func GetVotes(electionId string) (models.ResultElection, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("total_votes")
-	const initialAmountVotesId = 1
 	var amountVotes bson.M
-	err := uruguayanVotesCollection.FindOne(context.TODO(), bson.D{{"id", initialAmountVotesId}}).Decode(&amountVotes)
+	err := uruguayanVotesCollection.FindOne(context.TODO(), bson.D{{"election_id", electionId}}).Decode(&amountVotes)
 	if err != nil {
 		fmt.Println("error getting amount of votes")
 		if err == mongo.ErrNoDocuments {
@@ -168,4 +167,17 @@ func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.Po
 	}
 
 	return votesPerPartiesResume
+}
+
+func StoreElectionResult(resultElection models.ResultElection) error {
+	client := connections.GetInstanceMongoClient()
+	uruguayDataBase := client.Database("uruguay_votes")
+	uruguayanVotesCollection := uruguayDataBase.Collection("result_election")
+	_, err := uruguayanVotesCollection.InsertOne(context.TODO(), resultElection)
+	if err != nil {
+		message := "error storing result election"
+		log.Fatal(err)
+		return fmt.Errorf(message)
+	}
+	return nil
 }

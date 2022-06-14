@@ -5,13 +5,15 @@ type InitialAct struct {
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`
 	Voters           int                   `json:"voters"`
 	Mode             string                `json:"mode"`
+	ElectionId       string                `json:"electionId"`
 }
 
 type ClosingAct struct {
-	StarDate string         `json:"startDate"`
-	EndDate  string         `json:"endDate"`
-	Voters   int            `json:"voters"`
-	Result   ResultElection `json:"result"`
+	StarDate   string         `json:"startDate"`
+	EndDate    string         `json:"endDate"`
+	Voters     int            `json:"voters"`
+	Result     ResultElection `json:"result"`
+	ElectionId string         `json:"electionId"`
 }
 
 type ResultElection struct {

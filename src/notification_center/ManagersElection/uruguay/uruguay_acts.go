@@ -17,7 +17,7 @@ func SendInitialActsEmails(act models.InitialAct) {
 func sendInitialEmailTo(email string, act models.InitialAct) {
 	fmt.Println("Sending email to: " + email)
 	fmt.Println()
-	fmt.Println("Comenzó la elección: " + act.StartDate)
+	fmt.Println("Comenzó la elección: " + act.ElectionId + " " + act.StartDate)
 	fmt.Println("La cantidad de votantes que hay habilitados: " + strconv.FormatInt(int64(act.Voters), 10))
 	fmt.Println("El modo de elección es: " + act.Mode)
 	for _, politicalParty := range act.PoliticalParties {
@@ -39,7 +39,7 @@ func SendClosingEmails(act models.ClosingAct) {
 func sendClosingEmailTo(email string, act models.ClosingAct) {
 	fmt.Println("Sending email to: " + email)
 	fmt.Println()
-	fmt.Println("Comenzó la elección: " + act.StarDate)
+	fmt.Println("Comenzó la elección: " + act.ElectionId + " " + act.StarDate)
 	fmt.Println("Finalizó la elección: " + act.EndDate)
 	fmt.Println("La cantidad de votantes que ha votado: " + strconv.FormatInt(int64(act.Voters), 10))
 	fmt.Println("Los resultados de la elección son: ")

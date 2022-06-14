@@ -92,7 +92,7 @@ func FilterValidateEndTime(data any, params map[string]any) error {
 func FilterValidateVotesQuantity(data any, params map[string]any) error {
 	act := data.(models.ClosingAct)
 
-	if act.Result.AmountOfVotes > act.TotalAmountOfVoters {
+	if act.Result.AmountOfVotes > act.Result.TotalAmountOfVoters {
 		return fmt.Errorf("amount of votes is greater than total amount of voters")
 	}
 	// TODO eliminar o pasar a un log propio
