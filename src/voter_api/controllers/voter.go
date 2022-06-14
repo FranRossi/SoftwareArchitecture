@@ -7,15 +7,16 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
 	"voter_api/logic"
 	proto "voter_api/proto/authService"
 	pb "voter_api/proto/voteService"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type VoterServer struct {
@@ -92,7 +93,7 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 		if err2 != nil {
 			return &pb.VoteReply{Message: "Error"}, status.Errorf(codes.Internal, "cannot store vote info: %v", err)
 		}
-		go logic.SendCertificateSMS(voteModel, voteIdentification, timeFrontEnd)
+		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd)
 		message := "voted correctly"
 		return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "vote stored")
 	}

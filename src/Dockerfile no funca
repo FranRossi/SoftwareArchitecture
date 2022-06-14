@@ -1,0 +1,37 @@
+FROM golang:1.16-alpine as builder
+
+
+WORKDIR /src/
+# COPY the local libraries
+COPY ./message_queue/* /src/message_queue/
+COPY ./electoral_service/* /src/electoral_service/
+COPY ./pipes_and_filters/* /src/pipes_and_filters/
+
+
+WORKDIR /src/pipes_and_filters
+RUN rm -rf ./example
+RUN go mod download
+
+WORKDIR /src/electoral_service
+RUN go mod download
+
+WORKDIR /src/message_queue
+RUN go mod download
+
+WORKDIR /src/go-project/
+# COPY go.mod, go.sum and download the dependencies
+COPY ./certificate_api/go.* ./
+RUN go mod download
+
+# COPY All things inside the project and build
+COPY ./certificate_api/ .
+RUN go build -o /src/go-project/build/myapp .
+
+FROM alpine:latest
+COPY --from=builder /src/go-project/build/myapp /src/go-project/build/myapp
+
+EXPOSE 8081
+ENTRYPOINT [ "/src/go-project/build/myapp" ]
+
+# To use this Dockerfile: 
+# docker build -f Dockerfile -t test-go-docker:latest .

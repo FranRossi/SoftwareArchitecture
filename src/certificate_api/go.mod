@@ -36,3 +36,5 @@ require (
 replace message_queue => ./../message_queue
 
 replace electoral_service => ./../electoral_service/
+
+replace pipes_and_filters => ./../pipes_and_filters

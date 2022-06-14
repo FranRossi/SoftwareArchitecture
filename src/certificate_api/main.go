@@ -19,5 +19,5 @@ func main() {
 	api.ConnectionAPI(controller)
 
 	mq.GetMQWorker().Close()
-	mongoClient.Disconnect()
+	// mongoClient.Disconnect() TODO
 }

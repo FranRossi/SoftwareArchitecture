@@ -68,7 +68,7 @@ type VoteInfo struct {
 	VoteIdentification string
 }
 
-func SendCertificateSMS(vote *domain.VoteModel, voteIdentification string, timeFront time.Time) {
+func SendCertificate(vote *domain.VoteModel, voteIdentification string, timeFront time.Time) {
 	timeVoted := timeFront.Format(time.RFC3339)
 	certificate := VoteInfo{
 		IdVoter:            vote.IdVoter,
@@ -76,11 +76,11 @@ func SendCertificateSMS(vote *domain.VoteModel, voteIdentification string, timeF
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
 	}
-	sendCertificateSMSToMQ(certificate)
+	sendCertificateToMQ(certificate)
 }
 
-func sendCertificateSMSToMQ(certificate VoteInfo) {
-	queue := "certificate-sms-queue"
+func sendCertificateToMQ(certificate VoteInfo) {
+	queue := "voting-certificates"
 	certificateBytes, _ := json.Marshal(certificate)
 	mq.GetMQWorker().Send(queue, certificateBytes)
 }
