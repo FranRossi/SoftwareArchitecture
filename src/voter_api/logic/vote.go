@@ -18,14 +18,37 @@ func StoreVote(vote *domain.VoteModel) error {
 	if validationError != nil {
 		return validationError
 	}
+	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
+	if err2 != nil {
+		return fmt.Errorf("election mode cannot be found: %w", err2)
+	}
+	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
+	if electionMode == "multi" && howManyTimesVoted >= 1 {
+		errReplacing := updateNewVote(vote)
+		if errReplacing != nil {
+			return fmt.Errorf("candidate cannot be replaced: %w", errReplacing)
+		}
+	}
 	err := repository.StoreVote(vote)
 	if err != nil {
 		return fmt.Errorf("vote cannot be stored: %w", err)
 	}
-	err = repository.RegisterVote(vote.IdVoter)
+	err = repository.RegisterVote(vote, electionMode)
 	generateElectionSession(vote.IdElection)
-	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
+	howManyTimesVoted = howManyTimesVoted + 1
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
+	return nil
+}
+
+func updateNewVote(vote *domain.VoteModel) error {
+	err := repository.DeleteOldVote(vote)
+	if err != nil {
+		return fmt.Errorf("old vote cannot be deleted: %w", err)
+	}
+	err2 := repository.ReplaceLastCandidateVoted(vote)
+	if err2 != nil {
+		return fmt.Errorf("vote cannot be updated: %w", err2)
+	}
 	return nil
 }
 
