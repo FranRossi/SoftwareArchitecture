@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type ConsultingController struct {
+type ConsultingElectoralAuthorityController struct {
 	repo *repositories.ConsultingRepo
 }
 
-func NewConsultingController(repo *repositories.ConsultingRepo) *ConsultingController {
-	return &ConsultingController{repo: repo}
+func NewConsultingController(repo *repositories.ConsultingRepo) *ConsultingElectoralAuthorityController {
+	return &ConsultingElectoralAuthorityController{repo: repo}
 }
 
-func (controller *ConsultingController) RequestVote(c *fiber.Ctx) error {
+func (controller *ConsultingElectoralAuthorityController) RequestVote(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	voterId := c.Params("voterId")
 	electionId := c.Params("electionId")
@@ -38,7 +38,7 @@ func (controller *ConsultingController) RequestVote(c *fiber.Ctx) error {
 	})
 }
 
-func (controller *ConsultingController) RequestElectionResult(c *fiber.Ctx) error {
+func (controller *ConsultingElectoralAuthorityController) RequestElectionResult(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	electionId := c.Params("electionId")
 	electionResult, err := controller.repo.RequestElectionResult(electionId)
@@ -53,9 +53,6 @@ func (controller *ConsultingController) RequestElectionResult(c *fiber.Ctx) erro
 		Result:           electionResult,
 		QueryRequestTime: timeQueryRequest.Format(time.RFC3339),
 	}
-	votesPerDepartment, totalAmountOfVoterPerDepartment := controller.repo.RequestElectionResultPerDepartment(electionId)
-	electionResponse.Result.AmountOfVotersPerDepartment = totalAmountOfVoterPerDepartment
-	electionResponse.Result.TotalAmountOfVotesPerDepartment = votesPerDepartment
 	timeQueryResponse := time.Now()
 	electionResponse.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
 	electionResponse.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)

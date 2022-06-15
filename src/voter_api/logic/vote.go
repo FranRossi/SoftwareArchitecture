@@ -37,7 +37,21 @@ func StoreVote(vote *domain.VoteModel) error {
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
+	go updateElectionResult(vote)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func updateElectionResult(vote *domain.VoteModel) {
+	voter, err := repository.FindVoter(vote.IdVoter)
+	region := voter.Region
+	err = repository.UpdateElectionResult(vote, region)
+	if err != nil {
+		fmt.Errorf("election result cannot be updated: %w", err)
+	}
 }
 
 func updateNewVote(vote *domain.VoteModel) error {

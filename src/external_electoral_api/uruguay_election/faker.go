@@ -42,8 +42,11 @@ func customGeneratorVoter(amountVoters int) {
 			voterModel.Id = strconv.FormatInt(int64(i+10000000), 10)
 			departmentNumber := rand.Intn(len(departments))
 			voterModel.Department = departments[departmentNumber]
-
-			voterModel.CivicCredential = randomCivicCredential()
+			if voterModel.Id == "10000000" {
+				voterModel.CivicCredential = "1"
+			} else {
+				voterModel.CivicCredential = randomCivicCredential()
+			}
 			voterModel.IdCircuit = strconv.FormatInt(int64(departmentNumber), 10)
 			faker.FakeData(&voterModel)
 			voters = append(voters, voterModel)

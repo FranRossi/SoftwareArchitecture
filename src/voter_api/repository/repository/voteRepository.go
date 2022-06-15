@@ -179,3 +179,20 @@ func DeleteOldVote(vote *domain.VoteModel) error {
 	}
 	return nil
 }
+
+func UpdateElectionResult(vote *domain.VoteModel, region string) error {
+	client := connections.GetInstanceMongoClient()
+	uruguayDataBase := client.Database("uruguay_votes")
+	uruguayanVotesCollection := uruguayDataBase.Collection("result_election")
+	filter := bson.D{{"regions", bson.D{{"$elemMatch", bson.D{{"name", region}}}}}}
+	update := bson.D{{"$inc", bson.D{{"amount_voted", 1}}},
+		{"$inc", bson.D{{"regions.$.votes", 1}}},
+	}
+	_, err := uruguayanVotesCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		message := "error storing result election"
+		log.Fatal(err)
+		return fmt.Errorf(message)
+	}
+	return nil
+}

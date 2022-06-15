@@ -67,7 +67,6 @@ func StoreElectionVoters(voters []models.VoterModel) error {
 
 func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {
 	var votersInterface []interface{}
-
 	for _, v := range voters {
 		votersInterface = append(votersInterface, v)
 	}
@@ -95,7 +94,6 @@ func convertCandidateModelToInterface(candidates []models.CandidateModel) []inte
 	for _, v := range candidates {
 		candidatesResume = append(candidatesResume, models.CandidateEssential{Id: v.Id, Name: v.FullName, Votes: 0, PoliticalParty: v.NamePoliticalParty})
 	}
-
 	var candidatesInterface []interface{}
 	for _, v := range candidatesResume {
 		candidatesInterface = append(candidatesInterface, v)
@@ -103,7 +101,7 @@ func convertCandidateModelToInterface(candidates []models.CandidateModel) []inte
 	return candidatesInterface
 }
 
-func GetVotes(electionId string) (models.ResultElection, error) {
+func GetTotalVotes(electionId string) (int, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("total_votes")
@@ -112,22 +110,15 @@ func GetVotes(electionId string) (models.ResultElection, error) {
 	if err != nil {
 		fmt.Println("error getting amount of votes")
 		if err == mongo.ErrNoDocuments {
-			return models.ResultElection{}, nil
+			return -1, nil
 		}
 		log.Fatal(err)
 	}
 	amountVotesCounted := int(amountVotes["votes_counted"].(int32))
-	votesCandidatesResult, err := getEachCandidatesVotes()
-	if err != nil {
-		return models.ResultElection{}, err
-	}
-	voterPerParties := getVotesPerParties(votesCandidatesResult)
-	electionResult := models.ResultElection{VotesPerCandidates: votesCandidatesResult, AmountOfVotes: amountVotesCounted, VotesPerParties: voterPerParties}
-
-	return electionResult, nil
+	return amountVotesCounted, nil
 }
 
-func getEachCandidatesVotes() ([]models.CandidateEssential, error) {
+func GetEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("votes_per_candidate")
@@ -143,7 +134,7 @@ func getEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		log.Fatal(err)
 	}
-	votesCandidates := make([]models.CandidateEssential, len(results))
+	var votesCandidates []models.CandidateEssential
 	for _, result := range results {
 		candidate := &models.CandidateEssential{
 			Votes:          int(result["votes"].(int32)),
@@ -154,19 +145,6 @@ func getEachCandidatesVotes() ([]models.CandidateEssential, error) {
 		votesCandidates = append(votesCandidates, *candidate)
 	}
 	return votesCandidates, nil
-}
-
-func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.PoliticalPartyEssentials {
-	votesPerParties := make(map[string]int, len(votesCandidates))
-	for _, candidate := range votesCandidates {
-		votesPerParties[candidate.PoliticalParty] += candidate.Votes
-	}
-	var votesPerPartiesResume []models.PoliticalPartyEssentials
-	for key, value := range votesPerParties {
-		votesPerPartiesResume = append(votesPerPartiesResume, models.PoliticalPartyEssentials{Name: key, Votes: value})
-	}
-
-	return votesPerPartiesResume
 }
 
 func StoreElectionResult(resultElection models.ResultElection) error {

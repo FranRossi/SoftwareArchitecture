@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ConnectionAPI(controller *controllers.ConsultingController) {
+func ConnectionAPI(controller *controllers.ConsultingElectoralAuthorityController) {
 	// Define Fiber config.
 	config := configs.FiberConfig()
 

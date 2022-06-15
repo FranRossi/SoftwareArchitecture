@@ -73,7 +73,8 @@ func convertVoters(voters []models2.VoterModel) []modelsGeneric.VoterModel {
 			Sex:         voter.Sex,
 			Phone:       voter.Phone,
 			Voted:       voter.Voted,
-			OtherFields: map[string]any{"lastname": voter.LastName, "civiccredential": voter.CivicCredential, "department": voter.Department, "circuit": voter.IdCircuit},
+			Region:      voter.Department,
+			OtherFields: map[string]any{"lastname": voter.LastName, "civiccredential": voter.CivicCredential, "circuit": voter.IdCircuit},
 		}
 		votersGeneric = append(votersGeneric, voterGeneric)
 	}

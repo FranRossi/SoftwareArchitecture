@@ -5,6 +5,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"sync"
 )
 
 type ConsultingRepo struct {
@@ -46,18 +47,79 @@ func (certRepo *ConsultingRepo) RequestElectionResult(electionId string) (m.Resu
 	if err != nil {
 		return m.ResultElection{}, err
 	}
+	votesPerCandidates := result["votes_per_candidates"].(bson.A)
+	voterPerParties := result["votes_per_parties"].(bson.A)
+	regions := result["regions"].(bson.A)
+	votesPerCandidatesStruct, votesPerPartiesStruct, regionsStruct := convertInterfaceResultToStruct(votesPerCandidates, voterPerParties, regions)
+
 	resultElection := m.ResultElection{
 		ElectionId:          electionId,
 		AmountOfVotes:       int(result["amount_voted"].(int32)),
-		TotalAmountOfVoters: int(result["total_amount_voters"].(int32)),
-		VotesPerCandidates:  result["votes_per_candidate"].([]m.CandidateEssential),
-		VotesPerParties:     result["votes_per_party"].([]m.PoliticalPartyEssentials),
+		TotalAmountOfVoters: int(result["total_amount_of_voters"].(int32)),
+		VotesPerCandidates:  votesPerCandidatesStruct,
+		VotesPerParties:     votesPerPartiesStruct,
+		Regions:             regionsStruct,
 	}
 	return resultElection, nil
 }
 
-func (certRepo *ConsultingRepo) RequestElectionResultPerDepartment(electionId string) (int, int) {
-	//client := certRepo.mongoClient
-	//database := client.Database(certRepo.database)
-	return 1, 1
+func convertInterfaceResultToStruct(votesPerCandidates, votesPerParties, regions bson.A) ([]m.CandidateEssential, []m.PoliticalPartyEssentials, []m.Region) {
+	var votesPerCandidatesStruct []m.CandidateEssential
+	var votesPerPartiesStruct []m.PoliticalPartyEssentials
+	var regionsStruct []m.Region
+	wg := &sync.WaitGroup{}
+	wg.Add(3)
+	go func() {
+		votesPerCandidatesStruct = convertVotesPerCandidateToStruct(votesPerCandidates)
+		wg.Done()
+	}()
+	go func() {
+		votesPerPartiesStruct = convertVotesPerPartiesToStruct(votesPerParties)
+		wg.Done()
+	}()
+	go func() {
+		regionsStruct = convertRegionsToStruct(regions)
+		wg.Done()
+	}()
+	wg.Wait()
+	return votesPerCandidatesStruct, votesPerPartiesStruct, regionsStruct
+}
+
+func convertVotesPerCandidateToStruct(votesPerCandidates bson.A) []m.CandidateEssential {
+	var votesPerCandidatesStruct []m.CandidateEssential
+	for _, votePerCandidate := range votesPerCandidates {
+		vote := votePerCandidate.(bson.M)
+		votesPerCandidatesStruct = append(votesPerCandidatesStruct, m.CandidateEssential{
+			Id:             vote["id"].(string),
+			Name:           vote["name"].(string),
+			Votes:          int(vote["votes"].(int32)),
+			PoliticalParty: vote["politicalParty"].(string),
+		})
+	}
+	return votesPerCandidatesStruct
+}
+
+func convertVotesPerPartiesToStruct(votesPerParties bson.A) []m.PoliticalPartyEssentials {
+	var votesPerPartiesStruct []m.PoliticalPartyEssentials
+	for _, votePerParty := range votesPerParties {
+		vote := votePerParty.(bson.M)
+		votesPerPartiesStruct = append(votesPerPartiesStruct, m.PoliticalPartyEssentials{
+			Name:  vote["name"].(string),
+			Votes: int(vote["votes"].(int32)),
+		})
+	}
+	return votesPerPartiesStruct
+}
+
+func convertRegionsToStruct(regions bson.A) []m.Region {
+	var regionsStruct []m.Region
+	for _, region := range regions {
+		r := region.(bson.M)
+		regionsStruct = append(regionsStruct, m.Region{
+			Name:        r["name"].(string),
+			TotalVoters: int(r["total_voters"].(int32)),
+			Votes:       int(r["votes"].(int32)),
+		})
+	}
+	return regionsStruct
 }
