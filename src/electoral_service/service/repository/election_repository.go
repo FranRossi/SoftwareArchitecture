@@ -154,7 +154,6 @@ func StoreElectionResult(resultElection models.ResultElection) error {
 	_, err := uruguayanVotesCollection.InsertOne(context.TODO(), resultElection)
 	if err != nil {
 		message := "error storing result election"
-		log.Fatal(err)
 		return fmt.Errorf(message)
 	}
 	return nil

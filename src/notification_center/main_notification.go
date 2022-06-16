@@ -3,6 +3,6 @@ package main
 import "notification_center/logic"
 
 func main() {
-	logic.RecieveActs()
+	logic.ReceiveActs()
 	logic.ReceiveAlert()
 }

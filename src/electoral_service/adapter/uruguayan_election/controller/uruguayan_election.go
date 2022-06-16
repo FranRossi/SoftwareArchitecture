@@ -48,18 +48,18 @@ func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.Elect
 		ElectionMode:     election.ElectionMode,
 		Voters:           convertVoters(election.Voters),
 		PoliticalParties: convertPoliticalParties(election.PoliticalParties),
-		OtherFields:      convertMaximumVotesAndCertificate(),
+		OtherFields:      convertMaximumVotesAndCertificateAndEmails(election.Emails),
 	}
 	return electionGeneric
 }
 
-func convertMaximumVotesAndCertificate() map[string]any {
-	maximum := map[string]any{
+func convertMaximumVotesAndCertificateAndEmails(emails []string) map[string]any {
+	otherFields := map[string]any{
 		"maxVotes":       os.Getenv("maxVotes"),
 		"maxCertificate": os.Getenv("maxCertificate"),
+		"emails":         emails,
 	}
-	return maximum
-
+	return otherFields
 }
 
 func convertVoters(voters []models2.VoterModel) []modelsGeneric.VoterModel {

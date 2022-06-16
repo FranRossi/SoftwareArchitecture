@@ -6,6 +6,7 @@ type InitialAct struct {
 	Voters           int                   `json:"voters"`
 	Mode             string                `json:"mode"`
 	ElectionId       string                `json:"electionId"`
+	Emails           []string              `json:"emails"`
 }
 
 type ClosingAct struct {
@@ -13,6 +14,7 @@ type ClosingAct struct {
 	EndDate    string         `json:"endDate"`
 	Result     ResultElection `json:"result"`
 	ElectionId string         `json:"electionId"`
+	Emails     []string       `json:"emails"`
 }
 
 type PoliticalPartyEssentials struct {

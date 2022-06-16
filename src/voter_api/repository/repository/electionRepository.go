@@ -123,7 +123,7 @@ func HowManyVotesHasAVoter(idVoter string) int {
 	return int(result["voted"].(int32))
 }
 
-func GetMaximumValuesBeforeAlert(idElection string) (int, int, error) {
+func GetMaxVotesAndEmailsBeforeAlert(idElection string) (int, []string, error) {
 	client := connections.GetInstanceMongoClient()
 	electionDatabase := client.Database("uruguay_election")
 	uruguayCollection := electionDatabase.Collection("configuration_election")
@@ -133,16 +133,19 @@ func GetMaximumValuesBeforeAlert(idElection string) (int, int, error) {
 		fmt.Println(err2.Error())
 		fmt.Println("wrong election mode")
 		if err2 == mongo.ErrNoDocuments {
-			return 0, 0, err2
+			return 0, []string{}, err2
 		}
 		log.Fatal(err2)
 	}
 	maxVotesString := result["otherField"].(bson.M)["maxVotes"].(string)
 	maxVotes, err3 := strconv.Atoi(maxVotesString)
-	maxCertificatesString := result["otherField"].(bson.M)["maxCertificate"].(string)
-	maxCertificates, err4 := strconv.Atoi(maxCertificatesString)
-	if err3 != nil || err4 != nil {
-		return -1, -1, fmt.Errorf("worng maximum values")
+	emails := result["otherField"].(bson.M)["emails"].(bson.A)
+	var emailsArray []string
+	for _, email := range emails {
+		emailsArray = append(emailsArray, email.(string))
 	}
-	return maxVotes, maxCertificates, nil
+	if err3 != nil {
+		return -1, []string{}, fmt.Errorf("worng maximum values")
+	}
+	return maxVotes, emailsArray, nil
 }

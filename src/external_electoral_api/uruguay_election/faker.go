@@ -23,7 +23,11 @@ func CreateElectionMock(id string, amountVoters int) (models.ElectionModel, erro
 	if err != nil {
 		return models.ElectionModel{}, err
 	}
+	setEmail(&electionModel)
 	return electionModel, err
+}
+func setEmail(election *models.ElectionModel) {
+	election.Emails = []string{"montevideo@intendencia.com", "montevideo@presidencia.com", "colonia@intendencia.com"}
 }
 
 func customGenerateDates(election *models.ElectionModel) {
@@ -43,11 +47,11 @@ func customGeneratorVoter(amountVoters int) {
 			departmentNumber := rand.Intn(len(departments))
 			voterModel.Department = departments[departmentNumber]
 			if voterModel.Id == "10000000" {
-				voterModel.CivicCredential = "1"
+				voterModel.IdCircuit = "1"
 			} else {
-				voterModel.CivicCredential = randomCivicCredential()
+				voterModel.IdCircuit = strconv.FormatInt(int64(departmentNumber), 10)
 			}
-			voterModel.IdCircuit = strconv.FormatInt(int64(departmentNumber), 10)
+			voterModel.CivicCredential = randomCivicCredential()
 			faker.FakeData(&voterModel)
 			voters = append(voters, voterModel)
 

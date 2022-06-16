@@ -5,15 +5,12 @@ import (
 	"electoral_service/service"
 	"electoral_service/service/logic"
 	"electoral_service/service/repository"
-	"message_queue"
-	"os"
 )
 
 func Injection() *service.ElectionService {
 	repo := &repository.ElectionRepo{}
 	adapter := &controller.ElectionController{}
-	logic := logic.NewLogicElection(repo)
-	service := service.NewElectionService(logic, adapter)
-	mq.BuildRabbitWorker(os.Getenv("mq_address"))
-	return service
+	logicElection := logic.NewLogicElection(repo)
+	serviceElection := service.NewElectionService(logicElection, adapter)
+	return serviceElection
 }

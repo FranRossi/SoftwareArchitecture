@@ -139,8 +139,8 @@ func setPoliticalPartiesNamesToCandidates(politicalParties []models.PoliticalPar
 func SetElectionDate(election *models.ElectionModelEssential) {
 	startDate, _ := time.Parse(time.RFC3339, election.StartingDate)
 	endDate, _ := time.Parse(time.RFC3339, election.FinishingDate)
-	setTimer(startDate, startElection(startDate, election.PoliticalParties, len(election.Voters), election.ElectionMode, election.Id))
-	setTimer(endDate, endElection(startDate, endDate, len(election.Voters), election.Id))
+	setTimer(startDate, startElection(startDate, election))
+	setTimer(endDate, endElection(startDate, endDate, election))
 }
 
 func setTimer(timerDate time.Time, action func()) {
@@ -154,20 +154,21 @@ func setTimer(timerDate time.Time, action func()) {
 	action()
 }
 
-func startElection(startDate time.Time, politicalParties []models.PoliticalPartyModel, voters int, electionMode, electionId string) func() {
+func startElection(startDate time.Time, election *models.ElectionModelEssential) func() {
 	return func() {
 		fmt.Println("Election started")
-		sendInitialAct(startDate, politicalParties, voters, electionMode, electionId)
+		sendInitialAct(startDate, election)
 	}
 }
 
-func sendInitialAct(startDate time.Time, politicalParties []models.PoliticalPartyModel, voters int, electionMode, electionId string) {
+func sendInitialAct(startDate time.Time, election *models.ElectionModelEssential) {
 	act := models.InitialAct{
 		StarDate:         startDate.Format(time.RFC3339),
-		PoliticalParties: politicalParties,
-		Voters:           voters,
-		Mode:             electionMode,
-		ElectionId:       electionId,
+		PoliticalParties: election.PoliticalParties,
+		Voters:           len(election.Voters),
+		Mode:             election.ElectionMode,
+		ElectionId:       election.Id,
+		Emails:           election.OtherFields["emails"].([]string),
 	}
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
@@ -177,9 +178,9 @@ func sendInitialAct(startDate time.Time, politicalParties []models.PoliticalPart
 	mq.GetMQWorker().Send(queue, jsonAct)
 }
 
-func endElection(startDate, endDate time.Time, voters int, electionId string) func() {
+func endElection(startDate, endDate time.Time, election *models.ElectionModelEssential) func() {
 	return func() {
-		resultElection, err := getElectionResult(electionId, voters)
+		resultElection, err := getElectionResult(election.Id, len(election.Voters))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -187,6 +188,7 @@ func endElection(startDate, endDate time.Time, voters int, electionId string) fu
 			StarDate: startDate.Format(time.RFC3339),
 			EndDate:  endDate.Format(time.RFC3339),
 			Result:   resultElection,
+			Emails:   election.OtherFields["emails"].([]string),
 		}
 		validationError := validation.ValidateEndAct(act)
 		if validationError != nil {
