@@ -5,13 +5,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func PublicRoutesElectoralAuth(a *fiber.App, controller *controllers.ConsultingElectoralAuthorityController) {
+func PublicRoutesElectionVotes(a *fiber.App, controller *controllers.ConsultingElectionVotesController) {
 	route := a.Group("/api/v1")
 	route.Get("/consulting/vote/:electionId/:voterId", controller.RequestVote)
 	route.Get("/consulting/election/:electionId", controller.RequestElectionResult)
+	route.Get("/consulting/election/votesHours/:electionId", controller.RequestAverageVotingTime)
 }
 
-func PublicRoutesElectionConfig(a *fiber.App, controller *controllers.ConsultingElectoralConfigController) {
+func PublicRoutesElectionInfo(a *fiber.App, controller *controllers.ConsultingElectionInfoController) {
 	route := a.Group("/api/v1")
-	route.Get("/consulting/electionConfig/:electionId", controller.RequestElectionConfiguration)
+	route.Get("/consulting/election/config/:electionId", controller.RequestElectionConfiguration)
 }

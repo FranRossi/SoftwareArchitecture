@@ -3,8 +3,11 @@ package repositories
 import (
 	m "consulting_api/models"
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
+	"strings"
 	"sync"
 )
 
@@ -122,4 +125,44 @@ func convertRegionsToStruct(regions bson.A) []m.Region {
 		})
 	}
 	return regionsStruct
+}
+
+func (certRepo *VotesRepo) RequestAverageVotingTime(electionId string) (map[string]int, error) {
+	client := certRepo.mongoClient
+	database := client.Database(certRepo.database)
+	collection := database.Collection("votes_info")
+	filter := bson.D{{"election", electionId}}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return map[string]int{}, err
+	}
+	var results []bson.M
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		log.Fatal(err)
+	}
+	averageTimes, err := calculateWhichHoursHaveMoreVotes(results)
+	if err != nil {
+		return map[string]int{}, err
+	}
+	return averageTimes, nil
+}
+
+func calculateWhichHoursHaveMoreVotes(results []bson.M) (map[string]int, error) {
+	hours := make(map[string]int)
+	for _, result := range results {
+		timeVoted := result["time_front_end"].(string)
+		timeVotedSplit := strings.Split(timeVoted, "T")
+		fmt.Println(timeVotedSplit)
+		hourMinutesSecond := timeVotedSplit[1]
+		hourSplit := strings.Split(hourMinutesSecond, ":")
+		fmt.Println(hourSplit)
+		hour := hourSplit[0]
+		fmt.Println(hour)
+		if _, ok := hours[hour]; ok {
+			hours[hour]++
+		} else {
+			hours[hour] = 1
+		}
+	}
+	return hours, nil
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ConnectionAPI(controller *controllers.ConsultingElectoralAuthorityController, electionController *controllers.ConsultingElectoralConfigController) {
+func ConnectionAPI(controller *controllers.ConsultingElectionVotesController, electionController *controllers.ConsultingElectionInfoController) {
 	// Define Fiber config.
 	config := configs.FiberConfig()
 
@@ -16,8 +16,8 @@ func ConnectionAPI(controller *controllers.ConsultingElectoralAuthorityControlle
 
 	// Routes.
 	// Aqui defino cuales van a ser las rutas accesibles
-	routes.PublicRoutesElectoralAuth(app, controller)          // Register a public routes for app.
-	routes.PublicRoutesElectionConfig(app, electionController) // Register a public routes for app.
+	routes.PublicRoutesElectionVotes(app, controller)        // Register a public routes for app.
+	routes.PublicRoutesElectionInfo(app, electionController) // Register a public routes for app.
 	// Aqui inicializamos el servidor en el puerto 8081
 	app.Listen(":8082")
 }

@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type ConsultingElectoralConfigController struct {
+type ConsultingElectionInfoController struct {
 	repo *repositories.ElectionRepo
 }
 
-func NewConsultingElectionConfigController(repo *repositories.ElectionRepo) *ConsultingElectoralConfigController {
-	return &ConsultingElectoralConfigController{repo: repo}
+func NewConsultingElectionConfigController(repo *repositories.ElectionRepo) *ConsultingElectionInfoController {
+	return &ConsultingElectionInfoController{repo: repo}
 }
 
-func (controller *ConsultingElectoralConfigController) RequestElectionConfiguration(c *fiber.Ctx) error {
+func (controller *ConsultingElectionInfoController) RequestElectionConfiguration(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	electionId := c.Params("electionId")
 	electionConfig, err := controller.repo.RequestElectionConfig(electionId)
