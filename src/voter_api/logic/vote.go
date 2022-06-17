@@ -19,25 +19,28 @@ func StoreVote(vote domain.VoteModel) error {
 		return validationError
 	}
 	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
+	voter, _ := repository.FindVoter(vote.IdVoter)
+	region := voter.Region
 	if err2 != nil {
-		return fmt.Errorf("election mode cannot be found: %w", err2)
+		return fmt.Errorf("election mode cannot be found or political party: %w", err2)
 	}
 	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
 	if electionMode == "multi" && howManyTimesVoted >= 1 {
-		errReplacing := updateNewVote(vote)
+		errReplacing := updateNewVote(vote, region)
 		if errReplacing != nil {
 			return fmt.Errorf("candidate cannot be replaced: %w", errReplacing)
 		}
 	}
-	politicalPartyName, err := repository.StoreVote(vote)
+	err := repository.StoreVote(vote)
 	if err != nil {
 		return fmt.Errorf("vote cannot be stored: %w", err)
 	}
 	err = repository.RegisterVote(vote, electionMode)
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
+	politicalParty, err := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
-	go updateElectionResult(vote, politicalPartyName)
+	go updateElectionResult(vote, politicalParty, region)
 	if err != nil {
 		return err
 	}
@@ -45,17 +48,15 @@ func StoreVote(vote domain.VoteModel) error {
 	return nil
 }
 
-func updateElectionResult(vote domain.VoteModel, politicalPartyName string) {
-	voter, err := repository.FindVoter(vote.IdVoter)
-	region := voter.Region
-	err = repository.UpdateElectionResult(vote, region, politicalPartyName)
+func updateElectionResult(vote domain.VoteModel, politicalPartyName, region string) {
+	err := repository.UpdateElectionResult(vote, region, politicalPartyName)
 	if err != nil {
 		fmt.Errorf("election result cannot be updated: %w", err)
 	}
 }
 
-func updateNewVote(vote domain.VoteModel) error {
-	err := repository.DeleteOldVote(vote)
+func updateNewVote(vote domain.VoteModel, region string) error {
+	err := repository.DeleteOldVote(vote, region)
 	if err != nil {
 		return fmt.Errorf("old vote cannot be deleted: %w", err)
 	}
@@ -63,6 +64,7 @@ func updateNewVote(vote domain.VoteModel) error {
 	if err2 != nil {
 		return fmt.Errorf("vote cannot be updated: %w", err2)
 	}
+
 	return nil
 }
 

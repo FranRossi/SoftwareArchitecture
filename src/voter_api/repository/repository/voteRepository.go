@@ -11,7 +11,7 @@ import (
 	"voter_api/domain"
 )
 
-func StoreVote(vote domain.VoteModel) (string, error) {
+func StoreVote(vote domain.VoteModel) error {
 	client := connections.GetInstanceMongoClient()
 	electionDatabase := client.Database("uruguay_votes")
 	uruguayVotersCollection := electionDatabase.Collection("votes_per_candidate")
@@ -21,15 +21,11 @@ func StoreVote(vote domain.VoteModel) (string, error) {
 	if err2 != nil {
 		fmt.Println("error storing vote")
 		if err2 == mongo.ErrNoDocuments {
-			return "", nil
+			return nil
 		}
 		log.Fatal(err2)
 	}
-	var result bson.M
-	err := uruguayVotersCollection.FindOne(context.TODO(), bson.D{{"id", vote.IdCandidate}}).Decode(&result)
-	if err != nil {
-		return "", err
-	}
+
 	totalVotesCollection := electionDatabase.Collection("total_votes")
 	filter2 := bson.D{{"election_id", vote.IdElection}}
 	update2 := bson.D{{"$inc", bson.D{{"votes_counted", 1}}}}
@@ -37,12 +33,12 @@ func StoreVote(vote domain.VoteModel) (string, error) {
 	if err3 != nil {
 		fmt.Println("error registering new vote on election")
 		if err3 == mongo.ErrNoDocuments {
-			return "", nil
+			return nil
 		}
 		log.Fatal(err3)
 	}
-	politicalParty := result["politicalParty"].(string)
-	return politicalParty, nil
+
+	return nil
 }
 
 func RegisterVote(vote domain.VoteModel, electionMode string) error {
@@ -159,7 +155,7 @@ func ReplaceLastCandidateVoted(vote domain.VoteModel) error {
 	return nil
 }
 
-func DeleteOldVote(vote domain.VoteModel) error {
+func DeleteOldVote(vote domain.VoteModel, region string) error {
 	client := connections.GetInstanceMongoClient()
 	electionDatabase := client.Database("uruguay_election")
 	uruguayVotersCollection := electionDatabase.Collection("voters")
@@ -174,14 +170,32 @@ func DeleteOldVote(vote domain.VoteModel) error {
 	votesPerCandidatesCollection := votesDatabase.Collection("votes_per_candidate")
 	filter2 := bson.D{{"id", lastCandidateVoted}}
 	update2 := bson.D{{"$inc", bson.D{{"votes", -1}}}}
-	_, err2 := votesPerCandidatesCollection.UpdateOne(context.TODO(), filter2, update2)
+	var politicalPartyObject bson.M
+	err2 := votesPerCandidatesCollection.FindOneAndUpdate(context.TODO(), filter2, update2).Decode(&politicalPartyObject)
 	if err2 != nil {
 		message := "error deleting old vote from candidate"
 		if err2 == mongo.ErrNoDocuments {
 			return fmt.Errorf("not documents found")
 		}
-		log.Fatal(err2)
 		return fmt.Errorf(message)
+	}
+	latestPoliticalParty := politicalPartyObject["politicalParty"].(string)
+
+	uruguayanVotesCollection := votesDatabase.Collection("result_election")
+	query := bson.M{"election_id": vote.IdElection}
+	updateDocument := bson.M{"$inc": bson.M{
+		"votes_per_candidates.$[candidate].votes": -1,
+		"votes_per_parties.$[party].votes":        -1,
+		"regions.$[region].votes":                 -1,
+		"amount_voted":                            -1,
+	}}
+	opts := options.Update().SetArrayFilters(options.ArrayFilters{
+		Filters: []interface{}{bson.D{{"candidate.id", lastCandidateVoted}}, bson.D{{"party.name", latestPoliticalParty}}, bson.D{{"region.name", region}}},
+	})
+
+	_, err = uruguayanVotesCollection.UpdateOne(context.TODO(), query, updateDocument, opts)
+	if err != nil {
+		return fmt.Errorf("error deleting vote from result election: %v", err)
 	}
 	return nil
 }
@@ -190,35 +204,36 @@ func UpdateElectionResult(vote domain.VoteModel, region, politicalParty string) 
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("result_election")
-	filterRegion := bson.D{
-		{"regions", bson.D{{"$elemMatch", bson.D{{"name", region}}}}},
-		{"election_id", vote.IdElection},
-	}
-	updateRegionAndotalVotes := bson.D{{"$inc", bson.D{{"amount_voted", 1}}},
-		{"$inc", bson.D{{"regions.$.votes", 1}}},
-	}
-	_, err := uruguayanVotesCollection.UpdateOne(context.TODO(), filterRegion, updateRegionAndotalVotes)
 
-	filterCandidates := bson.D{
-		{"votes_per_candidates", bson.D{{"$elemMatch", bson.D{{"id", vote.IdCandidate}}}}},
-		{"election_id", vote.IdElection},
-	}
-	update := bson.D{
-		{"$inc", bson.D{{"votes_per_candidates.$.votes", 1}}},
-	}
-	_, err = uruguayanVotesCollection.UpdateOne(context.TODO(), filterCandidates, update)
-	filterParties := bson.D{
-		{"votes_per_parties", bson.D{{"$elemMatch", bson.D{{"name", politicalParty}}}}},
-		{"election_id", vote.IdElection},
-	}
-	updateParties := bson.D{
-		{"$inc", bson.D{{"votes_per_parties.$.votes", 1}}},
-	}
-	_, err = uruguayanVotesCollection.UpdateOne(context.TODO(), filterParties, updateParties)
+	query := bson.M{"election_id": vote.IdElection}
+	updateDocument := bson.M{"$inc": bson.M{
+		"votes_per_candidates.$[candidate].votes": 1,
+		"votes_per_parties.$[party].votes":        1,
+		"regions.$[region].votes":                 1,
+		"amount_voted":                            1,
+	}}
+	opts := options.Update().SetArrayFilters(options.ArrayFilters{
+		Filters: []interface{}{bson.D{{"candidate.id", vote.IdCandidate}}, bson.D{{"party.name", politicalParty}}, bson.D{{"region.name", region}}},
+	})
+
+	_, err := uruguayanVotesCollection.UpdateOne(context.TODO(), query, updateDocument, opts)
 
 	if err != nil {
 		return fmt.Errorf("error updating election result: %v", err)
 	}
 
 	return nil
+}
+
+func FindPoliticalPartyFromCandidateId(candidateId string) (string, error) {
+	client := connections.GetInstanceMongoClient()
+	uruguayDataBase := client.Database("uruguay_votes")
+	uruguayVotersCollection := uruguayDataBase.Collection("votes_per_candidate")
+	var result bson.M
+	err := uruguayVotersCollection.FindOne(context.TODO(), bson.D{{"id", candidateId}}).Decode(&result)
+	if err != nil {
+		return "", fmt.Errorf("error finding political party: %v", err)
+	}
+	politicalParty := result["politicalParty"].(string)
+	return politicalParty, nil
 }

@@ -89,7 +89,7 @@ func SignVote(privateKey *rsa.PrivateKey) {
 	vote := VoteModel{
 		IdElection:  "1",
 		IdVoter:     "10000000",
-		IdCandidate: "3",
+		IdCandidate: "1",
 		Circuit:     "1",
 	}
 	voter := []byte(vote.IdVoter)
