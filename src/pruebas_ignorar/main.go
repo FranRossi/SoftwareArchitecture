@@ -5,15 +5,38 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
 
+	castedElement := true
+	// print num
+	fmt.Println(fmt.Sprint(castedElement))
+	// conver string to int
+	fmt.Print(strconv.ParseBool(fmt.Sprint(castedElement)))
+	// var varPrueba any
+	// varPrueba = 'd'
+	// fmt.Println(varPrueba)
+	// bt := []byte(string(varPrueba))
+
+	// switch v := varPrueba.(type) {
+	// case int:
+	// 	fmt.Printf("Twice %v is %v\n", v, v*2)
+	// case string:
+	// 	fmt.Printf("%q is %v bytes long\n", v, len(v))
+	// default:
+	// 	fmt.Printf("I don't know about type %T!\n", v)
+	// }
+}
+
+//////////////////////////////////
+
+func pruebaFunciones() {
 	multiplicarPor2 := fijarParametro(multiplicar, 2)
 	result := multiplicarPor2(34)
 	fmt.Println(result)
-
 }
 
 func fijarParametro(function func(a int, b int) int, x int) func(b int) int {

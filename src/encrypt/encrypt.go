@@ -20,9 +20,7 @@ func DecryptText(encryptedText string) string {
 		fmt.Fprintf(os.Stderr, "Error from decryption: %s\n", err)
 	}
 
-	textInBase64 := string(decryptedBytes)
-	textInBytes, _ := b64.StdEncoding.DecodeString(textInBase64)
-	plaintext := string(textInBytes)
+	plaintext := string(decryptedBytes)
 	return plaintext
 }
 
@@ -31,8 +29,7 @@ func EncryptText(text string) string {
 	publicKeyPEM := ReadKeyFromFile("./../encrypt/pubkey.pem")
 	publicKey := ExportPEMStrToPubKey(publicKeyPEM)
 
-	textInBase64 := b64.StdEncoding.EncodeToString([]byte(text))
-	secretMessage := []byte(textInBase64)
+	secretMessage := []byte(text)
 	rng := rand.Reader
 
 	ciphertext, err := rsa.EncryptOAEP(sha256.New(), rng, publicKey, secretMessage, nil)

@@ -15,6 +15,7 @@ func main() {
 		"check_age_upper":   FilterCheckAgeUpper,
 		"check_age_between": FilterCheckAgeBetween,
 		"echo_data":         FilterEchoData,
+		"write_file":        FilterCreateFile,
 	}
 
 	fmt.Println("Test")
@@ -118,5 +119,12 @@ func FilterCheckAgeBetween(data any, params map[string]any) error {
 func FilterEchoData(data any, params map[string]any) error {
 	input, _ := data.(int)
 	fmt.Printf("data Data: %d\n", input)
+	return nil
+}
+
+func FilterCreateFile(data any, params map[string]any) error {
+
+	file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE, 0666)
+	file.WriteString("Hello World")
 	return nil
 }

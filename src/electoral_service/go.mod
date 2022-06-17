@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	encrypt v0.0.0-00010101000000-000000000000
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -28,3 +29,5 @@ require (
 replace pipes_and_filters => ./../pipes_and_filters
 
 replace message_queue => ./../message_queue
+
+replace encrypt => ./../encrypt

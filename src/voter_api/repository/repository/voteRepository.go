@@ -2,13 +2,15 @@ package repository
 
 import (
 	"context"
+	"encrypt"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"voter_api/connections"
 	"voter_api/domain"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func StoreVote(vote *domain.VoteModel) error {
@@ -69,7 +71,7 @@ func setCandidateToVoter(vote *domain.VoteModel) error {
 	uruguayCollection := uruguayDataBase.Collection("voters")
 	opts := options.Update().SetUpsert(true)
 	filter := bson.D{{"id", vote.IdVoter}}
-	update := bson.D{{"$set", bson.D{{"lastCandidate", vote.IdCandidate}}}}
+	update := bson.D{{"$set", bson.D{{"lastCandidateVotedId", encrypt.EncryptText(vote.IdCandidate)}}}}
 	_, err2 := uruguayCollection.UpdateOne(context.TODO(), filter, update, opts)
 	if err2 != nil {
 		message := "error registering last candidate for voter"
@@ -140,7 +142,7 @@ func ReplaceLastCandidateVoted(vote *domain.VoteModel) error {
 	electionDatabase := client.Database("uruguay_election")
 	uruguayVotersCollection := electionDatabase.Collection("voters")
 	filter := bson.D{{"id", vote.IdVoter}}
-	update := bson.D{{"$set", bson.D{{"lastCandidate", vote.IdCandidate}}}}
+	update := bson.D{{"$set", bson.D{{"lastCandidateVotedId", encrypt.EncryptText(vote.IdCandidate)}}}}
 	_, err2 := uruguayVotersCollection.UpdateOne(context.TODO(), filter, update)
 	if err2 != nil {
 		message := "error replacing candidate for voter"
@@ -162,11 +164,11 @@ func DeleteOldVote(vote *domain.VoteModel) error {
 	if err != nil {
 		return fmt.Errorf("error deleting old vote: %v", err)
 	}
-	lastCandidateVoted := result["lastCandidate"].(string)
+	lastCandidateVotedId := encrypt.DecryptText(result["lastCandidateVotedId"].(string))
 
 	votesDatabase := client.Database("uruguay_votes")
 	votesPerCandidatesCollection := votesDatabase.Collection("votes_per_candidate")
-	filter2 := bson.D{{"id", lastCandidateVoted}}
+	filter2 := bson.D{{"id", lastCandidateVotedId}}
 	update2 := bson.D{{"$inc", bson.D{{"votes", -1}}}}
 	_, err2 := votesPerCandidatesCollection.UpdateOne(context.TODO(), filter2, update2)
 	if err2 != nil {

@@ -9,11 +9,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"io/ioutil"
 	"log"
 	"voting_simulator/proto"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func generateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
@@ -46,7 +47,6 @@ func exportPrivKeyAsPEMStr(privkey *rsa.PrivateKey) string {
 		},
 	))
 	return privKeyPem
-
 }
 
 // Save string to a file

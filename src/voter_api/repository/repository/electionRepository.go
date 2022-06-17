@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	m "electoral_service/models"
+	"encrypt"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"strconv"
 	"voter_api/connections"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //func RegisterUser(user *domain.User) error {
@@ -35,7 +37,7 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
 	if err2 != nil {
 		fmt.Println(err2.Error())
-		fmt.Println("there is no voter habilitated to vote with that id")
+		fmt.Println("there is no voter allowed to vote with that id")
 		if err2 == mongo.ErrNoDocuments {
 			return nil, nil
 		}
@@ -43,18 +45,22 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 	}
 	other := result["otherFields"].(bson.M)
 	user := &m.VoterModel{
-		Id:          result["id"].(string),
-		FullName:    result["name"].(string),
-		Sex:         result["sex"].(string),
-		BirthDate:   result["birthDate"].(string),
-		Phone:       result["phone"].(string),
-		Email:       result["email"].(string),
-		Voted:       int(result["voted"].(int32)),
-		OtherFields: other,
+		Id:                   result["id"].(string),
+		FullName:             result["name"].(string),
+		Sex:                  result["sex"].(string),
+		BirthDate:            result["birthDate"].(string),
+		Phone:                result["phone"].(string),
+		Email:                result["email"].(string),
+		Voted:                int(result["voted"].(int32)),
+		LastCandidateVotedId: result["lastCandidateVotedId"].(string),
+		OtherFields:          other,
 
 		////Role:           result["role"].(string),
 		//HashedPassword: result["password"].(string),
 	}
+	fmt.Println(user)
+	encrypt.DecryptVoter(user)
+	fmt.Println(user)
 	return user, nil
 }
 

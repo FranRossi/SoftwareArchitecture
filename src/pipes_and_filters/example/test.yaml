@@ -1,4 +1,5 @@
 - name: echo_data
+- name: write_file
 - name: check_age_lower
   params: 
     min_age:  18

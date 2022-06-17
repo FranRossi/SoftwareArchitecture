@@ -1,3 +1,3 @@
 module pruebas_ignorar
 
-go 1.17
+go 1.18

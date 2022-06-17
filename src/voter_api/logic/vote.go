@@ -95,6 +95,7 @@ func SendCertificate(vote *domain.VoteModel, voteIdentification string, timeFron
 	queue := "voting-certificates"
 	if err != nil {
 		queue = "voting-certificates-error"
+		fmt.Println("error sending certificate: %w", err)
 	}
 	sendCertificateToMQ(certificate, queue)
 }

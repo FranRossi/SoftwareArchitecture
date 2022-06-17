@@ -4,6 +4,7 @@ import (
 	"context"
 	"electoral_service/connections"
 	"electoral_service/models"
+	"encrypt"
 	"fmt"
 	"log"
 
@@ -50,6 +51,8 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 }
 
 func StoreElectionVoters(voters []models.VoterModel) error {
+
+	encryptVoter(voters)
 	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_election")
@@ -63,6 +66,14 @@ func StoreElectionVoters(voters []models.VoterModel) error {
 		log.Fatal(err)
 	}
 	return err
+}
+
+func encryptVoter(voters []models.VoterModel) {
+
+	// Don't use for voter := range voters, because it won't change the properties of the voters in the original array
+	for i := range voters {
+		encrypt.EncryptVoter(&voters[i])
+	}
 }
 
 func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {

@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	encrypt v0.0.0-00010101000000-000000000000
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -41,3 +42,5 @@ replace pipes_and_filters => ./../pipes_and_filters
 replace electoral_service => ./../electoral_service/
 
 replace message_queue => ./../message_queue
+
+replace encrypt => ./../encrypt
