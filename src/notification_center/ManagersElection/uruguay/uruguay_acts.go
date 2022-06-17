@@ -6,10 +6,8 @@ import (
 	"strconv"
 )
 
-var emails = []string{"montevideo@intendencia.com", "montevideo@presidencia.com", "colonia@intendencia.com"}
-
 func SendInitialActsEmails(act models.InitialAct) {
-	for _, email := range emails {
+	for _, email := range act.Emails {
 		sendInitialEmailTo(email, act)
 	}
 }
@@ -31,7 +29,7 @@ func sendInitialEmailTo(email string, act models.InitialAct) {
 }
 
 func SendClosingEmails(act models.ClosingAct) {
-	for _, email := range emails {
+	for _, email := range act.Emails {
 		sendClosingEmailTo(email, act)
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func SendAlertEmails(alert models.Alert) {
-	for _, email := range emails {
+	for _, email := range alert.Emails {
 		sendAlertEmailTo(email, alert)
 	}
 }

@@ -8,23 +8,25 @@ import (
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
-	"voter_api/repository/repository"
+	"voter_api/repository"
 )
 
 var electionSession = make([]string, 1)
 
-func StoreVote(vote *domain.VoteModel) error {
-	validationError := validation.ValidateVote(*vote)
+func StoreVote(vote domain.VoteModel) error {
+	validationError := validation.ValidateVote(vote)
 	if validationError != nil {
 		return validationError
 	}
 	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
+	voter, _ := repository.FindVoter(vote.IdVoter)
+	region := voter.Region
 	if err2 != nil {
-		return fmt.Errorf("election mode cannot be found: %w", err2)
+		return fmt.Errorf("election mode cannot be found or political party: %w", err2)
 	}
 	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
 	if electionMode == "multi" && howManyTimesVoted >= 1 {
-		errReplacing := updateNewVote(vote)
+		errReplacing := updateNewVote(vote, region)
 		if errReplacing != nil {
 			return fmt.Errorf("candidate cannot be replaced: %w", errReplacing)
 		}
@@ -36,12 +38,25 @@ func StoreVote(vote *domain.VoteModel) error {
 	err = repository.RegisterVote(vote, electionMode)
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
+	politicalParty, err := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
+	go updateElectionResult(vote, politicalParty, region)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func updateNewVote(vote *domain.VoteModel) error {
-	err := repository.DeleteOldVote(vote)
+func updateElectionResult(vote domain.VoteModel, politicalPartyName, region string) {
+	err := repository.UpdateElectionResult(vote, region, politicalPartyName)
+	if err != nil {
+		fmt.Errorf("election result cannot be updated: %w", err)
+	}
+}
+
+func updateNewVote(vote domain.VoteModel, region string) error {
+	err := repository.DeleteOldVote(vote, region)
 	if err != nil {
 		return fmt.Errorf("old vote cannot be deleted: %w", err)
 	}
@@ -49,6 +64,7 @@ func updateNewVote(vote *domain.VoteModel) error {
 	if err2 != nil {
 		return fmt.Errorf("vote cannot be updated: %w", err2)
 	}
+
 	return nil
 }
 
@@ -57,7 +73,7 @@ func generateElectionSession(idElection string) {
 	electionSession = append(electionSession, strconv.Itoa(idElectionInt))
 }
 
-func DeleteVote(vote *domain.VoteModel) error {
+func DeleteVote(vote domain.VoteModel) error {
 	err := repository.DeleteVote(vote)
 	if err != nil {
 		return fmt.Errorf("vote cannot be deleted: %w", err)
@@ -84,7 +100,7 @@ func generateRandomVoteIdentification(idElection string) string {
 	return sessionNumber + randomNumber
 }
 
-func SendCertificate(vote *domain.VoteModel, voteIdentification string, timeFront time.Time, err error) {
+func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront time.Time, err error) {
 	timeVoted := timeFront.Format(time.RFC3339)
 	certificate := domain.VoteInfo{
 		IdVoter:            vote.IdVoter,
@@ -105,23 +121,24 @@ func sendCertificateToMQ(certificate domain.VoteInfo, queue string) {
 	mq.GetMQWorker().Send(queue, certificateBytes)
 }
 
-func checkMaxVotesAndSendAlert(howManyTimesVoted int, vote *domain.VoteModel) {
-	maxVotes, _, err := repository.GetMaximumValuesBeforeAlert(vote.IdElection)
+func checkMaxVotesAndSendAlert(howManyTimesVoted int, vote domain.VoteModel) {
+	maxVotes, emails, err := repository.GetMaxVotesAndEmailsBeforeAlert(vote.IdElection)
 	if err != nil {
 		fmt.Println(err)
 	}
 	if howManyTimesVoted >= maxVotes {
-		sendAlertToMQ(vote.IdVoter, vote.IdElection, howManyTimesVoted, maxVotes)
+		sendAlertToMQ(vote, howManyTimesVoted, maxVotes, emails)
 	}
 }
 
-func sendAlertToMQ(idVoter, idElection string, howManyTimesVoted int, maxVotes int) {
+func sendAlertToMQ(vote domain.VoteModel, howManyTimesVoted, maxVotes int, emails []string) {
 	queue := "alert-queue"
 	alert := domain.Alert{
-		IdVoter:    idVoter,
-		IdElection: idElection,
+		IdVoter:    vote.IdVoter,
+		IdElection: vote.IdElection,
 		MaxVotes:   maxVotes,
 		Votes:      howManyTimesVoted,
+		Emails:     emails,
 	}
 	alertBytes, _ := json.Marshal(alert)
 	mq.GetMQWorker().Send(queue, alertBytes)

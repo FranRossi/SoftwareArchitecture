@@ -35,6 +35,7 @@ func FindVoterFullName(idVoter string) (fullName string, err error) {
 		Phone:       result["phone"].(string),
 		Email:       result["email"].(string),
 		Voted:       int(result["voted"].(int32)),
+		Region:      result["region"].(string),
 		OtherFields: other,
 	}
 	return user.FullName, nil

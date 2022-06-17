@@ -7,15 +7,14 @@ type ElectionJson struct {
 }
 
 type ElectionModel struct {
-	Id            string `bson:"id"`
-	Description   string `bson:"description"`
-	StartingDate  string `bson:"startingDate"`
-	FinishingDate string `bson:"finishingDate"`
-	ElectionMode  string `bson:"electionMode"` // "unico" o "multi"
+	Id            string   `bson:"id"`
+	Description   string   `bson:"description"`
+	StartingDate  string   `bson:"startingDate"`
+	FinishingDate string   `bson:"finishingDate"`
+	ElectionMode  string   `bson:"electionMode"`
+	Emails        []string `json:"emails" bson:"emails"`
 
-	Voters []VoterModel `json:"voters" bson:"voters"`
-	// TODO ver si incluir por separado los candidatos o no
-	//Candidates       []CandidateModel      `json:"candidates" bson:"candidates"`
+	Voters           []VoterModel          `json:"voters" bson:"voters"`
 	Circuits         []CircuitModel        `json:"circuits"`
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`
 }

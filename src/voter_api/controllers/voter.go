@@ -74,7 +74,7 @@ func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.
 }
 
 func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
-	voteModel := &domain.VoteModel{
+	voteModel := domain.VoteModel{
 		IdElection:  req.GetIdElection(),
 		IdVoter:     req.GetIdVoter(),
 		Circuit:     req.GetCircuit(),
@@ -88,7 +88,7 @@ func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
 }
 
-func processVote(timeFrontEnd time.Time, voteModel *domain.VoteModel) (string, error) {
+func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
 	failed := verifySignatureVote(voteModel)
 	if failed != nil {
 		_ = fmt.Errorf("signature verification failed: %v", failed)
@@ -117,7 +117,7 @@ func processVote(timeFrontEnd time.Time, voteModel *domain.VoteModel) (string, e
 	}
 }
 
-func verifySignatureVote(vote *domain.VoteModel) error {
+func verifySignatureVote(vote domain.VoteModel) error {
 	publicKeyPEM := validation.ReadKeyFromFile("./controllers/validation/pubkey.pem")
 	publicKey := validation.ExportPEMStrToPubKey(publicKeyPEM)
 	voter := []byte(vote.IdVoter)

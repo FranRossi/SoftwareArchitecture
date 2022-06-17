@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func RecieveActs() {
+func ReceiveActs() {
 	ReceiveAct()
 	ReceiveClosingAct()
 }

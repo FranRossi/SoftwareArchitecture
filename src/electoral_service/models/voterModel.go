@@ -9,5 +9,6 @@ type VoterModel struct {
 	Email                string         `bson:"email"`
 	Voted                int            `bson:"voted"`
 	LastCandidateVotedId string         `bson:"lastCandidateVotedId"`
+	Region               string         `bson:"region"`
 	OtherFields          map[string]any `json:"otherFields" bson:"otherFields"`
 }

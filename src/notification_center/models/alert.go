@@ -5,4 +5,5 @@ type Alert struct {
 	IdElection string
 	MaxVotes   int
 	Votes      int
+	Emails     []string
 }

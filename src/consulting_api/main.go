@@ -11,6 +11,8 @@ func main() {
 	mongoClient := connections.GetInstanceMongoClient()
 	repo := repositories.NewRequestsRepo(mongoClient, "uruguay_votes")
 	controller := controllers.NewConsultingController(repo)
-	api.ConnectionAPI(controller)
+	repoElection := repositories.NewElectionRepo(mongoClient, "uruguay_election")
+	electionController := controllers.NewConsultingElectionConfigController(repoElection)
+	api.ConnectionAPI(controller, electionController)
 	// mongoClient.Disconnect() TODO
 }
