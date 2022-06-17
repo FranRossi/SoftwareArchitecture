@@ -8,19 +8,19 @@ import (
 	"sync"
 )
 
-type ConsultingRepo struct {
+type VotesRepo struct {
 	mongoClient *mongo.Client
 	database    string
 }
 
-func NewRequestsRepo(mongoClient *mongo.Client, database string) *ConsultingRepo {
-	return &ConsultingRepo{
+func NewRequestsRepo(mongoClient *mongo.Client, database string) *VotesRepo {
+	return &VotesRepo{
 		mongoClient: mongoClient,
 		database:    database,
 	}
 }
 
-func (certRepo *ConsultingRepo) RequestVote(voterId, electionId string) (*m.VoteModel, error) {
+func (certRepo *VotesRepo) RequestVote(voterId, electionId string) (*m.VoteModel, error) {
 	client := certRepo.mongoClient
 	database := client.Database(certRepo.database)
 	collection := database.Collection("votes_info")
@@ -37,7 +37,7 @@ func (certRepo *ConsultingRepo) RequestVote(voterId, electionId string) (*m.Vote
 	return vote, nil
 }
 
-func (certRepo *ConsultingRepo) RequestElectionResult(electionId string) (m.ResultElection, error) {
+func (certRepo *VotesRepo) RequestElectionResult(electionId string) (m.ResultElection, error) {
 	client := certRepo.mongoClient
 	database := client.Database(certRepo.database)
 	collection := database.Collection("result_election")

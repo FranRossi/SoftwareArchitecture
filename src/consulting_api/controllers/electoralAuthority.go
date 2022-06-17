@@ -8,10 +8,10 @@ import (
 )
 
 type ConsultingElectoralAuthorityController struct {
-	repo *repositories.ConsultingRepo
+	repo *repositories.VotesRepo
 }
 
-func NewConsultingController(repo *repositories.ConsultingRepo) *ConsultingElectoralAuthorityController {
+func NewConsultingController(repo *repositories.VotesRepo) *ConsultingElectoralAuthorityController {
 	return &ConsultingElectoralAuthorityController{repo: repo}
 }
 

@@ -33,3 +33,13 @@ type CandidateEssential struct {
 	Votes          int    `bson:"votes"`
 	PoliticalParty string `bson:"politicalParty"`
 }
+
+type ElectionConfig struct {
+	ElectionId          string   `json:"election_id"`
+	MaxVotes            int      `json:"max_votes"`
+	MaxCertificates     int      `json:"max_certificates"`
+	Emails              []string `json:"emails"`
+	QueryRequestTime    string   `json:"query_request_time"`
+	QueryResponseTime   string   `json:"query_response_time"`
+	QueryProcessingTime string   `json:"query_processing_time"`
+}
