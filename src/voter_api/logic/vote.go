@@ -8,7 +8,7 @@ import (
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
-	"voter_api/repository/repository"
+	"voter_api/repository"
 )
 
 var electionSession = make([]string, 1)
