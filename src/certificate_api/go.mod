@@ -40,3 +40,5 @@ replace electoral_service => ./../electoral_service/
 replace pipes_and_filters => ./../pipes_and_filters
 
 replace own_logger => ./../own_logger
+
+replace encrypt => ./../encrypt
