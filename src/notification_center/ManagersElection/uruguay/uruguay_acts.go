@@ -3,11 +3,13 @@ package uruguay
 import (
 	"fmt"
 	"notification_center/models"
+	l "own_logger"
 	"strconv"
 )
 
 func SendInitialActsEmails(act models.InitialAct) {
 	for _, email := range act.Emails {
+		l.LogInfo("Sending email with initial act to: " + email)
 		sendInitialEmailTo(email, act)
 	}
 }
@@ -30,6 +32,7 @@ func sendInitialEmailTo(email string, act models.InitialAct) {
 
 func SendClosingEmails(act models.ClosingAct) {
 	for _, email := range act.Emails {
+		l.LogInfo("Sending email with closing act to: " + email)
 		sendClosingEmailTo(email, act)
 	}
 }

@@ -3,11 +3,13 @@ package uruguay
 import (
 	"fmt"
 	"notification_center/models"
+	l "own_logger"
 	"strconv"
 )
 
 func SendAlertEmails(alert models.Alert) {
 	for _, email := range alert.Emails {
+		l.LogInfo("Sending alert email to: " + email)
 		sendAlertEmailTo(email, alert)
 	}
 }
