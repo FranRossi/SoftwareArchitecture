@@ -10,7 +10,7 @@ import (
 )
 
 func DecryptText(encryptedText string) string {
-	privateKeyPEM := ReadKeyFromFile("./../encrypt/privkey.pem")
+	privateKeyPEM := ReadKeyFromFile("./../encrypt/privkey_appEV.pem")
 	privKey := ExportPEMStrToPrivKey(privateKeyPEM)
 	rng := rand.Reader
 
@@ -26,7 +26,7 @@ func DecryptText(encryptedText string) string {
 
 func EncryptText(text string) string {
 
-	publicKeyPEM := ReadKeyFromFile("./../encrypt/pubkey.pem")
+	publicKeyPEM := ReadKeyFromFile("./../encrypt/pubkey_appEV.pem")
 	publicKey := ExportPEMStrToPubKey(publicKeyPEM)
 
 	secretMessage := []byte(text)

@@ -12,7 +12,6 @@ type VoteModel struct {
 
 func EncryptVote(vote *VoteModel) {
 	applyFunToVote(vote, EncryptText)
-
 }
 
 func Test(t string) {

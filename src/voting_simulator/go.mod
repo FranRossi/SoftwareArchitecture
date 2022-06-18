@@ -19,7 +19,3 @@ require (
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 )
 
-
-replace voter_api => ./../voter_api
-replace encrypt => ./../encrypt
-replace electoral_service => ./../electoral_service // TODO capaz pasar a un paquete /models

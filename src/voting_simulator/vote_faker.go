@@ -7,11 +7,12 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	b64 "encoding/base64"
 	"encoding/pem"
-	"encrypt"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"voting_simulator/proto"
 
 	"google.golang.org/grpc"
@@ -114,7 +115,7 @@ const addr = "localhost:50004"
 
 func Vote(vote VoteModel) {
 	fmt.Println(vote)
-	encrypt.EncryptVote((*encrypt.VoteModel)(&vote))
+	encryptVote(&vote)
 	fmt.Println(vote)
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -136,4 +137,41 @@ func Vote(vote VoteModel) {
 		log.Fatalf("could not vote: %v", err2)
 	}
 	fmt.Printf("Vote: %s\n", response.Message)
+}
+
+func encryptVote(vote *VoteModel) {
+	publicKey := getPublicKey()
+
+	vote.Circuit = encryptText(vote.Circuit, publicKey)
+	vote.IdVoter = encryptText(vote.IdVoter, publicKey)
+	vote.IdCandidate = encryptText(vote.IdCandidate, publicKey)
+	vote.IdElection = encryptText(vote.IdElection, publicKey)
+}
+
+func getPublicKey() *rsa.PublicKey {
+	publicKeyPEM := ReadKeyFromFile("./pubkey_appEV.pem")
+	block, _ := pem.Decode(publicKeyPEM)
+	if block == nil || block.Type != "RSA PUBLIC KEY" {
+		fmt.Println("failed to decode PEM block containing public key")
+	}
+	publicKey, err2 := x509.ParsePKCS1PublicKey(block.Bytes)
+	if err2 != nil {
+		fmt.Println("Error on Parsing:", err2)
+	}
+
+	return publicKey
+}
+
+func encryptText(text string, publicKey *rsa.PublicKey) string {
+
+	secretMessage := []byte(text)
+	rng := rand.Reader
+
+	ciphertext, err := rsa.EncryptOAEP(sha256.New(), rng, publicKey, secretMessage, nil)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error from encryption: %s\n", err)
+		panic(err)
+	}
+	ciphertextBase64 := b64.StdEncoding.EncodeToString(ciphertext)
+	return ciphertextBase64
 }

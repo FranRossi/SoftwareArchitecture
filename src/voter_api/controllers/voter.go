@@ -83,10 +83,7 @@ func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 		IdCandidate: req.GetIdCandidate(),
 		Signature:   req.GetSignature(),
 	}
-	fmt.Println(voteModel)
 	encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
-	fmt.Println(voteModel)
-	// encrypt.DecryptVote(voteModel)
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
 		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
