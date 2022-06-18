@@ -20,10 +20,13 @@ func StoreVote(vote domain.VoteModel) error {
 		return validationError
 	}
 	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
-	voter, _ := repository.FindVoter(vote.IdVoter)
-	region := voter.Region
 	if err2 != nil {
-		return fmt.Errorf("election mode cannot be found or political party: %w", err2)
+		return fmt.Errorf("election mode cannot be found when storing vote: %w", err2)
+	}
+	voter, err3 := repository.FindVoter(vote.IdVoter)
+	region := voter.Region
+	if err3 != nil {
+		return fmt.Errorf("error getting voter region when storing vote: %w", err3)
 	}
 	howManyTimesVoted := repository.HowManyVotesHasAVoter(vote.IdVoter)
 	if electionMode == "multi" && howManyTimesVoted >= 1 {
@@ -36,16 +39,18 @@ func StoreVote(vote domain.VoteModel) error {
 	if err != nil {
 		return fmt.Errorf("vote cannot be stored: %w", err)
 	}
-	err = repository.RegisterVote(vote, electionMode)
+	err4 := repository.RegisterVote(vote, electionMode)
+	if err4 != nil {
+		return fmt.Errorf("vote cannot be registered: %w", err4)
+	}
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
-	politicalParty, err := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
+	politicalParty, err5 := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
+	if err5 != nil {
+		return fmt.Errorf("error getting political party name when storing vote: %w", err5)
+	}
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	go updateElectionResult(vote, politicalParty, region)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

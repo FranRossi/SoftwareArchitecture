@@ -112,7 +112,7 @@ func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.Po
 }
 
 func storeVoters(voters []models.VoterModel) error {
-	err := repository.StoreElectionVoters([]models.VoterModel{})
+	err := repository.StoreElectionVoters(voters)
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
 	}

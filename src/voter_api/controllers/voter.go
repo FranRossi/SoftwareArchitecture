@@ -88,33 +88,31 @@ func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 		fmt.Println(err.Error())
 		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
+	l.LogInfo("Vote processed")
 	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
 	failed := verifySignatureVote(voteModel)
 	if failed != nil {
-		_ = fmt.Errorf("signature verification failed: %v", failed)
 		return "", failed
 	}
 	err := logic.StoreVote(voteModel)
 	if err != nil {
-		_ = fmt.Errorf("cannot store vote: %v", err)
 		return "", err
 	}
 	timeBackEnd := time.Now()
 	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
 		err2 := logic.DeleteVote(voteModel)
 		if err2 != nil {
-			_ = fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
-			return "", err2
+			return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
 		}
-		messageFailed := "vote cannot processed under 2 seconds"
+		messageFailed := "vote cannot processed under 2 seconds and was deleted"
 		return "", fmt.Errorf(messageFailed)
 	} else {
 		voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
 		if err2 != nil {
-			return "", fmt.Errorf("cannot store vote info: %v", err)
+			return "", fmt.Errorf("cannot store vote info: %v", err2)
 		}
 		return voteIdentification, nil
 	}
