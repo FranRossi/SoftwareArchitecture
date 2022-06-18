@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mq "message_queue"
+	l "own_logger"
 	"strconv"
 	"time"
 	"voter_api/controllers/validation"
@@ -110,6 +111,7 @@ func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront
 	}
 	queue := "voting-certificates"
 	if err != nil {
+		l.LogError(err.Error())
 		queue = "voting-certificates-error"
 	}
 	sendCertificateToMQ(certificate, queue)
@@ -117,7 +119,10 @@ func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront
 
 func sendCertificateToMQ(certificate domain.VoteInfo, queue string) {
 	certificateBytes, _ := json.Marshal(certificate)
-	mq.GetMQWorker().Send(queue, certificateBytes)
+	err := mq.GetMQWorker().Send(queue, certificateBytes)
+	if err != nil {
+		l.LogError(err.Error())
+	}
 }
 
 func checkMaxVotesAndSendAlert(howManyTimesVoted int, vote domain.VoteModel) {
@@ -140,5 +145,8 @@ func sendAlertToMQ(vote domain.VoteModel, howManyTimesVoted, maxVotes int, email
 		Emails:     emails,
 	}
 	alertBytes, _ := json.Marshal(alert)
-	mq.GetMQWorker().Send(queue, alertBytes)
+	err := mq.GetMQWorker().Send(queue, alertBytes)
+	if err != nil {
+		l.LogError(err.Error())
+	}
 }

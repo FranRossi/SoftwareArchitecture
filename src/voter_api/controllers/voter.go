@@ -7,6 +7,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
+	l "own_logger"
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
@@ -83,6 +84,8 @@ func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 	}
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
+		l.LogError(err.Error())
+		fmt.Println(err.Error())
 		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
 	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
@@ -103,7 +106,7 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
 		err2 := logic.DeleteVote(voteModel)
 		if err2 != nil {
-			_ = fmt.Errorf("cannot delete vote: %v", err2)
+			_ = fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
 			return "", err2
 		}
 		messageFailed := "vote cannot processed under 2 seconds"
@@ -126,7 +129,7 @@ func verifySignatureVote(vote domain.VoteModel) error {
 	msgHashSBytes := msgHash.Sum(nil)
 	err := rsa.VerifyPSS(publicKey, crypto.SHA256, msgHashSBytes, vote.Signature, nil)
 	if err != nil {
-		return fmt.Errorf("verification failed")
+		return fmt.Errorf("signature verification failed")
 	}
 	return nil
 }

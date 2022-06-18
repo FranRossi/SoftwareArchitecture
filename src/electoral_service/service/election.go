@@ -24,6 +24,7 @@ func (service *ElectionService) GetElectionSettings() {
 	err := service.electionLogic.StoreElection(election)
 	if err != nil {
 		own_logger.LogError(err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 	fmt.Println("Election stored successfully")
