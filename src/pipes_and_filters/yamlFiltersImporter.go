@@ -39,11 +39,11 @@ func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[str
 		if !filterExists {
 			panic("Filter " + selectedFilter.Name + " not found")
 		}
-		p.Use(insertParamters(filterName, selectedFilter.Params))
+		p.Use(insertParameters(filterName, selectedFilter.Params))
 	}
 }
 
-func insertParamters(missingParameterFilter FilterWithParams, params map[string]any) Filter {
+func insertParameters(missingParameterFilter FilterWithParams, params map[string]any) Filter {
 	return func(data any) error {
 		return missingParameterFilter(data, params)
 	}

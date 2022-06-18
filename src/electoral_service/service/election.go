@@ -4,7 +4,7 @@ import (
 	"electoral_service/adapter/uruguayan_election/controller"
 	"electoral_service/service/logic"
 	"fmt"
-	"log"
+	"own_logger"
 )
 
 type ElectionService struct {
@@ -19,15 +19,16 @@ func NewElectionService(logic *logic.ElectionLogic, adapter *controller.Election
 	}
 }
 
-func (service *ElectionService) GetElectionSettings() error {
+func (service *ElectionService) GetElectionSettings() {
 	election := service.adapter.GetElectionSettings()
 	err := service.electionLogic.StoreElection(election)
 	if err != nil {
-		log.Fatal(err)
+		own_logger.LogError(err.Error())
+		fmt.Println(err.Error())
+		return
 	}
 	fmt.Println("Election stored successfully")
 	logic.SetElectionDate(election)
-	return nil
 }
 
 func (service *ElectionService) DropDataBases() {

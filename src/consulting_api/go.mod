@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gofiber/fiber/v2 v2.34.1
 	go.mongodb.org/mongo-driver v1.9.1
+	own_logger v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -25,3 +26,5 @@ require (
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
+
+replace own_logger => ./../own_logger

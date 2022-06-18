@@ -8,15 +8,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func ConnectionRabbit(act []byte, queue string) {
+func ConnectionRabbit() Worker {
 	worker, err := BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		panic(err)
 	}
-	err = worker.Send(queue, act)
-	if err != nil {
-		panic(err)
-	}
+	return worker
 }
 
 type rabbitWorker struct {

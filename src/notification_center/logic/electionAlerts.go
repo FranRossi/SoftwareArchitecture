@@ -2,21 +2,21 @@ package logic
 
 import (
 	"encoding/json"
-	"log"
+	mq "message_queue"
 	managersElection "notification_center/ManagersElection/uruguay"
-	connections "notification_center/connection"
 	"notification_center/models"
+	l "own_logger"
 	"sync"
 )
 
 func ReceiveAlert() {
-	worker := connections.ConnectionRabbit()
+	worker := mq.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "alert-queue", func(message []byte) error {
 		var alert models.Alert
 		er := json.Unmarshal(message, &alert)
 		if er != nil {
-			log.Fatal(er)
+			l.LogError(er.Error())
 		}
 		notifyAlertEmails(alert)
 		wg.Done()

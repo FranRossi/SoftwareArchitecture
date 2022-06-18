@@ -44,3 +44,4 @@ replace electoral_service => ./../electoral_service/
 replace message_queue => ./../message_queue
 
 replace encrypt => ./../encrypt
+replace own_logger => ./../own_logger

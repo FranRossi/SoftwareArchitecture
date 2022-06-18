@@ -4,6 +4,7 @@ import (
 	"consulting_api/models"
 	"consulting_api/repositories"
 	"github.com/gofiber/fiber/v2"
+	l "own_logger"
 	"time"
 )
 
@@ -20,6 +21,7 @@ func (controller *ConsultingElectionInfoController) RequestElectionConfiguration
 	electionId := c.Params("electionId")
 	electionConfig, err := controller.repo.RequestElectionConfig(electionId)
 	if err != nil {
+		l.LogError(err.Error())
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
 			"error":   true,
 			"msg":     err.Error(),
@@ -37,6 +39,7 @@ func (controller *ConsultingElectionInfoController) RequestElectionConfiguration
 	electionResponse.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
 	electionResponse.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	electionResponse.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
+	l.LogInfo("Election configuration requested")
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error":   false,
 		"msg":     "Config of election" + electionId,

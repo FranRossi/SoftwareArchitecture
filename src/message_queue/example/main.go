@@ -3,16 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	mq "message_queue"
 	"os"
 	"time"
 )
 
 func main() {
 
-	worker, err := mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
-	if err != nil {
-		panic(err)
-	}
+	worker := mq.ConnectionRabbit()
 
 	// Listen for messages in queue
 	worker.Listen(50, "test-queue", func(message []byte) error {

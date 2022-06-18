@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"strconv"
 )
 
@@ -29,12 +28,7 @@ func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.Electi
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", electionId}}).Decode(&result)
 	if err2 != nil {
-		fmt.Println(err2.Error())
-		fmt.Println("wrong election")
-		if err2 == mongo.ErrNoDocuments {
-			return m.ElectionConfig{}, err2
-		}
-		log.Fatal(err2)
+		return m.ElectionConfig{}, fmt.Errorf("election not found: %v", err2)
 	}
 	maxVotesString := result["otherField"].(bson.M)["maxVotes"].(string)
 	maxVotes, err3 := strconv.Atoi(maxVotesString)

@@ -2,10 +2,10 @@ package logic
 
 import (
 	"encoding/json"
-	"log"
+	mq "message_queue"
 	managersElection "notification_center/ManagersElection/uruguay"
-	connections "notification_center/connection"
 	"notification_center/models"
+	l "own_logger"
 	"sync"
 )
 
@@ -15,13 +15,13 @@ func ReceiveActs() {
 }
 
 func ReceiveAct() {
-	worker := connections.ConnectionRabbit()
+	worker := mq.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "initial-election-queue", func(message []byte) error {
 		var act models.InitialAct
 		er := json.Unmarshal(message, &act)
 		if er != nil {
-			log.Fatal(er)
+			l.LogError(er.Error())
 		}
 		notifyEmails(act)
 		wg.Done()
@@ -34,13 +34,13 @@ func notifyEmails(act models.InitialAct) {
 }
 
 func ReceiveClosingAct() {
-	worker := connections.ConnectionRabbit()
+	worker := mq.ConnectionRabbit()
 	wg := sync.WaitGroup{}
 	worker.Listen(50, "closing-election-queue", func(message []byte) error {
 		var act models.ClosingAct
 		er := json.Unmarshal(message, &act)
 		if er != nil {
-			log.Fatal(er)
+			l.LogError(er.Error())
 		}
 		notifyEmailsClosing(act)
 		wg.Done()

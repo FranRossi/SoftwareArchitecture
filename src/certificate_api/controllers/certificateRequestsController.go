@@ -4,6 +4,7 @@ import (
 	"certificate_api/models"
 	"certificate_api/repositories"
 	"encoding/json"
+	l "own_logger"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,6 +24,7 @@ func (controller *CertificateController) RequestCertificate(c *fiber.Ctx) error 
 	request.Timestamp = time.Now().Format(time.RFC3339)
 	err := json.Unmarshal(c.Body(), &request)
 	if err != nil {
+		l.LogError(err.Error())
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error":   true,
 			"msg":     err.Error(),
@@ -32,16 +34,17 @@ func (controller *CertificateController) RequestCertificate(c *fiber.Ctx) error 
 
 	err = controller.repo.StoreRequest(request)
 	if err != nil {
+		l.LogError(err.Error())
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error":   true,
 			"msg":     err.Error(),
 			"request": nil,
 		})
 	}
-
+	l.LogInfo("Certificate request stored successfully")
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error":   false,
-		"msg":     "Request created succesfully!",
+		"msg":     "Certificate requested successfully!",
 		"request": request,
 	})
 }
