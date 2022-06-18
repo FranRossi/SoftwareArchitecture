@@ -114,9 +114,7 @@ type VoteModel struct {
 const addr = "localhost:50004"
 
 func Vote(vote VoteModel) {
-	fmt.Println(vote)
 	encryptVote(&vote)
-	fmt.Println(vote)
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

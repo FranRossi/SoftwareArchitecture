@@ -4,12 +4,10 @@ import (
 	"context"
 	"encrypt"
 	"fmt"
-	"log"
 	"voter_api/connections"
 	"voter_api/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -60,17 +58,11 @@ func setCandidateToVoter(vote domain.VoteModel) error {
 	uruguayCollection := uruguayDataBase.Collection("voters")
 	opts := options.Update().SetUpsert(true)
 	filter := bson.D{{"id", vote.IdVoter}}
-<<<<<<< HEAD
 	update := bson.D{{"$set", bson.D{{"lastCandidateVotedId", encrypt.EncryptText(vote.IdCandidate)}}}}
 	_, err2 := uruguayCollection.UpdateOne(context.TODO(), filter, update, opts)
 	if err2 != nil {
-=======
-	update := bson.D{{"$set", bson.D{{"lastCandidate", vote.IdCandidate}}}}
-	_, err := uruguayCollection.UpdateOne(context.TODO(), filter, update, opts)
-	if err != nil {
->>>>>>> ba70836f62075eafd381490024f77c945049a94e
 		message := "error registering last candidate for voter"
-		return fmt.Errorf(message+": %v", err)
+		return fmt.Errorf(message+": %v", err2)
 	}
 	return nil
 }

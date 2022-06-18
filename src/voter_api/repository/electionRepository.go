@@ -55,9 +55,7 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 		LastCandidateVotedId: result["lastCandidateVotedId"].(string),
 		OtherFields:          other,
 	}
-	fmt.Println(user)
 	encrypt.DecryptVoter(user)
-	fmt.Println(user)
 	return user, nil
 }
 

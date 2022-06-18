@@ -10,6 +10,7 @@ require (
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
 	message_queue v0.0.0-00010101000000-000000000000
+	own_logger v0.0.0-00010101000000-000000000000
 	pipes_and_filters v0.0.0-00010101000000-000000000000
 )
 
@@ -44,4 +45,5 @@ replace electoral_service => ./../electoral_service/
 replace message_queue => ./../message_queue
 
 replace encrypt => ./../encrypt
+
 replace own_logger => ./../own_logger

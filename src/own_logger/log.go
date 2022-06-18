@@ -33,4 +33,5 @@ func LogSync(message, logType string, args ...interface{}) {
 	}
 	logger := log.New(file, logType, log.Ldate|log.Ltime|log.Lshortfile)
 	logger.Output(3, fmt.Sprintf(message, args...))
+	file.Close()
 }
