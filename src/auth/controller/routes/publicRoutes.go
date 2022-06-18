@@ -9,6 +9,7 @@ import (
 func PublicRoutes(a *fiber.App, controller *controllers.SessionController) {
 	route := a.Group("/api/v1")
 
-	route.Post("/login", controller.Login)
+	route.Post("/users/login", controller.Login)
+	route.Post("/users/", controller.Register)
 
 }

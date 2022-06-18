@@ -16,9 +16,9 @@ func NewJWTManager(secretKey string, tokenDuration time.Duration) *Manager {
 	return &Manager{secretKey, tokenDuration}
 }
 
-func (manager *Manager) Generate(user models.User) (string, error){
+func (manager *Manager) Generate(user models.TokenInfo) (string, error){
 	claims := models.UserClaim{
-		User : user,
+		TokenInfo : user,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(manager.tokenDuration).Unix(),
 		},

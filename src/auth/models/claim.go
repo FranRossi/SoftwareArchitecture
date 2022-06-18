@@ -6,5 +6,5 @@ import(
 
 type UserClaim struct {
 	jwt.StandardClaims
-	User `json:"user"`
+	TokenInfo `json:"user"`
 }
