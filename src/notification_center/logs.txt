@@ -1,0 +1,3 @@
+INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: colonia@intendencia.com

@@ -32,7 +32,7 @@ func setEmail(election *models.ElectionModel) {
 
 func customGenerateDates(election *models.ElectionModel) {
 	election.StartingDate = time.Now().Format(time.RFC3339)
-	election.FinishingDate = time.Now().Add(time.Minute * 12).Format(time.RFC3339)
+	election.FinishingDate = time.Now().Add(time.Minute * 59).Format(time.RFC3339)
 	//election.FinishingDate = time.Now().AddDate(0, 0, 1).Format(time.RFC3339)
 }
 
