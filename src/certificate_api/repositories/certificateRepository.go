@@ -5,11 +5,10 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 const (
-	reqCollection = "certificate_requests"
+	reqCollection  = "certificate_requests"
 	certCollection = "certificates"
 )
 
@@ -30,11 +29,7 @@ func (certRepo *CertificatesRepo) StoreRequest(req models.CertificateRequestMode
 	requestsCollection := certificatesDatabase.Collection(reqCollection)
 	_, err2 := requestsCollection.InsertOne(context.TODO(), req)
 	if err2 != nil {
-		fmt.Println("error storing request")
-		if err2 == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err2)
+		return fmt.Errorf("error storing request: %v", err2)
 	}
 	return nil
 }
@@ -44,11 +39,7 @@ func (certRepo *CertificatesRepo) StoreCertificate(cert *models.CertificateModel
 	certificatesCollection := certificatesDatabase.Collection(certCollection)
 	_, err2 := certificatesCollection.InsertOne(context.TODO(), cert)
 	if err2 != nil {
-		fmt.Println("error storing certificate")
-		if err2 == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err2)
+		return fmt.Errorf("error storing certificate: %v", err2)
 	}
 	return nil
 }

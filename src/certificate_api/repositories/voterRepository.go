@@ -3,13 +3,10 @@ package repositories
 import (
 	"certificate_api/connections"
 	"context"
-	"fmt"
-	"log"
-
 	electoral_service_models "electoral_service/models"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func FindVoterFullName(idVoter string) (fullName string, err error) {
@@ -19,12 +16,7 @@ func FindVoterFullName(idVoter string) (fullName string, err error) {
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
 	if err2 != nil {
-		fmt.Println(err2.Error())
-		fmt.Println("there is no voter habilitated to vote with that id")
-		if err2 == mongo.ErrNoDocuments {
-			return "", nil
-		}
-		log.Fatal(err2)
+		return "", fmt.Errorf("there is no voter assigned to vote with that id: %v", err2)
 	}
 	other := result["otherFields"].(bson.M)
 	user := &electoral_service_models.VoterModel{

@@ -4,8 +4,9 @@ import (
 	"certificate_api/models"
 	"certificate_api/repositories"
 	"encoding/json"
-	"log"
+	"fmt"
 	mq "message_queue"
+	l "own_logger"
 )
 
 //funcion que recibe el modelo de info de la votacion y genera el certificado
@@ -15,16 +16,15 @@ func ListenerForNewCertificates() {
 		var voteInfo models.VoteInfo
 		err := json.Unmarshal(message, &voteInfo)
 		if err != nil {
-			log.Fatal(err)
+			l.LogError(err.Error())
+			fmt.Println(err.Error())
 			return err
 		}
-
 		return GenerateCertificate(voteInfo)
 	})
 }
 
 func GenerateCertificate(voteInfo models.VoteInfo) error {
-	log.Println(voteInfo)
 	var certificate models.CertificateModel
 	certificate.IdVoter = voteInfo.IdVoter
 	certificate.IdElection = voteInfo.IdElection
@@ -33,7 +33,7 @@ func GenerateCertificate(voteInfo models.VoteInfo) error {
 
 	fullName, _ := repositories.FindVoterFullName(voteInfo.IdVoter)
 	certificate.Fullname = fullName
-
+	l.LogInfo("Generating certificate for voter: " + fullName)
 	// certificate.StartingDate =
 	// certificate.FinishingDate =
 	// certificate.ElectionMode =
