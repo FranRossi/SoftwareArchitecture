@@ -1,97 +1,104 @@
 package controller
 
-import(
+import (
+	"auth/jwt"
 	"auth/models"
-	"github.com/gofiber/fiber/v2"
 	"auth/repository"
 	"encoding/json"
-	"log"
-	"auth/jwt"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
+	"log"
 	"time"
 )
 
 type SessionController struct {
-	repo *repository.UsersRepo 
+	repo *repository.UsersRepo
 }
 
 func NewSessionController(repo *repository.UsersRepo) *SessionController {
 	return &SessionController{repo: repo}
 }
 
-func  (controller *SessionController) Login(c *fiber.Ctx) error{
+func (controller *SessionController) Login(c *fiber.Ctx) error {
 	var login models.Login
 	err := json.Unmarshal(c.Body(), &login)
 	if err != nil {
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-			"error":   true,
-			"msg":     err.Error(),
+			"error": true,
+			"msg":   err.Error(),
 			"login": nil,
 		})
 	}
 
-	user, err:= controller.repo.FindUser(login.Id)
+	user, err := controller.repo.FindUser(login.Id)
 	if err != nil {
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
-			"error":   true,
-			"msg":     err.Error(),
+			"error": true,
+			"msg":   err.Error(),
 			"login": nil,
 		})
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(login.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-			"error":   true,
-			"msg":     err.Error(),
+			"error": true,
+			"msg":   err.Error(),
 			"login": nil,
 		})
 	}
-	if (user.HashedPassword == string(hashedPassword)){
+	if user.HashedPassword == string(hashedPassword) {
 		generator := &models.TokenInfo{
-			Id: user.Id,
+			Id:   user.Id,
 			Role: user.Role,
 		}
-		duration := time.Duration(30*time.Minute)
+		duration := time.Duration(30 * time.Minute)
 
 		privateKey, err := ioutil.ReadFile("./private.rsa")
-			if err != nil{
+		if err != nil {
 			log.Fatal("Could not read rsa")
 		}
-		manager:= jwt.NewJWTManager(privateKey, duration)
-		
-		token, err  := manager.Generate(*generator)
+		manager := jwt.NewJWTManager(privateKey, duration)
+
+		token, err := manager.Generate(*generator)
 		if err != nil {
 			return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-				"error":   true,
-				"msg":     err.Error(),
+				"error": true,
+				"msg":   err.Error(),
 				"login": nil,
 			})
 		}
-		result := &models.ResponseToken{Token:token,}
+		result := &models.ResponseToken{Token: token}
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error":   false,
-			"msg":     "Login succesful",
-			"token": 	result,
+			"error": false,
+			"msg":   "Login succesful",
+			"token": result,
 		})
 	}
 
 	return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-		"error":   true,
-		"msg":     err.Error(),
+		"error": true,
+		"msg":   err.Error(),
 		"login": nil,
 	})
 }
 
-func (controller *SessionController) RegisterUser(c *fiber.Ctx) (*models.TokenInfo, error) {
+func (controller *SessionController) RegisterUser(c *fiber.Ctx) error {
 	var register models.UserRegister
 	user, err := controller.createUser(&register)
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"error": true,
+			"msg":   "Register failed",
+			"user":  nil,
+		})
 	}
-	return user, err
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"error": false,
+		"msg":   "Register successful",
+		"user":  user,
+	})
 }
 
 func (controller *SessionController) createUser(user *models.UserRegister) (*models.TokenInfo, error) {
@@ -99,7 +106,7 @@ func (controller *SessionController) createUser(user *models.UserRegister) (*mod
 	if err != nil {
 		return nil, fmt.Errorf("cannot hash password: %w", err)
 	}
-	
+
 	userdb := &models.UserDB{
 		Id:             user.Id,
 		HashedPassword: string(hashedPassword),
@@ -114,7 +121,7 @@ func (controller *SessionController) storeUser(user *models.UserDB) (*models.Tok
 		return nil, fmt.Errorf("user cannot be created: %w", err)
 	}
 	result := &models.TokenInfo{
-		Id: user.Id,
+		Id:   user.Id,
 		Role: user.Role,
 	}
 	return result, nil

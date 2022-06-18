@@ -8,11 +8,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ConnectionAPI(controller *controllers.SessionController) {
+func ConnectionAPI(controller *controller.SessionController) {
 	config := configs.FiberConfig()
 	app := fiber.New(config)
-	routes.PublicRoutes(app, controller) 
+	routes.PublicRoutes(app, controller)
 
-	
-	app.Listen(":8082")
+	app.Listen(":8084")
 }

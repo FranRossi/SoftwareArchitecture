@@ -9,11 +9,10 @@ import (
 
 func main() {
 
-		
 	mongoClient := connections.GetInstanceMongoClient()
 
-	repo := repositories.NewUsersRepo(mongoClient, "uruguayan_users")
-	controller := controllers.NewSessionController(repo)
+	repo := repository.NewUsersRepo(mongoClient, "uruguayan_users")
+	controller := controller.NewSessionController(repo)
 	api.ConnectionAPI(controller)
 
 	// mongoClient.Disconnect() TODO
