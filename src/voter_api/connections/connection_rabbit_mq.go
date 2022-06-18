@@ -3,12 +3,19 @@ package connections
 import (
 	mq "message_queue"
 	"os"
+	l "own_logger"
 )
 
 func ConnectionRabbitMQ() {
-	mq.BuildRabbitWorker(os.Getenv("mq_address"))
+	_, err := mq.BuildRabbitWorker(os.Getenv("mq_address"))
+	if err != nil {
+		l.LogError(err.Error())
+	}
 }
 
 func CloseConnectionRabbitMQ() {
-	mq.GetMQWorker().Close()
+	err := mq.GetMQWorker().Close()
+	if err != nil {
+		l.LogError(err.Error())
+	}
 }

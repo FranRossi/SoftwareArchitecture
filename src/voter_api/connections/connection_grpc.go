@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	l "own_logger"
 )
 
 func streamInterceptor(
@@ -14,7 +15,7 @@ func streamInterceptor(
 	info *grpc.StreamServerInfo,
 	handler grpc.StreamHandler,
 ) error {
-	log.Println("--> stream interceptor: ", info.FullMethod)
+	fmt.Println("--> stream interceptor: ", info.FullMethod)
 	return handler(srv, stream)
 }
 
@@ -25,19 +26,19 @@ func ConnectionGRPC() *grpc.Server {
 	conn, err := net.Listen("tcp", address)
 	connection = conn
 	if err != nil {
-		log.Fatal("tcp connection err: ", err.Error())
+		l.LogError("tcp connection error: " + err.Error())
+		log.Fatal(err)
 	}
-
 	grpcServer := grpc.NewServer(
 		grpc.StreamInterceptor(streamInterceptor),
 	)
-
 	fmt.Println("Starting gRPC server at: ", address)
 	return grpcServer
 }
 
 func ServeGRPC(server *grpc.Server) {
 	if err := server.Serve(connection); err != nil {
+		l.LogError("gRPC server error: " + err.Error())
 		log.Fatal(err)
 	}
 }

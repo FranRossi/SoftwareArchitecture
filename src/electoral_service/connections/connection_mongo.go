@@ -3,6 +3,7 @@ package connections
 import (
 	"context"
 	"fmt"
+	"log"
 	l "own_logger"
 	"sync"
 	"time"
@@ -34,16 +35,15 @@ func connectionMongo() *mongo.Client {
 
 	if err != nil {
 		l.LogError(err.Error())
+		log.Fatal(err)
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
 		l.LogError(err.Error())
+		log.Fatal(err)
 	}
 	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		l.LogError(err.Error())
-	}
 	if err != nil {
 		l.LogError(err.Error())
 	}

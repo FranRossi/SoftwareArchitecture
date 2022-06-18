@@ -12,6 +12,6 @@ func ConfigEnvironment() {
 	err = os.Setenv("maxCertificate", "10")
 	err = os.Setenv("mq_address", "amqp://guest:guest@localhost:5672/")
 	if err != nil {
-		own_logger.LogError("Error getting environmental variables")
+		own_logger.LogWarning("Error getting environmental variables")
 	}
 }
