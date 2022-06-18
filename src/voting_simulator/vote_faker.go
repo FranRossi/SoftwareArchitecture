@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
+	"encrypt"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -112,6 +113,9 @@ type VoteModel struct {
 const addr = "localhost:50004"
 
 func Vote(vote VoteModel) {
+	fmt.Println(vote)
+	encrypt.EncryptVote((*encrypt.VoteModel)(&vote))
+	fmt.Println(vote)
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

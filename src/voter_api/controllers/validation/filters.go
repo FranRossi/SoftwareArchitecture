@@ -5,7 +5,7 @@ import (
 	p_f "pipes_and_filters"
 	"time"
 	"voter_api/domain"
-	"voter_api/repository/repository"
+	"voter_api/repository"
 )
 
 func GetAvailableFilters() map[string]p_f.FilterWithParams {

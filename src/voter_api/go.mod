@@ -5,6 +5,7 @@ go 1.18
 require (
 	auth v0.0.0-00010101000000-000000000000
 	electoral_service v0.0.0-00010101000000-000000000000
+	encrypt v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
@@ -13,7 +14,6 @@ require (
 )
 
 require (
-	encrypt v0.0.0-00010101000000-000000000000
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

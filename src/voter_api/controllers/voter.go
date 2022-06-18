@@ -14,6 +14,8 @@ import (
 	proto "voter_api/proto/authService"
 	pb "voter_api/proto/voteService"
 
+	"encrypt"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -81,6 +83,10 @@ func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 		IdCandidate: req.GetIdCandidate(),
 		Signature:   req.GetSignature(),
 	}
+	fmt.Println(voteModel)
+	encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
+	fmt.Println(voteModel)
+	// encrypt.DecryptVote(voteModel)
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
 		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)

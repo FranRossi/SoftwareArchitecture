@@ -2,7 +2,6 @@ module voting_simulator
 
 go 1.18
 
-replace voter_api => ./../voter_api
 
 
 require (
@@ -19,3 +18,8 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 )
+
+
+replace voter_api => ./../voter_api
+replace encrypt => ./../encrypt
+replace electoral_service => ./../electoral_service // TODO capaz pasar a un paquete /models

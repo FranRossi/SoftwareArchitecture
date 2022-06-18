@@ -192,7 +192,7 @@ func DeleteOldVote(vote domain.VoteModel, region string) error {
 		"amount_voted":                            -1,
 	}}
 	opts := options.Update().SetArrayFilters(options.ArrayFilters{
-		Filters: []interface{}{bson.D{{"candidate.id", lastCandidateVoted}}, bson.D{{"party.name", latestPoliticalParty}}, bson.D{{"region.name", region}}},
+		Filters: []interface{}{bson.D{{"candidate.id", lastCandidateVotedId}}, bson.D{{"party.name", latestPoliticalParty}}, bson.D{{"region.name", region}}},
 	})
 
 	_, err = uruguayanVotesCollection.UpdateOne(context.TODO(), query, updateDocument, opts)
