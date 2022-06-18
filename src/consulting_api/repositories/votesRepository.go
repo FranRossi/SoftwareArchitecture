@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"strings"
 	"sync"
 )
@@ -31,7 +30,7 @@ func (certRepo *VotesRepo) RequestVote(voterId, electionId string) (*m.VoteModel
 	var result bson.M
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		return &m.VoteModel{}, err
+		return &m.VoteModel{}, fmt.Errorf("error requesting voter on election: %v", err)
 	}
 	vote := &m.VoteModel{
 		VoterId:   result["voter"].(string),
@@ -48,7 +47,7 @@ func (certRepo *VotesRepo) RequestElectionResult(electionId string) (m.ResultEle
 	var result bson.M
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		return m.ResultElection{}, err
+		return m.ResultElection{}, fmt.Errorf("error requesting election result: %v", err)
 	}
 	votesPerCandidates := result["votes_per_candidates"].(bson.A)
 	voterPerParties := result["votes_per_parties"].(bson.A)
@@ -127,42 +126,36 @@ func convertRegionsToStruct(regions bson.A) []m.Region {
 	return regionsStruct
 }
 
-func (certRepo *VotesRepo) RequestAverageVotingTime(electionId string) (map[string]int, error) {
+func (certRepo *VotesRepo) RequestPopularVotingTimes(electionId string) (map[string]int, error) {
 	client := certRepo.mongoClient
 	database := client.Database(certRepo.database)
 	collection := database.Collection("votes_info")
 	filter := bson.D{{"election", electionId}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		return map[string]int{}, err
+		return map[string]int{}, fmt.Errorf("error requesting popular voting times: %v", err)
 	}
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		log.Fatal(err)
+		return map[string]int{}, fmt.Errorf("error requesting popular voting times using cursor: %v", err)
 	}
-	averageTimes, err := calculateWhichHoursHaveMoreVotes(results)
-	if err != nil {
-		return map[string]int{}, err
-	}
+	averageTimes := calculateWhichHoursHaveMoreVotes(results)
 	return averageTimes, nil
 }
 
-func calculateWhichHoursHaveMoreVotes(results []bson.M) (map[string]int, error) {
+func calculateWhichHoursHaveMoreVotes(results []bson.M) map[string]int {
 	hours := make(map[string]int)
 	for _, result := range results {
 		timeVoted := result["time_front_end"].(string)
 		timeVotedSplit := strings.Split(timeVoted, "T")
-		fmt.Println(timeVotedSplit)
 		hourMinutesSecond := timeVotedSplit[1]
 		hourSplit := strings.Split(hourMinutesSecond, ":")
-		fmt.Println(hourSplit)
 		hour := hourSplit[0]
-		fmt.Println(hour)
 		if _, ok := hours[hour]; ok {
 			hours[hour]++
 		} else {
 			hours[hour] = 1
 		}
 	}
-	return hours, nil
+	return hours
 }
