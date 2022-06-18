@@ -6,9 +6,9 @@ import (
 	modelsGeneric "electoral_service/models"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	l "own_logger"
 )
 
 type ElectionController struct {
@@ -19,25 +19,24 @@ func (controller *ElectionController) GetElectionSettings() *modelsGeneric.Elect
 	url := os.Getenv("electoral_service_url")
 	response, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		l.LogError(err.Error())
 	}
 	jsonBytes, err := ioutil.ReadAll(response.Body)
 	defer func() {
 		err := response.Body.Close()
 		if err != nil {
-			log.Fatal(err)
+			l.LogError(err.Error())
 		}
 	}()
 	var electionSettings models2.ElectionJson
 	er := json.Unmarshal(jsonBytes, &electionSettings)
 	if er != nil {
-		log.Fatal(er)
+		l.LogError(err.Error())
 	}
 	if electionSettings.Error {
-		log.Fatal(electionSettings.Msg)
+		l.LogError(electionSettings.Msg)
 	}
 	return convertToElectionModel(electionSettings.Election)
-
 }
 
 func convertToElectionModel(election models2.ElectionModel) *modelsGeneric.ElectionModelEssential {

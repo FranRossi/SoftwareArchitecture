@@ -6,8 +6,8 @@ import (
 	"electoral_service/service/repository"
 	"encoding/json"
 	"fmt"
-	"log"
 	mq "message_queue"
+	l "own_logger"
 	"time"
 )
 
@@ -41,6 +41,9 @@ func (logicElection *ElectionLogic) storeInitialValues(election *models.Election
 		return err
 	}
 	err = storeCandidates(election.PoliticalParties)
+	if err != nil {
+		return err
+	}
 	err = storeInitialResult(election)
 	if err != nil {
 		return err
@@ -109,7 +112,7 @@ func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.Po
 }
 
 func storeVoters(voters []models.VoterModel) error {
-	err := repository.StoreElectionVoters(voters)
+	err := repository.StoreElectionVoters([]models.VoterModel{})
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
 	}
@@ -172,7 +175,7 @@ func sendInitialAct(startDate time.Time, election *models.ElectionModelEssential
 	}
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
-		log.Fatal(err)
+		l.LogError(err.Error() + "Error while marshalling initial act")
 	}
 	queue := "initial-election-queue"
 	mq.GetMQWorker().Send(queue, jsonAct)
@@ -182,7 +185,7 @@ func endElection(startDate, endDate time.Time, election *models.ElectionModelEss
 	return func() {
 		resultElection, err := getElectionResult(election.Id, len(election.Voters))
 		if err != nil {
-			log.Fatal(err)
+			l.LogError(err.Error())
 		}
 		act := models.ClosingAct{
 			StarDate: startDate.Format(time.RFC3339),
@@ -192,13 +195,13 @@ func endElection(startDate, endDate time.Time, election *models.ElectionModelEss
 		}
 		validationError := validation.ValidateEndAct(act)
 		if validationError != nil {
-			log.Fatal(validationError)
+			l.LogError(validationError.Error())
 		}
 		fmt.Println("Election finished")
 		go sendEndingAct(act)
 		err = repository.StoreElectionResult(resultElection)
 		if err != nil {
-			return
+			l.LogError(err.Error())
 		}
 	}
 }
@@ -206,7 +209,7 @@ func endElection(startDate, endDate time.Time, election *models.ElectionModelEss
 func sendEndingAct(act models.ClosingAct) {
 	jsonAct, err := json.Marshal(act)
 	if err != nil {
-		log.Fatal(err)
+		l.LogError(err.Error() + "Error while marshalling closing act")
 	}
 	queue := "closing-election-queue"
 	mq.GetMQWorker().Send(queue, jsonAct)

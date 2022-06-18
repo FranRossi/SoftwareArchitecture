@@ -10,9 +10,6 @@ func main() {
 	mq.BuildRabbitWorker(os.Getenv("mq_address"))
 	electoral_service := dependencyinjection.Injection()
 	electoral_service.DropDataBases()
-	err := electoral_service.GetElectionSettings()
-	if err != nil {
-		return
-	}
+	electoral_service.GetElectionSettings()
 	mq.GetMQWorker().Close()
 }

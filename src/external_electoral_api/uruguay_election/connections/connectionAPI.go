@@ -17,7 +17,7 @@ func Connection() {
 	app := fiber.New(config)
 
 	//// Middlewares.
-	//// Aqui defino middlewares que quiera para mi app, solo uso un logger por ahora
+	//// Aqui defino middlewares que quiera para mi app, solo uso un own_logger por ahora
 	//middlewares.FiberMiddleware(app) // Register Fiber's middleware for app.
 
 	// Repositories

@@ -41,3 +41,5 @@ replace pipes_and_filters => ./../pipes_and_filters
 replace electoral_service => ./../electoral_service/
 
 replace message_queue => ./../message_queue
+
+replace own_logger => ./../own_logger

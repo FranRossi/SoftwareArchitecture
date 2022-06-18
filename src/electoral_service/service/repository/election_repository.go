@@ -5,10 +5,7 @@ import (
 	"electoral_service/connections"
 	"electoral_service/models"
 	"fmt"
-	"log"
-
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ElectionRepo struct {
@@ -28,11 +25,7 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 	uruguayanElectionCollection := uruguayDataBase.Collection("configuration_election")
 	_, err := uruguayanElectionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode, "otherField": election.OtherFields})
 	if err != nil {
-		fmt.Println("error storing election configuration")
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err)
+		return fmt.Errorf("error storing election configuration")
 	}
 
 	uruguayVotesDataBase := client.Database("uruguay_votes")
@@ -40,11 +33,7 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 	amountVotes := bson.D{{"votes_counted", 0}, {"election_id", election.Id}}
 	_, err = collectionTotalVotes.InsertOne(context.TODO(), amountVotes)
 	if err != nil {
-		fmt.Println("error storing initial amount of votes")
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err)
+		return fmt.Errorf("error storing initial amount of votes")
 	}
 	return err
 }
@@ -56,13 +45,9 @@ func StoreElectionVoters(voters []models.VoterModel) error {
 	uruguayanVotersCollection := uruguayDataBase.Collection("voters")
 	_, err := uruguayanVotersCollection.InsertMany(context.TODO(), votersInterface)
 	if err != nil {
-		fmt.Println("error storing voters")
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err)
+		return fmt.Errorf("error storing voters")
 	}
-	return err
+	return nil
 }
 
 func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {
@@ -80,11 +65,7 @@ func StoreCandidates(candidates []models.CandidateModel) error {
 	uruguayanCandidatesCollection := uruguayDataBase.Collection("votes_per_candidate")
 	_, err := uruguayanCandidatesCollection.InsertMany(context.TODO(), candidatesToStore)
 	if err != nil {
-		fmt.Println("error storing initial candidates")
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		log.Fatal(err)
+		return fmt.Errorf("error storing initial candidates")
 	}
 	return nil
 }
@@ -108,11 +89,7 @@ func GetTotalVotes(electionId string) (int, error) {
 	var amountVotes bson.M
 	err := uruguayanVotesCollection.FindOne(context.TODO(), bson.D{{"election_id", electionId}}).Decode(&amountVotes)
 	if err != nil {
-		fmt.Println("error getting amount of votes")
-		if err == mongo.ErrNoDocuments {
-			return -1, nil
-		}
-		log.Fatal(err)
+		return -1, fmt.Errorf("error getting amount of votes")
 	}
 	amountVotesCounted := int(amountVotes["votes_counted"].(int32))
 	return amountVotesCounted, nil
@@ -125,14 +102,10 @@ func GetEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	var results []bson.M
 	cursor, err := uruguayanVotesCollection.Find(context.TODO(), bson.D{})
 	if err != nil {
-		fmt.Println("there are no votes")
-		if err == mongo.ErrNoDocuments {
-			return nil, nil
-		}
-		log.Fatal(err)
+		return []models.CandidateEssential{}, fmt.Errorf("there are no votes: %v", err)
 	}
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		log.Fatal(err)
+		return []models.CandidateEssential{}, err
 	}
 	var votesCandidates []models.CandidateEssential
 	for _, result := range results {
