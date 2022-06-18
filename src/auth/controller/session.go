@@ -9,7 +9,8 @@ import(
 	"auth/jwt"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
-
+	"io/ioutil"
+	"time"
 )
 
 type SessionController struct {
@@ -52,7 +53,13 @@ func  (controller *SessionController) Login(c *fiber.Ctx) error{
 			Id: user.Id,
 			Role: user.Role,
 		}
-		manager:= jwt.NewJWTManager(privateKey, time.now() )
+		duration := time.Duration(30*time.Minute)
+
+		privateKey, err := ioutil.ReadFile("./private.rsa")
+			if err != nil{
+			log.Fatal("Could not read rsa")
+		}
+		manager:= jwt.NewJWTManager(privateKey, duration)
 		
 		token, err  := manager.Generate(*generator)
 		if err != nil {

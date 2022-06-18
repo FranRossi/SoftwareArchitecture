@@ -9,6 +9,7 @@ import (
 
 func main() {
 
+		
 	mongoClient := connections.GetInstanceMongoClient()
 
 	repo := repositories.NewUsersRepo(mongoClient, "uruguayan_users")

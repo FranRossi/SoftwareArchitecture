@@ -8,11 +8,11 @@ import (
 )
 
 type Manager struct {
-	secretKey     string
+	secretKey     []byte
 	tokenDuration time.Duration
 }
 
-func NewJWTManager(secretKey string, tokenDuration time.Duration) *Manager {
+func NewJWTManager(secretKey []byte, tokenDuration time.Duration) *Manager {
 	return &Manager{secretKey, tokenDuration}
 }
 
@@ -24,7 +24,7 @@ func (manager *Manager) Generate(user models.TokenInfo) (string, error){
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	return token.SignedString([]byte(manager.secretKey))
+	return token.SignedString(manager.secretKey)
 }
 
 
