@@ -12,8 +12,8 @@ func main() {
 	mongoClient := connections.GetInstanceMongoClient()
 
 	repo := repository.NewUsersRepo(mongoClient, "uruguayan_users")
-	controller := controller.NewSessionController(repo)
-	api.ConnectionAPI(controller)
+	sessionController := controller.NewSessionController(repo)
+	api.ConnectionAPI(sessionController)
 
 	// mongoClient.Disconnect() TODO
 }

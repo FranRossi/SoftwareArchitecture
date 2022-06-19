@@ -1,13 +1,13 @@
 package repository
 
 import (
-	"auth/models"
-	"go.mongodb.org/mongo-driver/mongo"
-	"fmt"
-	"log"
-	"go.mongodb.org/mongo-driver/bson"
-	"context"
 	"auth/connections"
+	"auth/models"
+	"context"
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 )
 
 const (
@@ -26,7 +26,6 @@ func NewUsersRepo(mongoClient *mongo.Client, database string) *UsersRepo {
 	}
 }
 
-
 func (repo *UsersRepo) RegisterUser(user *models.UserDB) error {
 	client := connections.GetInstanceMongoClient()
 	usersDatabase := client.Database(repo.database)
@@ -42,7 +41,7 @@ func (repo *UsersRepo) RegisterUser(user *models.UserDB) error {
 	return err2
 }
 
-func (repo *UsersRepo)FindUser(idUser string) (*models.UserDB, error) {
+func (repo *UsersRepo) FindUser(idUser string) (*models.UserDB, error) {
 	client := connections.GetInstanceMongoClient()
 	usersDatabase := client.Database(repo.database)
 	uruguayUsersCollection := usersDatabase.Collection(Collection)
@@ -57,9 +56,9 @@ func (repo *UsersRepo)FindUser(idUser string) (*models.UserDB, error) {
 		log.Fatal(err2)
 	}
 	user := &models.UserDB{
-		Id:          result["id"].(string),
+		Id:             result["id"].(string),
 		Role:           result["role"].(string),
-		HashedPassword: result["password"].(string),
+		HashedPassword: result["hashedpassword"].(string),
 	}
 	return user, nil
 }

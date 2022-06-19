@@ -1,23 +1,49 @@
 package controllers
 
 import (
+	"auth/jwt"
 	"consulting_api/models"
 	"consulting_api/repositories"
 	"github.com/gofiber/fiber/v2"
+
 	l "own_logger"
 	"time"
 )
 
 type ConsultingElectionVotesController struct {
-	repo *repositories.VotesRepo
+	repo       *repositories.VotesRepo
+	jwtManager *jwt.Manager
 }
 
-func NewConsultingController(repo *repositories.VotesRepo) *ConsultingElectionVotesController {
-	return &ConsultingElectionVotesController{repo: repo}
+func NewConsultingController(repo *repositories.VotesRepo, manager *jwt.Manager) *ConsultingElectionVotesController {
+	return &ConsultingElectionVotesController{
+		repo:       repo,
+		jwtManager: manager,
+	}
 }
 
 func (controller *ConsultingElectionVotesController) RequestVote(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
+	token := c.GetReqHeaders()["Authorization"]
+	claims, err := controller.jwtManager.Verify(token)
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrUnauthorized.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     err.Error(),
+			"request": nil,
+		})
+	}
+	roleForApi := jwt.GetRoles().Electoral
+	validRole := ValidateRole(claims.Role, roleForApi)
+	if !validRole {
+		l.LogInfo("User " + claims.TokenInfo.Id + " tried to request a vote but is not authorized")
+		return c.Status(fiber.ErrForbidden.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     "User is not authorized to request a vote",
+			"request": nil,
+		})
+	}
 	voterId := c.Params("voterId")
 	electionId := c.Params("electionId")
 	vote, err := controller.repo.RequestVote(voterId, electionId)
@@ -44,6 +70,26 @@ func (controller *ConsultingElectionVotesController) RequestVote(c *fiber.Ctx) e
 
 func (controller *ConsultingElectionVotesController) RequestElectionResult(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
+	token := c.GetReqHeaders()["Authorization"]
+	claims, err := controller.jwtManager.Verify(token)
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrUnauthorized.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     err.Error(),
+			"request": nil,
+		})
+	}
+	roleForApi := jwt.GetRoles().Electoral
+	validRole := ValidateRole(claims.Role, roleForApi)
+	if !validRole {
+		l.LogInfo("User " + claims.TokenInfo.Id + " tried to request election result but is not authorized")
+		return c.Status(fiber.ErrForbidden.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     "User is not authorized to request election result",
+			"request": nil,
+		})
+	}
 	electionId := c.Params("electionId")
 	electionResult, err := controller.repo.RequestElectionResult(electionId)
 	if err != nil {
@@ -70,7 +116,7 @@ func (controller *ConsultingElectionVotesController) RequestElectionResult(c *fi
 	})
 }
 
-func (controller *ConsultingElectionVotesController) RequestAverageVotingTime(c *fiber.Ctx) error {
+func (controller *ConsultingElectionVotesController) RequestPopularVotingTimes(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	electionId := c.Params("electionId")
 	votesPerHours, err := controller.repo.RequestPopularVotingTimes(electionId)
@@ -96,4 +142,13 @@ func (controller *ConsultingElectionVotesController) RequestAverageVotingTime(c 
 		"msg":     "Votes Per Hours",
 		"request": response,
 	})
+}
+
+func ValidateRole(roleFromRequest string, roleForApi ...string) bool {
+	for _, role := range roleForApi {
+		if roleFromRequest == role {
+			return true
+		}
+	}
+	return false
 }

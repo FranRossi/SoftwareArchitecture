@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	jwt "auth"
+	jwt "auth/jwt"
 	"context"
 	"crypto"
 	"crypto/rsa"

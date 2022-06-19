@@ -9,7 +9,7 @@ func PublicRoutesElectionVotes(a *fiber.App, controller *controllers.ConsultingE
 	route := a.Group("/api/v1")
 	route.Get("/consulting/vote/:electionId/:voterId", controller.RequestVote)
 	route.Get("/consulting/election/:electionId", controller.RequestElectionResult)
-	route.Get("/consulting/election/votesHours/:electionId", controller.RequestAverageVotingTime)
+	route.Get("/consulting/election/votesHours/:electionId", controller.RequestPopularVotingTimes)
 }
 
 func PublicRoutesElectionInfo(a *fiber.App, controller *controllers.ConsultingElectionInfoController) {

@@ -1,0 +1,2 @@
+ERROR: 2022/06/18 21:38:22 asm_amd64.s:1571: invalid token: unexpected token signing method
+ERROR: 2022/06/18 21:39:39 asm_amd64.s:1571: invalid token: unexpected token signing method

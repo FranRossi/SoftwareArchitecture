@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"auth/jwt"
 	"consulting_api/models"
 	"consulting_api/repositories"
 	"github.com/gofiber/fiber/v2"
@@ -9,15 +10,40 @@ import (
 )
 
 type ConsultingElectionInfoController struct {
-	repo *repositories.ElectionRepo
+	repo       *repositories.ElectionRepo
+	jwtManager *jwt.Manager
 }
 
-func NewConsultingElectionConfigController(repo *repositories.ElectionRepo) *ConsultingElectionInfoController {
-	return &ConsultingElectionInfoController{repo: repo}
+func NewConsultingElectionConfigController(repo *repositories.ElectionRepo, manager *jwt.Manager) *ConsultingElectionInfoController {
+	return &ConsultingElectionInfoController{
+		repo:       repo,
+		jwtManager: manager,
+	}
 }
 
 func (controller *ConsultingElectionInfoController) RequestElectionConfiguration(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
+	token := c.GetReqHeaders()["Authorization"]
+	claims, err := controller.jwtManager.Verify(token)
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrUnauthorized.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     err.Error(),
+			"request": nil,
+		})
+	}
+	roleForApi := jwt.GetRoles().Electoral
+	anotherRoleForApi := jwt.GetRoles().Consulter
+	validRole := ValidateRole(claims.Role, roleForApi, anotherRoleForApi)
+	if !validRole {
+		l.LogInfo("User " + claims.TokenInfo.Id + " tried to request election configuration but is not authorized")
+		return c.Status(fiber.ErrForbidden.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     "User is not authorized to request election configuration",
+			"request": nil,
+		})
+	}
 	electionId := c.Params("electionId")
 	electionConfig, err := controller.repo.RequestElectionConfig(electionId)
 	if err != nil {

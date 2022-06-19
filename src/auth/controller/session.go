@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-	"log"
+	l "own_logger"
 	"time"
 )
 
@@ -40,52 +40,56 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 			"login": nil,
 		})
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(login.Password), bcrypt.DefaultCost)
-	if err != nil {
+	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(login.Password))
+	if err2 != nil {
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
-			"msg":   err.Error(),
+			"msg":   err2.Error() + " password is incorrect",
 			"login": nil,
 		})
 	}
-	if user.HashedPassword == string(hashedPassword) {
-		generator := &models.TokenInfo{
-			Id:   user.Id,
-			Role: user.Role,
-		}
-		duration := time.Duration(30 * time.Minute)
+	generator := models.TokenInfo{
+		Id:   user.Id,
+		Role: user.Role,
+	}
+	duration := 30 * time.Minute
 
-		privateKey, err := ioutil.ReadFile("./private.rsa")
-		if err != nil {
-			log.Fatal("Could not read rsa")
-		}
-		manager := jwt.NewJWTManager(privateKey, duration)
-
-		token, err := manager.Generate(*generator)
-		if err != nil {
-			return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-				"error": true,
-				"msg":   err.Error(),
-				"login": nil,
-			})
-		}
-		result := &models.ResponseToken{Token: token}
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-			"error": false,
-			"msg":   "Login succesful",
-			"token": result,
+	privateKey, err := ioutil.ReadFile("./private.rsa")
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error() + " cannot read private key",
+			"login": nil,
 		})
 	}
+	manager := jwt.NewJWTManager(privateKey, duration)
 
-	return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
-		"error": true,
-		"msg":   err.Error(),
-		"login": nil,
+	token, err := manager.Generate(generator)
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error() + " cannot generate token",
+			"login": nil,
+		})
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"error": false,
+		"msg":   "Login successful",
+		"token": token,
 	})
 }
 
 func (controller *SessionController) RegisterUser(c *fiber.Ctx) error {
 	var register models.UserRegister
+	err := json.Unmarshal(c.Body(), &register)
+	if err != nil {
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"error": true,
+			"msg":   "User malformed",
+			"user":  nil,
+		})
+	}
 	user, err := controller.createUser(&register)
 	if err != nil {
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{

@@ -1,7 +1,7 @@
 package connections
 
 import (
-	jwt "auth"
+	jwt "auth/jwt"
 	"time"
 )
 
@@ -11,5 +11,5 @@ const (
 )
 
 func ConnectionJWT() *jwt.Manager {
-	return jwt.NewJWTManager(secretKey, tokenDuration)
+	return jwt.NewJWTManager([]byte(secretKey), tokenDuration)
 }
