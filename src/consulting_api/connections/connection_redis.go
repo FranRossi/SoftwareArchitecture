@@ -16,7 +16,7 @@ var redisClientInstance *redis.Client
 func GetInstanceRedisClient() *redis.Client {
 	if redisClientInstance == nil {
 		lockRedis.Lock()
-		defer lock.Unlock()
+		defer lockRedis.Unlock()
 		if redisClientInstance == nil {
 			fmt.Println("Creating redis client instance now.")
 			redisClientInstance, _ = connectionRedis()
