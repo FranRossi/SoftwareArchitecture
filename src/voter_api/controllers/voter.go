@@ -23,7 +23,8 @@ import (
 )
 
 type VoterServer struct {
-	server pb.VoteServiceServer
+	server     pb.VoteServiceServer
+	jwtManager *jwt.Manager
 }
 
 type AuthServer struct {
@@ -34,40 +35,9 @@ type AuthServer struct {
 var voteReply pb.VoteReply
 
 func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
-	voteServer := VoterServer{}
+	voteServer := VoterServer{jwtManager: jwtManager}
 	pb.RegisterVoteServiceServer(grpcServer, &voteServer)
-
-	server := AuthServer{jwtManager: jwtManager}
-	proto.RegisterAuthServiceServer(grpcServer, &server)
 }
-
-func (server *AuthServer) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
-	//user, err := checkVoter(request.GetId(), request.GetPassword())
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//token, err := server.jwtManager.Generate(user.Username, user.Id, user.Role)
-	//if err != nil {
-	//	return nil, status.Errorf(codes.Internal, "cannot generate access token")
-	//}
-	//
-	//res := &proto.LoginResponse{AccessToken: token}
-	//return res, nil
-	return &proto.LoginResponse{AccessToken: "Falso Token 1234"}, nil
-}
-
-//func checkVoter(id, password string) (*domain2.User, error) {
-//	user, err := logic.FindVoter(id)
-//	if err != nil {
-//		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
-//	}
-//
-//	if user == nil || !logic.IsCorrectPassword(user, password) {
-//		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
-//	}
-//	return user, nil
-//}
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
 	timeFrontEnd := time.Now()

@@ -13,22 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//func RegisterUser(user *domain.User) error {
-//	client := connections.GetInstanceMongoClient()
-//	usersDatabase := client.Database("users")
-//	uruguayVotersCollection := usersDatabase.Collection("uruguayVoters")
-//	_, err2 := uruguayVotersCollection.InsertOne(context.TODO(), bson.M{"id": user.Id, "username": user.Username, "password": user.HashedPassword, "role": user.Role})
-//	if err2 != nil {
-//		fmt.Println("error creating user")
-//		if err2 == mongo.ErrNoDocuments {
-//			return nil
-//		}
-//		log.Fatal(err2)
-//	}
-//	return err2
-//	return nil
-//}
-
 func FindVoter(idVoter string) (*m.VoterModel, error) {
 	client := connections.GetInstanceMongoClient()
 	votesDatabase := client.Database("uruguay_election")
