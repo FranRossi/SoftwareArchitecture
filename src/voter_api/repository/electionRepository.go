@@ -37,6 +37,7 @@ func FindVoter(idVoter string) (*m.VoterModel, error) {
 		Email:                result["email"].(string),
 		Voted:                int(result["voted"].(int32)),
 		LastCandidateVotedId: result["lastCandidateVotedId"].(string),
+		Region:               result["region"].(string),
 		OtherFields:          other,
 	}
 	encrypt.DecryptVoter(user)

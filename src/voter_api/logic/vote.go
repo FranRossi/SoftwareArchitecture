@@ -51,6 +51,7 @@ func StoreVote(vote domain.VoteModel) error {
 	}
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	go updateElectionResult(vote, politicalParty, region)
+	go RegisterVoteOnCertainGroup(vote.IdElection, voter)
 	return nil
 }
 

@@ -159,3 +159,65 @@ func calculateWhichHoursHaveMoreVotes(results []bson.M) map[string]int {
 	}
 	return hours
 }
+
+func (certRepo *VotesRepo) RequestVotesPerCircuits(electionId string) ([]m.VotesPerCircuits, error) {
+	client := certRepo.mongoClient
+	database := client.Database(certRepo.database)
+	collection := database.Collection("statistics")
+	filter := bson.D{{"election_id", electionId}, {"group_type", "circuit"}}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return []m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits: %v", err)
+	}
+	var results []bson.M
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return []m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits using cursor: %v", err)
+	}
+	votesPerCircuits := convertVotesPerCircuitsToStruct(electionId, results)
+	return votesPerCircuits, nil
+}
+
+func convertVotesPerCircuitsToStruct(electionId string, results []bson.M) []m.VotesPerCircuits {
+	var votesPerCircuits []m.VotesPerCircuits
+	for _, result := range results {
+		perCircuit := m.VotesPerCircuits{
+			ElectionId:       electionId,
+			Circuit:          result["circuit"].(string),
+			VotesPerCircuits: int(result["votes"].(int32)),
+			GroupName:        result["group_name"].(string),
+		}
+		votesPerCircuits = append(votesPerCircuits, perCircuit)
+	}
+	return votesPerCircuits
+}
+
+func (certRepo *VotesRepo) RequestVotesPerRegions(electionId string) ([]m.VotesPerRegion, error) {
+	client := certRepo.mongoClient
+	database := client.Database(certRepo.database)
+	collection := database.Collection("statistics")
+	filter := bson.D{{"election_id", electionId}, {"group_type", "region"}}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return []m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions: %v", err)
+	}
+	var results []bson.M
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return []m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions using cursor: %v", err)
+	}
+	votesPerRegions := convertVotesPerRegionsToStruct(electionId, results)
+	return votesPerRegions, nil
+}
+
+func convertVotesPerRegionsToStruct(electionId string, results []bson.M) []m.VotesPerRegion {
+	var votesPerCircuits []m.VotesPerRegion
+	for _, result := range results {
+		perCircuit := m.VotesPerRegion{
+			ElectionId:     electionId,
+			Region:         result["region"].(string),
+			VotesPerRegion: int(result["votes"].(int32)),
+			GroupName:      result["group_name"].(string),
+		}
+		votesPerCircuits = append(votesPerCircuits, perCircuit)
+	}
+	return votesPerCircuits
+}

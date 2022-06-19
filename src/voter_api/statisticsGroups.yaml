@@ -1,0 +1,57 @@
+- name: add_to_vote_group
+  params:
+    min_age: 18
+    max_age: 50
+    type: "circuit"
+    sex: "M"
+    name: "young_men_circuit"
+- name: add_to_vote_group
+  params:
+    min_age: 18
+    max_age: 50
+    type: "circuit"
+    sex: "F"
+    name: "young_woman_circuit"
+- name: add_to_vote_group
+  params:
+    min_age: 51
+    max_age: 150
+    type: "circuit"
+    sex: "M"
+    name: "old_men_circuit"
+- name: add_to_vote_group
+  params:
+    min_age: 51
+    max_age: 150
+    type: "circuit"
+    sex: "F"
+    name: "old_woman_circuit"
+#PerRegion
+- name: add_to_vote_group
+  params:
+    min_age: 18
+    max_age: 50
+    type: "region"
+    sex: "M"
+    name: "young_men_region"
+- name: add_to_vote_group
+  params:
+    min_age: 18
+    max_age: 50
+    type: "circuit"
+    sex: "F"
+    name: "young_woman_region"
+- name: add_to_vote_group
+  params:
+    min_age: 51
+    max_age: 150
+    type: "region"
+    sex: "M"
+    name: "old_men_region"
+- name: add_to_vote_group
+  params:
+    min_age: 51
+    max_age: 150
+    type: "region"
+    sex: "F"
+    name: "old_woman_region"

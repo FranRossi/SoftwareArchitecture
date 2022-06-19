@@ -152,3 +152,64 @@ func ValidateRole(roleFromRequest string, roleForApi ...string) bool {
 	}
 	return false
 }
+
+func (controller *ConsultingElectionVotesController) RequestVotesPerCircuits(c *fiber.Ctx) error {
+	timeQueryRequest := time.Now()
+	electionId := c.Params("electionId")
+	response, err := controller.repo.RequestVotesPerCircuits(electionId)
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     err.Error() + " election not found",
+			"request": nil,
+		})
+	}
+
+	timeQueryResponse := time.Now()
+	requestTime := timeQueryRequest.Format(time.RFC3339)
+	responseTime := timeQueryResponse.Format(time.RFC3339)
+	processingTime := timeQueryResponse.Sub(timeQueryRequest).String()
+
+	l.LogInfo("Requested votes per circuit for election " + electionId)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"error":             false,
+		"msg":               "Votes Per Hours",
+		"voter_per_circuit": response,
+		"request": fiber.Map{
+			"request_time":    requestTime,
+			"response_time":   responseTime,
+			"processing_time": processingTime,
+		},
+	})
+}
+
+func (controller *ConsultingElectionVotesController) RequestVotesPerRegions(c *fiber.Ctx) error {
+	timeQueryRequest := time.Now()
+	electionId := c.Params("electionId")
+	votesPerDepartments, err := controller.repo.RequestVotesPerRegions(electionId)
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
+			"error":   true,
+			"msg":     err.Error() + " election not found",
+			"request": nil,
+		})
+	}
+	timeQueryResponse := time.Now()
+	requestTime := timeQueryRequest.Format(time.RFC3339)
+	responseTime := timeQueryResponse.Format(time.RFC3339)
+	processingTime := timeQueryResponse.Sub(timeQueryRequest).String()
+	l.LogInfo("Requested votes per circuit for election " + electionId)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"error":            false,
+		"msg":              "Votes Per Regions",
+		"votes_per_region": votesPerDepartments,
+		"request": fiber.Map{
+			"request_time":    requestTime,
+			"response_time":   responseTime,
+			"processing_time": processingTime,
+		},
+	})
+}

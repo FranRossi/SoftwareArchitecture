@@ -12,7 +12,6 @@ import (
 	"voter_api/controllers/validation"
 	"voter_api/domain"
 	"voter_api/logic"
-	proto "voter_api/proto/authService"
 	pb "voter_api/proto/voteService"
 
 	"encrypt"
@@ -26,13 +25,6 @@ type VoterServer struct {
 	server     pb.VoteServiceServer
 	jwtManager *jwt.Manager
 }
-
-type AuthServer struct {
-	server     proto.AuthServiceServer
-	jwtManager *jwt.Manager
-}
-
-var voteReply pb.VoteReply
 
 func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
 	voteServer := VoterServer{jwtManager: jwtManager}
