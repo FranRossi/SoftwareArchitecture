@@ -1,3 +1,5 @@
 ERROR: 2022/06/18 21:38:22 asm_amd64.s:1571: invalid token: unexpected token signing method
 ERROR: 2022/06/18 21:39:39 asm_amd64.s:1571: invalid token: unexpected token signing method
 INFO: 2022/06/18 22:30:52 election_votes.go:63: Requested voted by 10000000 for election 1
+ERROR: 2022/06/19 12:45:31 asm_amd64.s:1571: invalid token: token contains an invalid number of segments
+ERROR: 2022/06/19 12:53:53 asm_amd64.s:1571: invalid token: token contains an invalid number of segments

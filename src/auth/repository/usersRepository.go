@@ -4,10 +4,12 @@ import (
 	"auth/connections"
 	"auth/models"
 	"context"
-	"fmt"
+	"errors"
+	"log"
+	l "own_logger"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 const (
@@ -32,9 +34,9 @@ func (repo *UsersRepo) RegisterUser(user *models.UserDB) error {
 	uruguayUsersCollection := usersDatabase.Collection(Collection)
 	_, err2 := uruguayUsersCollection.InsertOne(context.TODO(), user)
 	if err2 != nil {
-		fmt.Println("error creating user")
+		l.LogError(err2.Error())
 		if err2 == mongo.ErrNoDocuments {
-			return nil
+			return errors.New("error creating user")
 		}
 		log.Fatal(err2)
 	}
@@ -48,12 +50,10 @@ func (repo *UsersRepo) FindUser(idUser string) (*models.UserDB, error) {
 	var result bson.M
 	err2 := uruguayUsersCollection.FindOne(context.TODO(), bson.D{{"id", idUser}}).Decode(&result)
 	if err2 != nil {
-		fmt.Println(err2.Error())
-		fmt.Println("there is no user with that id")
+		l.LogWarning(err2.Error())
 		if err2 == mongo.ErrNoDocuments {
-			return nil, nil
+			return nil, errors.New("there is no user with that id")
 		}
-		log.Fatal(err2)
 	}
 	user := &models.UserDB{
 		Id:             result["id"].(string),
