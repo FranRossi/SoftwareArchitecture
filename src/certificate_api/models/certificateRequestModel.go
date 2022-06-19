@@ -1,6 +1,7 @@
 package models
 
 type CertificateRequestModel struct {
-	VoterId       string 
-	Timestamp	  string
+	VoterId            string
+	VoteIdentification string
+	Timestamp          string
 }

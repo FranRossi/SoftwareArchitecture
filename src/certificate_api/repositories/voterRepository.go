@@ -9,17 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func FindVoterFullName(idVoter string) (fullName string, err error) {
+func (certRepo *CertificatesRepo) FindVoter(idVoter string) (user electoral_service_models.VoterModel, err error) {
 	client := connections.GetInstanceMongoClient()
 	votesDatabase := client.Database("uruguay_election")
 	uruguayCollection := votesDatabase.Collection("voters")
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
 	if err2 != nil {
-		return "", fmt.Errorf("there is no voter assigned to vote with that id: %v", err2)
+		return user, fmt.Errorf("there is no voter assigned to vote with that id: %v", err2)
 	}
 	other := result["otherFields"].(bson.M)
-	user := &electoral_service_models.VoterModel{
+	user = electoral_service_models.VoterModel{
 		Id:          result["id"].(string),
 		FullName:    result["name"].(string),
 		Sex:         result["sex"].(string),
@@ -30,5 +30,23 @@ func FindVoterFullName(idVoter string) (fullName string, err error) {
 		Region:      result["region"].(string),
 		OtherFields: other,
 	}
-	return user.FullName, nil
+	return user, nil
+}
+
+func (certRepo *CertificatesRepo) FindElection(idElection string) (election electoral_service_models.ElectionModelEssential, err error) {
+	client := connections.GetInstanceMongoClient()
+	votesDatabase := client.Database("uruguay_election")
+	uruguayCollection := votesDatabase.Collection("configuration_election")
+	var result bson.M
+	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idElection}}).Decode(&result)
+	if err2 != nil {
+		return election, fmt.Errorf("there is no election with that id: %v", err2)
+	}
+	election = electoral_service_models.ElectionModelEssential{
+		Id:            result["id"].(string),
+		ElectionMode:  result["electionMode"].(string),
+		StartingDate:  result["startingDate"].(string),
+		FinishingDate: result["configuration_election"].(string),
+	}
+	return election, nil
 }
