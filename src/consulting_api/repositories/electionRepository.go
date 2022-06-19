@@ -25,13 +25,10 @@ func NewElectionRepo(mongoClient *mongo.Client, database string) *ElectionRepo {
 
 func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.ElectionConfig, error) {
 
-	var configs m.ElectionConfig
 	configFromCache, errCache := RequestElectionConfigFromCache(electionId)
 	if errCache == nil {
 		l.LogInfo("Election config for election " + electionId + " was found in cache")
 		return configFromCache, nil
-	} else {
-		defer SaveElectionConfigToCache(configs)
 	}
 
 	client := certRepo.mongoClient
@@ -54,10 +51,11 @@ func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.Electi
 	if err3 != nil {
 		return m.ElectionConfig{}, fmt.Errorf("worng maximum values: %v", err3)
 	}
-	configs = m.ElectionConfig{
+	configs := m.ElectionConfig{
 		MaxVotes:        maxVotes,
 		MaxCertificates: maxCertificates,
 		Emails:          emailsArray,
 	}
+	SaveElectionConfigToCache(electionId, configs)
 	return configs, nil
 }

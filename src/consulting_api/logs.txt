@@ -1,5 +1,42 @@
-ERROR: 2022/06/18 21:38:22 asm_amd64.s:1571: invalid token: unexpected token signing method
-ERROR: 2022/06/18 21:39:39 asm_amd64.s:1571: invalid token: unexpected token signing method
-INFO: 2022/06/18 22:30:52 election_votes.go:63: Requested voted by 10000000 for election 1
-ERROR: 2022/06/19 12:45:31 asm_amd64.s:1571: invalid token: token contains an invalid number of segments
-ERROR: 2022/06/19 12:53:53 asm_amd64.s:1571: invalid token: token contains an invalid number of segments
+INFO: 2022/06/19 16:38:35 cache.go:20: Election config for election 1 was not found in cache
+INFO: 2022/06/19 16:38:35 cache.go:35: Saving election config for election 1 to cache
+INFO: 2022/06/19 16:38:35 cache.go:46: OK
+INFO: 2022/06/19 16:38:35 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:44 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:44 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:44 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:49 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:49 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:49 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:50 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:50 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:50 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:51 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:51 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:51 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:53 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:53 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:53 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:54 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:54 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:54 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:55 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:55 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:55 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:56 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:56 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:56 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:57 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:57 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:57 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:38:58 cache.go:24: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:58 electionRepository.go:30: Election config for election 1 was found in cache
+INFO: 2022/06/19 16:38:58 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:39:06 cache.go:20: Election config for election 1 was not found in cache
+INFO: 2022/06/19 16:39:06 cache.go:35: Saving election config for election 1 to cache
+INFO: 2022/06/19 16:39:06 cache.go:46: OK
+INFO: 2022/06/19 16:39:06 election_info.go:68: Election configuration requested
+INFO: 2022/06/19 16:39:55 cache.go:20: Election config for election 1 was not found in cache
+INFO: 2022/06/19 16:39:55 cache.go:35: Saving election config for election 1 to cache
+INFO: 2022/06/19 16:39:55 cache.go:46: OK
+INFO: 2022/06/19 16:39:55 election_info.go:68: Election configuration requested
