@@ -5,30 +5,19 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"pruebas_ignorar/repository"
 	"time"
 )
 
 func main() {
 
-	castedElement := true
-	// print num
-	fmt.Println(fmt.Sprint(castedElement))
-	// conver string to int
-	fmt.Print(strconv.ParseBool(fmt.Sprint(castedElement)))
-	// var varPrueba any
-	// varPrueba = 'd'
-	// fmt.Println(varPrueba)
-	// bt := []byte(string(varPrueba))
-
-	// switch v := varPrueba.(type) {
-	// case int:
-	// 	fmt.Printf("Twice %v is %v\n", v, v*2)
-	// case string:
-	// 	fmt.Printf("%q is %v bytes long\n", v, len(v))
-	// default:
-	// 	fmt.Printf("I don't know about type %T!\n", v)
-	// }
+	voter := repository.VoterModel{
+		ID:       "123",
+		Name:     "Juan",
+		LastName: "Perez",
+	}
+	repository.SaveVoterToCache(voter)
+	repository.GetVoter("123")
 }
 
 //////////////////////////////////
