@@ -29,6 +29,10 @@ func createJwtManager() *jwt.Manager {
 	if err != nil {
 		l.LogError(err.Error())
 	}
-	manager := jwt.NewJWTManager(privateKey, duration)
+	publicKey, err := ioutil.ReadFile("./jwt_public_key.rsa")
+	if err != nil {
+		l.LogError(err.Error())
+	}
+	manager := jwt.NewJWTManager(privateKey, publicKey, duration)
 	return manager
 }

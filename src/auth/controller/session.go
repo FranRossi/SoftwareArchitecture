@@ -63,7 +63,16 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 			"login": nil,
 		})
 	}
-	manager := jwt.NewJWTManager(privateKey, duration)
+	publicKey, err := ioutil.ReadFile("./public.rsa")
+	if err != nil {
+		l.LogError(err.Error())
+		return c.Status(fiber.ErrInternalServerError.Code).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error() + " cannot read public key",
+			"login": nil,
+		})
+	}
+	manager := jwt.NewJWTManager(privateKey, publicKey, duration)
 
 	token, err := manager.Generate(generator)
 	if err != nil {

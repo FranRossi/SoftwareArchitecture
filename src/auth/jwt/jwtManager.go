@@ -9,11 +9,12 @@ import (
 
 type Manager struct {
 	secretKey     []byte
+	publicKey     []byte
 	tokenDuration time.Duration
 }
 
-func NewJWTManager(secretKey []byte, tokenDuration time.Duration) *Manager {
-	return &Manager{secretKey, tokenDuration}
+func NewJWTManager(secretKey, publicKey []byte, tokenDuration time.Duration) *Manager {
+	return &Manager{secretKey, publicKey, tokenDuration}
 }
 
 func (manager *Manager) Generate(user models.TokenInfo) (string, error) {
@@ -40,7 +41,11 @@ func (manager *Manager) Verify(accessToken string) (*models.UserClaim, error) {
 			if !ok {
 				return nil, fmt.Errorf("unexpected token signing method")
 			}
-			return manager.secretKey, nil
+			publicKey, err := jwt.ParseRSAPublicKeyFromPEM(manager.publicKey)
+			if err != nil {
+				return nil, fmt.Errorf("invalid public key: %w", err)
+			}
+			return publicKey, nil
 		},
 	)
 
