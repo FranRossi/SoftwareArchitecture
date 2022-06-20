@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const DefaultExpiration time.Duration = time.Second * 30 // TODO cambiar cuando no sea para pruebas
+const DefaultExpiration time.Duration = time.Second * 30 // TODO cambiar a un numero más grande
 
 func Get(key string, result any) error {
 	cache := GetInstanceRedisClient()

@@ -3,11 +3,13 @@ package cache
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 
 	l "own_logger"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/joho/godotenv"
 )
 
 var lockRedis = &sync.Mutex{}
@@ -27,8 +29,12 @@ func GetInstanceRedisClient() *redis.Client {
 }
 
 func connectionRedis() (*redis.Client, error) {
-	const uri = "localhost:6379"
-	const password = "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81" // TODO: use .env file
+	errLoadingEnv := godotenv.Load("./../cache/.env")
+	if errLoadingEnv != nil {
+		l.LogError("Error loading .env file of cache: " + errLoadingEnv.Error())
+	}
+	uri := os.Getenv("REDIS_URI")
+	password := os.Getenv("REDIS_PASSWORD")
 
 	client := redis.NewClient(&redis.Options{Addr: uri, Password: password, DB: 0})
 
