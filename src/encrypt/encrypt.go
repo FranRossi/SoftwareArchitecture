@@ -10,8 +10,7 @@ import (
 )
 
 func DecryptText(encryptedText string) string {
-	privateKeyPEM := ReadKeyFromFile("./../encrypt/privkey_appEV.pem")
-	privKey := ExportPEMStrToPrivKey(privateKeyPEM)
+	privKey := GetInstancePrivateKey()
 	rng := rand.Reader
 
 	bytesToDecrypt, _ := b64.StdEncoding.DecodeString(encryptedText)
@@ -39,4 +38,19 @@ func EncryptText(text string) string {
 	}
 	ciphertextBase64 := b64.StdEncoding.EncodeToString(ciphertext)
 	return ciphertextBase64
+}
+
+var privateKeyInstance = readPrivateKey()
+
+func GetInstancePrivateKey() *rsa.PrivateKey {
+	if privateKeyInstance == nil {
+		privateKeyInstance = readPrivateKey()
+	}
+	return privateKeyInstance
+}
+
+func readPrivateKey() *rsa.PrivateKey {
+	privateKeyPEM := ReadKeyFromFile("./../encrypt/privkey_appEV.pem")
+	privKey := ExportPEMStrToPrivKey(privateKeyPEM)
+	return privKey
 }

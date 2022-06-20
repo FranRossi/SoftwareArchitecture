@@ -7,7 +7,6 @@ import (
 	l "own_logger"
 	"strconv"
 	"time"
-	"voter_api/controllers/validation"
 	"voter_api/domain"
 	"voter_api/repository"
 )
@@ -15,10 +14,10 @@ import (
 var electionSession = make([]string, 1)
 
 func StoreVote(vote domain.VoteModel) error {
-	validationError := validation.ValidateVote(vote)
-	if validationError != nil {
-		return validationError
-	}
+	//validationError := validation.ValidateVote(vote)
+	//if validationError != nil {
+	//	return validationError
+	//}
 	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
 	if err2 != nil {
 		return fmt.Errorf("election mode cannot be found when storing vote: %w", err2)

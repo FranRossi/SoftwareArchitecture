@@ -24,43 +24,47 @@ import (
 type VoterServer struct {
 	server     pb.VoteServiceServer
 	jwtManager *jwt.Manager
-	channel    chan *pb.VoteRequest
+	channel    chan VoteAndTime
+}
+
+type VoteAndTime struct {
+	Vote         *pb.VoteRequest
+	TimeFrontEnd time.Time
 }
 
 func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) *VoterServer {
 	voteServer := VoterServer{
 		jwtManager: jwtManager,
-		channel:    make(chan *pb.VoteRequest),
+		channel:    make(chan VoteAndTime),
 	}
 	pb.RegisterVoteServiceServer(grpcServer, &voteServer)
 	return &voteServer
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
-	timeFrontEnd := time.Now()
 	message := "We received your vote, we will validate it shortly and send you a notification"
-	newVote.channel <- req
-	go processVoteAndSendEmail(timeFrontEnd, req)
+	var voteAndTime VoteAndTime
+	voteAndTime.Vote = req
+	voteAndTime.TimeFrontEnd = time.Now()
+	newVote.channel <- voteAndTime
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "voted send for processing", nil)
 }
 
 func ActivateChannel(server *VoterServer) {
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 50000; i++ {
 		go processVotes(server)
 	}
 }
 
 func processVotes(server *VoterServer) {
 	for {
-		timeFrontEnd := time.Now()
-		var vote *pb.VoteRequest
+		var vote VoteAndTime
 		vote = <-server.channel
-		fmt.Println("Vote was recieved")
-		processVoteAndSendEmail(timeFrontEnd, vote)
+		processVoteAndSendEmail(vote.Vote, vote.TimeFrontEnd)
 	}
 }
 
-func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
+func processVoteAndSendEmail(req *pb.VoteRequest, timeFrontEnd time.Time) {
 	voteModel := domain.VoteModel{
 		IdElection:  req.IdElection,
 		IdVoter:     req.IdVoter,
@@ -84,10 +88,10 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if failed != nil {
 		return "", failed
 	}
-	//err := logic.StoreVote(voteModel)
-	//if err != nil {
-	//	return "", err
-	//}
+	err := logic.StoreVote(voteModel)
+	if err != nil {
+		return "", err
+	}
 	timeBackEnd := time.Now()
 	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
 	//	err2 := logic.DeleteVote(voteModel)

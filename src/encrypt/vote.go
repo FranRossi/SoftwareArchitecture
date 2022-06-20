@@ -27,5 +27,4 @@ func applyFunToVote(vote *VoteModel, fun func(string) string) {
 	vote.IdVoter = fun(vote.IdVoter)
 	vote.Circuit = fun(vote.Circuit)
 	vote.IdCandidate = fun(vote.IdCandidate)
-
 }

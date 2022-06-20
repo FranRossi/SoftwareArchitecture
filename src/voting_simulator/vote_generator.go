@@ -9,6 +9,7 @@ import (
 	"electoral_service/models"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -27,7 +28,12 @@ func GetVoters() ([]models.VoterModel, error) {
 	if err != nil {
 		l.LogError(err.Error())
 	}
-	defer cursor.Close(context.TODO())
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			l.LogError(err.Error())
+		}
+	}(cursor, context.TODO())
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		return []models.VoterModel{}, fmt.Errorf("error requesting voters: %v", err)
 	}
