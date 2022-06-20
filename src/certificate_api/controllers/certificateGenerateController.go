@@ -19,12 +19,12 @@ func ListenerForNewCertificates() {
 		if err != nil {
 			l.LogError(err.Error())
 			fmt.Println(err.Error())
-			return err
+			return err // TODO no devolver error, eso solo hace que el rabbit no haga el ack
 		}
 		mongoClient := connections.GetInstanceMongoClient()
 		repo := repositories.NewRequestsRepo(mongoClient, "certificates")
 		controller := CertificateRequestsController(repo)
-		return controller.GenerateCertificate(voteInfo)
+		return controller.GenerateCertificate(voteInfo) // TODO no devolver error, eso solo hace que el rabbit no haga el ack
 	})
 }
 

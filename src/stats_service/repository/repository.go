@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"voter_api/connections"
 	"voter_api/domain"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func UpdateStatistics(statistics domain.Statistics, groupType, groupName string) error {

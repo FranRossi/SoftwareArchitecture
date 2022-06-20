@@ -1,20 +1,37 @@
 package logic
 
 import (
-	"electoral_service/models"
 	"fmt"
 	"own_logger"
 	p_f "pipes_and_filters"
+	"stats_service/models"
+	domain "stats_service/models"
+	"stats_service/repository"
 	"time"
-	"voter_api/domain"
-	"voter_api/repository"
 )
 
-func RegisterVoteOnCertainGroup(idElection string, voter *models.VoterModel) {
+func ListenForNewStats(){
+
+	pipeLineTotal :=
+	pipeLineActual := 
+
+}
+
+func createTotalPipeLine(){
+	p := p_f.Pipeline{}
+
+}
+
+
+func RegisterVoteOnCertainGroupActual(voter *models.VoterStats) {
 	p := p_f.Pipeline{}
 	statistics := transformDataToStatistics(voter)
-	statistics.ElectionId = idElection
-	errLoadingYaml := p.LoadFiltersFromYaml("statisticsGroups.yaml", GetAvailableFilters())
+	statistics.ElectionId = voter.ElectionId
+
+	availableFilters := map[string]p_f.FilterWithParams{
+		"add_to_vote_group": AddVoteToCertainGroup,
+	}
+	errLoadingYaml := p.LoadFiltersFromYaml("statisticsGroups.yaml", availableFilters)
 	if errLoadingYaml != nil {
 		return
 	}
@@ -22,7 +39,7 @@ func RegisterVoteOnCertainGroup(idElection string, voter *models.VoterModel) {
 	if len(errors) > 0 {
 		// TODO add error code
 		LogValidationErrors(errors)
-		fmt.Printf("statistics is not valid: %v", errors)
+		fmt.("statistics are not valid: %v", errors)
 	}
 }
 
@@ -51,11 +68,8 @@ func getAge(birthDate string) int {
 	return time.Now().Year() - t.Year()
 }
 
-func GetAvailableFilters() map[string]p_f.FilterWithParams {
-	availableFilters := map[string]p_f.FilterWithParams{
-		"add_to_vote_group": AddVoteToCertainGroup,
-	}
-	return availableFilters
+func AddVoteToCertainGroupTotal(data any, params map[string]any) error {
+
 }
 
 func AddVoteToCertainGroup(data any, params map[string]any) error {
