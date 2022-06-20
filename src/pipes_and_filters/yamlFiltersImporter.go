@@ -20,12 +20,13 @@ type SelectedFilterFromYaml struct {
 	Params map[string]any `yaml:"params"`
 }
 
-func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[string]FilterWithParams) {
+func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[string]FilterWithParams) error {
 
 	// Read yaml file
 	yamlFile, errReadingFile := ioutil.ReadFile(yamlPath)
 	if errReadingFile != nil {
-		panic(errReadingFile)
+		l.LogError("Error reading yaml file: " + errReadingFile.Error())
+		return errReadingFile
 	}
 
 	// Parse yaml file
@@ -33,14 +34,16 @@ func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[str
 	errParsingYaml := yaml.Unmarshal(yamlFile, &selectedFilters)
 
 	if errParsingYaml != nil {
-		panic(errParsingYaml)
+		l.LogError("Error parsing yaml file: " + errParsingYaml.Error())
+		return errParsingYaml
 	}
 
 	// Insert filters in Pipe
 	for _, selectedFilter := range selectedFilters {
 		filterName, filterExists := availableFilters[selectedFilter.Name]
 		if !filterExists {
-			panic("Filter " + selectedFilter.Name + " not found")
+			l.LogWarning("Filter " + selectedFilter.Name + " not found")
+			continue
 		}
 
 		maxRetries, specify := selectedFilter.Params["maxRetries"]
@@ -51,6 +54,7 @@ func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[str
 		}
 		p.Use(insertParameters(filterName, selectedFilter.Params, maxRetries.(int), selectedFilter.Name))
 	}
+	return nil
 }
 
 func insertParameters(missingParameterFilter FilterWithParams, params map[string]any, maxRetries int, filterName string) Filter {
