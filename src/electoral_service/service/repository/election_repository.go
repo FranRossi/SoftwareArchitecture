@@ -40,7 +40,6 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 }
 
 func StoreElectionVoters(voters []models.VoterModel) error {
-
 	encryptVoter(voters)
 	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()

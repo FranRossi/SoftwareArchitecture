@@ -25,16 +25,16 @@ func (controller *ElectionController) GetElectionSettings() *modelsGeneric.Elect
 	defer func() {
 		err := response.Body.Close()
 		if err != nil {
-			l.LogError(err.Error())
+			go l.LogError(err.Error())
 		}
 	}()
 	var electionSettings models2.ElectionJson
 	er := json.Unmarshal(jsonBytes, &electionSettings)
 	if er != nil {
-		l.LogError(err.Error())
+		go l.LogError(err.Error() + " error casting election settings")
 	}
 	if electionSettings.Error {
-		l.LogError(electionSettings.Msg)
+		go l.LogError(electionSettings.Msg + " error on election settings from external service")
 	}
 	return convertToElectionModel(electionSettings.Election)
 }

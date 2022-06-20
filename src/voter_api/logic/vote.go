@@ -101,8 +101,8 @@ func StoreVoteInfo(idVoter, idElection string, timeFrontEnd, timeBackEnd time.Ti
 }
 
 func generateRandomVoteIdentification(idElection string) string {
-	idElectionInt, _ := strconv.Atoi(idElection)
-	sessionNumber := electionSession[idElectionInt]
+	//idElectionInt, _ := strconv.Atoi(idElection)
+	sessionNumber := "1234" //electionSession[idElectionInt]
 	randomNumber := strconv.Itoa(int(time.Now().UnixNano()))
 	return sessionNumber + randomNumber
 }

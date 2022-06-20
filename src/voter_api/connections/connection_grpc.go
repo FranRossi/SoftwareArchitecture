@@ -31,6 +31,7 @@ func ConnectionGRPC() *grpc.Server {
 	}
 	grpcServer := grpc.NewServer(
 		grpc.StreamInterceptor(streamInterceptor),
+
 	)
 	fmt.Println("Starting gRPC server at: ", address)
 	return grpcServer

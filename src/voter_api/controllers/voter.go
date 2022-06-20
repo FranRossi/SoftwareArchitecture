@@ -24,37 +24,59 @@ import (
 type VoterServer struct {
 	server     pb.VoteServiceServer
 	jwtManager *jwt.Manager
+	channel    chan *pb.VoteRequest
 }
 
-func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
-	voteServer := VoterServer{jwtManager: jwtManager}
+func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) *VoterServer {
+	voteServer := VoterServer{
+		jwtManager: jwtManager,
+		channel:    make(chan *pb.VoteRequest),
+	}
 	pb.RegisterVoteServiceServer(grpcServer, &voteServer)
+	return &voteServer
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
 	timeFrontEnd := time.Now()
 	message := "We received your vote, we will validate it shortly and send you a notification"
+	newVote.channel <- req
 	go processVoteAndSendEmail(timeFrontEnd, req)
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "voted send for processing", nil)
 }
 
+func ActivateChannel(server *VoterServer) {
+	for i := 0; i < 50; i++ {
+		go processVotes(server)
+	}
+}
+
+func processVotes(server *VoterServer) {
+	for {
+		timeFrontEnd := time.Now()
+		var vote *pb.VoteRequest
+		vote = <-server.channel
+		fmt.Println("Vote was recieved")
+		processVoteAndSendEmail(timeFrontEnd, vote)
+	}
+}
+
 func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
 	voteModel := domain.VoteModel{
-		IdElection:  req.GetIdElection(),
-		IdVoter:     req.GetIdVoter(),
-		Circuit:     req.GetCircuit(),
-		IdCandidate: req.GetIdCandidate(),
-		Signature:   req.GetSignature(),
+		IdElection:  req.IdElection,
+		IdVoter:     req.IdVoter,
+		Circuit:     req.Circuit,
+		IdCandidate: req.IdCandidate,
+		Signature:   req.Signature,
 	}
 	encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
-		l.LogError(err.Error())
+		go l.LogError(err.Error())
 		fmt.Println(err.Error())
-		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
+		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
-	l.LogInfo("Vote processed")
-	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
+	go l.LogInfo("Vote processed")
+	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
@@ -62,25 +84,26 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if failed != nil {
 		return "", failed
 	}
-	err := logic.StoreVote(voteModel)
-	if err != nil {
-		return "", err
-	}
+	//err := logic.StoreVote(voteModel)
+	//if err != nil {
+	//	return "", err
+	//}
 	timeBackEnd := time.Now()
-	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
-		err2 := logic.DeleteVote(voteModel)
-		if err2 != nil {
-			return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
-		}
-		messageFailed := "vote cannot processed under 2 seconds and was deleted"
-		return "", fmt.Errorf(messageFailed)
-	} else {
-		voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
-		if err2 != nil {
-			return "", fmt.Errorf("cannot store vote info: %v", err2)
-		}
-		return voteIdentification, nil
+	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
+	//	err2 := logic.DeleteVote(voteModel)
+	//	if err2 != nil {
+	//		return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
+	//	}
+	//	messageFailed := "vote cannot processed under 2 seconds"
+	//	return "", fmt.Errorf(messageFailed)
+	//} else {
+	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds())
+	voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
+	if err2 != nil {
+		return "", fmt.Errorf("cannot store vote info: %v", err2)
 	}
+	return voteIdentification, nil
+	//}
 }
 
 func verifySignatureVote(vote domain.VoteModel) error {

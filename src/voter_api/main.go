@@ -10,7 +10,8 @@ func main() {
 	connections.ConnectionRabbitMQ()
 	grpcServer := connections.ConnectionGRPC()
 	jwt := connections.ConnectionJWT()
-	controllers.RegisterServicesServer(grpcServer, jwt)
+	voteServer := controllers.RegisterServicesServer(grpcServer, jwt)
+	controllers.ActivateChannel(voteServer)
 	connections.ServeGRPC(grpcServer)
 	defer connections.CloseConnectionRabbitMQ()
 }
