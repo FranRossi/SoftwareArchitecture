@@ -2,6 +2,9 @@ package pipes_and_filters
 
 import (
 	"io/ioutil"
+	"strconv"
+
+	l "own_logger"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -39,12 +42,27 @@ func (p *Pipeline) LoadFiltersFromYaml(yamlPath string, availableFilters map[str
 		if !filterExists {
 			panic("Filter " + selectedFilter.Name + " not found")
 		}
-		p.Use(insertParameters(filterName, selectedFilter.Params))
+
+		maxRetries, specify := selectedFilter.Params["maxRetries"]
+		if !specify {
+			maxRetries = 1
+		} else {
+			maxRetries = maxRetries.(int)
+		}
+		p.Use(insertParameters(filterName, selectedFilter.Params, maxRetries.(int), selectedFilter.Name))
 	}
 }
 
-func insertParameters(missingParameterFilter FilterWithParams, params map[string]any) Filter {
+func insertParameters(missingParameterFilter FilterWithParams, params map[string]any, maxRetries int, filterName string) Filter {
 	return func(data any) error {
-		return missingParameterFilter(data, params)
+		var err error
+		for i := 0; i < maxRetries; i++ {
+			err = missingParameterFilter(data, params)
+			if err == nil {
+				return nil
+			}
+			l.LogWarning("Filter " + filterName + " failed. Retrying for " + strconv.Itoa(i) + "th time...")
+		}
+		return err
 	}
 }
