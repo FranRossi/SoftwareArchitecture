@@ -14,7 +14,10 @@ func RegisterVoteOnCertainGroup(idElection string, voter *models.VoterModel) {
 	p := p_f.Pipeline{}
 	statistics := transformDataToStatistics(voter)
 	statistics.ElectionId = idElection
-	p.LoadFiltersFromYaml("statisticsGroups.yaml", GetAvailableFilters())
+	errLoadingYaml := p.LoadFiltersFromYaml("statisticsGroups.yaml", GetAvailableFilters())
+	if errLoadingYaml != nil {
+		return
+	}
 	errors := p.Run(statistics)
 	if len(errors) > 0 {
 		// TODO add error code

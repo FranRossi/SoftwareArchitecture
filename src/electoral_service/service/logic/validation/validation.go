@@ -9,7 +9,10 @@ import (
 
 func ValidateInitial(election models.ElectionModelEssential) error {
 	p := p_f.Pipeline{}
-	p.LoadFiltersFromYaml("initialValidations.yaml", GetAvailableFilters())
+	errLoadingYaml := p.LoadFiltersFromYaml("initialValidations.yaml", GetAvailableFilters())
+	if errLoadingYaml != nil {
+		return errLoadingYaml
+	}
 	errors := p.Run(election)
 	if len(errors) > 0 {
 		LogValidationErrors(errors)
@@ -21,7 +24,10 @@ func ValidateInitial(election models.ElectionModelEssential) error {
 
 func ValidateEndAct(act models.ClosingAct) error {
 	p := p_f.Pipeline{}
-	p.LoadFiltersFromYaml("endValidations.yaml", GetAvailableFilters())
+	errLoadingYaml := p.LoadFiltersFromYaml("endValidations.yaml", GetAvailableFilters())
+	if errLoadingYaml != nil {
+		return errLoadingYaml
+	}
 	errors := p.Run(act)
 	if len(errors) > 0 {
 		LogValidationErrors(errors)

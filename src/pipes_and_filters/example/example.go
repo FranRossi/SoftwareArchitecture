@@ -22,7 +22,11 @@ func main() {
 
 	p := l.Pipeline{}
 
-	p.LoadFiltersFromYaml("test.yaml", availableFilters)
+	errLoadingYaml := p.LoadFiltersFromYaml("test.yaml", availableFilters)
+	if errLoadingYaml != nil {
+		fmt.Println(errLoadingYaml)
+		return
+	}
 
 	validateNumber(70, &p)
 	fmt.Println("")
