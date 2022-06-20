@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	cache v0.0.0-00010101000000-000000000000
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-redis/redis/v8 v8.11.5
@@ -38,3 +39,5 @@ require (
 replace own_logger => ./../own_logger
 
 replace auth => ./../auth
+
+replace cache => ./../cache

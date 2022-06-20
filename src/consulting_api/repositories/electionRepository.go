@@ -1,10 +1,10 @@
 package repositories
 
 import (
+	"cache"
 	m "consulting_api/models"
 	"context"
 	"fmt"
-	l "own_logger"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,11 +23,13 @@ func NewElectionRepo(mongoClient *mongo.Client, database string) *ElectionRepo {
 	}
 }
 
+const electionConfigCacheKeyPrefix = "election_config_"
+
 func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.ElectionConfig, error) {
 
-	configFromCache, errCache := RequestElectionConfigFromCache(electionId)
+	var configFromCache m.ElectionConfig
+	errCache := cache.Get(electionConfigCacheKeyPrefix+electionId, &configFromCache)
 	if errCache == nil {
-		l.LogInfo("Election config for election " + electionId + " was found in cache")
 		return configFromCache, nil
 	}
 
@@ -56,6 +58,6 @@ func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.Electi
 		MaxCertificates: maxCertificates,
 		Emails:          emailsArray,
 	}
-	SaveElectionConfigToCache(electionId, configs)
+	cache.Save(electionConfigCacheKeyPrefix+electionId, &configs, cache.DefaultExpiration)
 	return configs, nil
 }

@@ -1,10 +1,11 @@
-package connections
+package cache
 
 import (
 	"context"
 	"fmt"
-	l "own_logger"
 	"sync"
+
+	l "own_logger"
 
 	"github.com/go-redis/redis/v8"
 )
