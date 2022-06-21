@@ -28,7 +28,7 @@ func RegisterVoteOnCertainGroup(idElection string, voter *models.VoterModel) {
 
 func LogValidationErrors(errors []error) {
 	for _, er := range errors {
-		own_logger.LogError(er.Error())
+		go own_logger.LogError(er.Error())
 	}
 }
 
@@ -66,7 +66,7 @@ func AddVoteToCertainGroup(data any, params map[string]any) error {
 	groupType := params["type"].(string)
 	groupName := params["name"].(string)
 	if statistics.Age >= minAge && statistics.Age <= maxAge && statistics.Sex == sex {
-		err := repository.UpdateStatistics(statistics, groupType, groupName)
+		err := repository.UpdateStatistics(statistics, minAge, maxAge, groupType, groupName)
 		if err != nil {
 			return fmt.Errorf("error storing statistics on database")
 		}

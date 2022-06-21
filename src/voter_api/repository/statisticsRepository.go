@@ -9,15 +9,15 @@ import (
 	"voter_api/domain"
 )
 
-func UpdateStatistics(statistics domain.Statistics, groupType, groupName string) error {
+func UpdateStatistics(statistics domain.Statistics, minAge, maxAge int, groupType, groupName string) error {
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_votes")
 	uruguayanVotesCollection := uruguayDataBase.Collection("statistics")
 	var query bson.M
 	if groupType == "region" {
-		query = bson.M{"election_id": statistics.ElectionId, "group_type": groupType, "group_name": groupName, "region": statistics.Region}
+		query = bson.M{"election_id": statistics.ElectionId, "group_type": groupType, "group_name": groupName, "region": statistics.Region, "sex": statistics.Sex, "minAge": minAge, "maxAge": maxAge}
 	} else {
-		query = bson.M{"election_id": statistics.ElectionId, "group_type": groupType, "group_name": groupName, "circuit": statistics.Circuit}
+		query = bson.M{"election_id": statistics.ElectionId, "group_type": groupType, "group_name": groupName, "circuit": statistics.Circuit, "sex": statistics.Sex, "minAge": minAge, "maxAge": maxAge}
 	}
 
 	updateDocument := bson.M{"$inc": bson.M{"votes": 1}}
