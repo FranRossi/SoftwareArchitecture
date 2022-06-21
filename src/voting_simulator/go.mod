@@ -3,7 +3,7 @@ module voting_simulator
 go 1.18
 
 require (
-	encrypt v0.0.0-00010101000000-000000000000
+	electoral_service v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
@@ -11,10 +11,10 @@ require (
 )
 
 require (
-	electoral_service v0.0.0-00010101000000-000000000000 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

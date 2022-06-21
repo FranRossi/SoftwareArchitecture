@@ -7,6 +7,7 @@ import (
 	l "own_logger"
 	"strconv"
 	"time"
+	"voter_api/controllers/validation"
 	"voter_api/domain"
 	"voter_api/repository"
 )
@@ -14,10 +15,10 @@ import (
 var electionSession = make([]string, 1)
 
 func StoreVote(vote domain.VoteModel) error {
-	//validationError := validation.ValidateVote(vote)
-	//if validationError != nil {
-	//	return validationError
-	//}
+	validationError := validation.ValidateVote(vote)
+	if validationError != nil {
+		return validationError
+	}
 	electionMode, err2 := repository.FindElectionMode(vote.IdElection)
 	if err2 != nil {
 		return fmt.Errorf("election mode cannot be found when storing vote: %w", err2)
@@ -44,20 +45,20 @@ func StoreVote(vote domain.VoteModel) error {
 	}
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
-	politicalParty, err5 := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
-	if err5 != nil {
-		return fmt.Errorf("error getting political party name when storing vote: %w", err5)
-	}
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
-	go updateElectionResult(vote, politicalParty, region)
+	go updateElectionResult(vote, region)
 	go RegisterVoteOnCertainGroup(vote.IdElection, voter)
 	return nil
 }
 
-func updateElectionResult(vote domain.VoteModel, politicalPartyName, region string) {
+func updateElectionResult(vote domain.VoteModel, region string) {
+	politicalPartyName, errPP := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
+	if errPP != nil {
+		l.LogError("error getting political party name when storing vote: %w" + errPP.Error())
+	}
 	err := repository.UpdateElectionResult(vote, region, politicalPartyName)
 	if err != nil {
-		fmt.Errorf("election result cannot be updated: %w", err)
+		l.LogError("election result cannot be updated: %w" + err.Error())
 	}
 }
 

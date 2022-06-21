@@ -8,16 +8,18 @@ import (
 	"crypto/sha256"
 	"electoral_service/models"
 	"fmt"
+	math "math/rand"
+	"os"
+	l "own_logger"
+	"strconv"
+	"sync"
+	"time"
+	"voting_simulator/proto"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
-	math "math/rand"
-	l "own_logger"
-	"strconv"
-	"sync"
-	"voting_simulator/proto"
 )
 
 func GetVoters() ([]models.VoterModel, error) {
@@ -69,17 +71,32 @@ func CreateVotes() {
 		l.LogError(err.Error())
 	}
 	fmt.Println("Started voting")
-	wg := sync.WaitGroup{}
-	wg.Add(len(voters))
-	for _, voter := range voters {
-		go CreateVote(voter, &wg)
+	startTime := time.Now()
+	var wg sync.WaitGroup
+	count := 0
+	batchString := os.Getenv("BATCH_SIZE")
+	batchSize, _ := strconv.Atoi(batchString)
+	fmt.Println("Batchsize: " + batchString)
+	for i := 0; i < len(voters); i++ {
+		localVoter := voters[i]
+		count++
+		wg.Add(1)
+		go func(v models.VoterModel) {
+			CreateVote(localVoter)
+			wg.Done()
+		}(localVoter)
+		if count >= batchSize {
+			wg.Wait()
+			count = 0
+		}
 	}
 	wg.Wait()
+	endTime := time.Now()
 	fmt.Println("Finished voting")
+	fmt.Println("Time: ", endTime.Sub(startTime))
 }
 
-func CreateVote(voter models.VoterModel, wg *sync.WaitGroup) {
-	defer wg.Done()
+func CreateVote(voter models.VoterModel) {
 	candidateId := strconv.Itoa(int(math.Int31n(3) + 1))
 	vote := VoteModel{
 		IdElection:  "1",
@@ -109,16 +126,17 @@ type VoteModel struct {
 	Signature   []byte
 }
 
-const addr = ":50004"
+const addr = "localhost:50004"
 
 func Vote(vote VoteModel) {
 	encryptVote(&vote)
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("cannot connect: %s", err)
+		fmt.Printf("cannot connect: %s", err)
+		conn.Close()
+		return
 	}
-	defer conn.Close()
 
 	client := proto.NewVoteServiceClient(conn)
 	request := &proto.VoteRequest{
@@ -128,9 +146,14 @@ func Vote(vote VoteModel) {
 		IdCandidate: vote.IdCandidate,
 		Signature:   vote.Signature,
 	}
-	response, err2 := client.Vote(context.Background(), request)
+	_, err2 := client.Vote(context.Background(), request)
 	if err2 != nil {
-		log.Fatalf("could not vote: %v", err2)
+		// fmt.Printf("\n could not vote: %v", err2)
+		fmt.Printf("X")
+		conn.Close()
+		return
 	}
-	fmt.Println("Vote: %s\n", response.Message)
+	// fmt.Println("Vote: %s\n", response.Message)
+	fmt.Print(".")
+	conn.Close()
 }

@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func generateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
@@ -61,6 +63,7 @@ func main() {
 
 	//saveKeyToFile(privKeyStr, "privkey.pem")
 	//saveKeyToFile(pubKeyStr, "pubkey.pem")
+	godotenv.Load()
 	CreateVotes()
 	fmt.Println("Press Enter to exit")
 	input := bufio.NewScanner(os.Stdin)

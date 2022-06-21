@@ -7,7 +7,9 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
+	"os"
 	l "own_logger"
+	"strconv"
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
@@ -42,17 +44,30 @@ func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) *V
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
+	// fmt.Println(runtime.NumGoroutine())
+	// runtime.LockOSThread() TODO
 	message := "We received your vote, we will validate it shortly and send you a notification"
 	var voteAndTime VoteAndTime
 	voteAndTime.Vote = req
 	voteAndTime.TimeFrontEnd = time.Now()
-	newVote.channel <- voteAndTime
+	limit := os.Getenv("LIMIT_GO_ROUTINES")
+	if limit == "true" {
+		newVote.channel <- voteAndTime
+	} else {
+		go processVoteAndSendEmail(req, voteAndTime.TimeFrontEnd)
+	}
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "voted send for processing", nil)
 }
 
 func ActivateChannel(server *VoterServer) {
-	for i := 0; i < 50000; i++ {
-		go processVotes(server)
+	limit := os.Getenv("LIMIT_GO_ROUTINES")
+	if limit == "true" {
+		numString := os.Getenv("NUMBER_OF_GO_ROUTINES")
+		num, _ := strconv.Atoi(numString)
+		fmt.Println("limiting go routines to: " + numString)
+		for i := 0; i < num; i++ {
+			go processVotes(server)
+		}
 	}
 }
 
@@ -88,11 +103,11 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if failed != nil {
 		return "", failed
 	}
+	timeBackEnd := time.Now()
 	err := logic.StoreVote(voteModel)
 	if err != nil {
 		return "", err
 	}
-	timeBackEnd := time.Now()
 	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
 	//	err2 := logic.DeleteVote(voteModel)
 	//	if err2 != nil {
@@ -101,7 +116,7 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	//	messageFailed := "vote cannot processed under 2 seconds"
 	//	return "", fmt.Errorf(messageFailed)
 	//} else {
-	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds())
+	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME
 	voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
 	if err2 != nil {
 		return "", fmt.Errorf("cannot store vote info: %v", err2)

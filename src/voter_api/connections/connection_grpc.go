@@ -2,11 +2,12 @@ package connections
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
 	l "own_logger"
+
+	"google.golang.org/grpc"
 )
 
 func streamInterceptor(
@@ -31,13 +32,13 @@ func ConnectionGRPC() *grpc.Server {
 	}
 	grpcServer := grpc.NewServer(
 		grpc.StreamInterceptor(streamInterceptor),
-
 	)
 	fmt.Println("Starting gRPC server at: ", address)
 	return grpcServer
 }
 
 func ServeGRPC(server *grpc.Server) {
+	// runtime.LockOSThread() TODO
 	if err := server.Serve(connection); err != nil {
 		l.LogError("gRPC server error: " + err.Error())
 		log.Fatal(err)
