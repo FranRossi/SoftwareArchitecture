@@ -1,8 +1,7 @@
 package main
 
 import (
-	"context"
-	"crypto"
+	"bufio"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -11,12 +10,9 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"voting_simulator/proto"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/joho/godotenv"
 )
 
 func generateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
@@ -67,9 +63,17 @@ func main() {
 
 	//saveKeyToFile(privKeyStr, "privkey.pem")
 	//saveKeyToFile(pubKeyStr, "pubkey.pem")
+	godotenv.Load()
+	CreateVotes()
+	fmt.Println("Press Enter to exit")
+	input := bufio.NewScanner(os.Stdin)
+	input.Scan()
+}
+
+func getPrivateKey() *rsa.PrivateKey {
 	privateKeyPEM := ReadKeyFromFile("./privkey.pem")
 	privateKey := ExportPEMStrToPrivKey(privateKeyPEM)
-	SignVote(privateKey)
+	return privateKey
 }
 
 func ExportPEMStrToPrivKey(priv []byte) *rsa.PrivateKey {
@@ -87,60 +91,9 @@ func ReadKeyFromFile(filename string) []byte {
 	return key
 }
 
-func SignVote(privateKey *rsa.PrivateKey) {
-	vote := VoteModel{
-		IdElection:  "1",
-		IdVoter:     "10000000",
-		IdCandidate: "3",
-		Circuit:     "1",
-	}
-	voter := []byte(vote.IdVoter)
-	msgHash := sha256.New()
-	msgHash.Write(voter)
-	msgHashSBytes := msgHash.Sum(nil)
-	signature, _ := rsa.SignPSS(rand.Reader, privateKey, crypto.SHA256, msgHashSBytes, nil)
-	vote.Signature = signature
-	Vote(vote)
-}
-
-type VoteModel struct {
-	IdElection  string
-	IdVoter     string
-	Circuit     string
-	IdCandidate string
-	Signature   []byte
-}
-
-const addr = "localhost:50004"
-
-func Vote(vote VoteModel) {
-	encryptVote(&vote)
-	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("cannot connect: %s", err)
-	}
-	defer conn.Close()
-
-	client := proto.NewVoteServiceClient(conn)
-	request := &proto.VoteRequest{
-		IdElection:  vote.IdElection,
-		IdVoter:     vote.IdVoter,
-		Circuit:     vote.Circuit,
-		IdCandidate: vote.IdCandidate,
-		Signature:   vote.Signature,
-	}
-	response, err2 := client.Vote(context.Background(), request)
-	if err2 != nil {
-		log.Fatalf("could not vote: %v", err2)
-	}
-	fmt.Printf("Vote: %s\n", response.Message)
-}
-
 func encryptVote(vote *VoteModel) {
 	publicKey := getPublicKey()
 
-	vote.Circuit = encryptText(vote.Circuit, publicKey)
 	vote.IdVoter = encryptText(vote.IdVoter, publicKey)
 	vote.IdCandidate = encryptText(vote.IdCandidate, publicKey)
 	vote.IdElection = encryptText(vote.IdElection, publicKey)

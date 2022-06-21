@@ -7,7 +7,9 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
+	"os"
 	l "own_logger"
+	"strconv"
 	"time"
 	"voter_api/controllers/validation"
 	"voter_api/domain"
@@ -24,37 +26,76 @@ import (
 type VoterServer struct {
 	server     pb.VoteServiceServer
 	jwtManager *jwt.Manager
+	channel    chan VoteAndTime
 }
 
-func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) {
-	voteServer := VoterServer{jwtManager: jwtManager}
+type VoteAndTime struct {
+	Vote         *pb.VoteRequest
+	TimeFrontEnd time.Time
+}
+
+func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) *VoterServer {
+	voteServer := VoterServer{
+		jwtManager: jwtManager,
+		channel:    make(chan VoteAndTime),
+	}
 	pb.RegisterVoteServiceServer(grpcServer, &voteServer)
+	return &voteServer
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
-	timeFrontEnd := time.Now()
+	// fmt.Println(runtime.NumGoroutine())
+	// runtime.LockOSThread() TODO
 	message := "We received your vote, we will validate it shortly and send you a notification"
-	go processVoteAndSendEmail(timeFrontEnd, req)
+	var voteAndTime VoteAndTime
+	voteAndTime.Vote = req
+	voteAndTime.TimeFrontEnd = time.Now()
+	limit := os.Getenv("LIMIT_GO_ROUTINES")
+	if limit == "true" {
+		newVote.channel <- voteAndTime
+	} else {
+		go processVoteAndSendEmail(req, voteAndTime.TimeFrontEnd)
+	}
 	return &pb.VoteReply{Message: message}, status.Errorf(codes.OK, "voted send for processing", nil)
 }
 
-func processVoteAndSendEmail(timeFrontEnd time.Time, req *pb.VoteRequest) {
+func ActivateChannel(server *VoterServer) {
+	limit := os.Getenv("LIMIT_GO_ROUTINES")
+	if limit == "true" {
+		numString := os.Getenv("NUMBER_OF_GO_ROUTINES")
+		num, _ := strconv.Atoi(numString)
+		fmt.Println("limiting go routines to: " + numString)
+		for i := 0; i < num; i++ {
+			go processVotes(server)
+		}
+	}
+}
+
+func processVotes(server *VoterServer) {
+	for {
+		var vote VoteAndTime
+		vote = <-server.channel
+		processVoteAndSendEmail(vote.Vote, vote.TimeFrontEnd)
+	}
+}
+
+func processVoteAndSendEmail(req *pb.VoteRequest, timeFrontEnd time.Time) {
 	voteModel := domain.VoteModel{
-		IdElection:  req.GetIdElection(),
-		IdVoter:     req.GetIdVoter(),
-		Circuit:     req.GetCircuit(),
-		IdCandidate: req.GetIdCandidate(),
-		Signature:   req.GetSignature(),
+		IdElection:  req.IdElection,
+		IdVoter:     req.IdVoter,
+		Circuit:     req.Circuit,
+		IdCandidate: req.IdCandidate,
+		Signature:   req.Signature,
 	}
 	encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
-		l.LogError(err.Error())
+		go l.LogError(err.Error())
 		fmt.Println(err.Error())
-		logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
+		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
-	l.LogInfo("Vote processed")
-	logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
+	go l.LogInfo("Vote processed")
+	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
@@ -62,25 +103,26 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if failed != nil {
 		return "", failed
 	}
+	timeBackEnd := time.Now()
 	err := logic.StoreVote(voteModel)
 	if err != nil {
 		return "", err
 	}
-	timeBackEnd := time.Now()
-	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
-		err2 := logic.DeleteVote(voteModel)
-		if err2 != nil {
-			return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
-		}
-		messageFailed := "vote cannot processed under 2 seconds and was deleted"
-		return "", fmt.Errorf(messageFailed)
-	} else {
-		voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
-		if err2 != nil {
-			return "", fmt.Errorf("cannot store vote info: %v", err2)
-		}
-		return voteIdentification, nil
+	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
+	//	err2 := logic.DeleteVote(voteModel)
+	//	if err2 != nil {
+	//		return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
+	//	}
+	//	messageFailed := "vote cannot processed under 2 seconds"
+	//	return "", fmt.Errorf(messageFailed)
+	//} else {
+	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME
+	voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
+	if err2 != nil {
+		return "", fmt.Errorf("cannot store vote info: %v", err2)
 	}
+	return voteIdentification, nil
+	//}
 }
 
 func verifySignatureVote(vote domain.VoteModel) error {

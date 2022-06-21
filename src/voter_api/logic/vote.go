@@ -45,20 +45,20 @@ func StoreVote(vote domain.VoteModel) error {
 	}
 	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
-	politicalParty, err5 := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
-	if err5 != nil {
-		return fmt.Errorf("error getting political party name when storing vote: %w", err5)
-	}
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
-	go updateElectionResult(vote, politicalParty, region)
+	go updateElectionResult(vote, region)
 	go RegisterVoteOnCertainGroup(vote.IdElection, voter)
 	return nil
 }
 
-func updateElectionResult(vote domain.VoteModel, politicalPartyName, region string) {
+func updateElectionResult(vote domain.VoteModel, region string) {
+	politicalPartyName, errPP := repository.FindPoliticalPartyFromCandidateId(vote.IdCandidate)
+	if errPP != nil {
+		l.LogError("error getting political party name when storing vote: %w" + errPP.Error())
+	}
 	err := repository.UpdateElectionResult(vote, region, politicalPartyName)
 	if err != nil {
-		fmt.Errorf("election result cannot be updated: %w", err)
+		l.LogError("election result cannot be updated: %w" + err.Error())
 	}
 }
 
@@ -101,8 +101,8 @@ func StoreVoteInfo(idVoter, idElection string, timeFrontEnd, timeBackEnd time.Ti
 }
 
 func generateRandomVoteIdentification(idElection string) string {
-	idElectionInt, _ := strconv.Atoi(idElection)
-	sessionNumber := electionSession[idElectionInt]
+	//idElectionInt, _ := strconv.Atoi(idElection)
+	sessionNumber := "1234" //electionSession[idElectionInt]
 	randomNumber := strconv.Itoa(int(time.Now().UnixNano()))
 	return sessionNumber + randomNumber
 }

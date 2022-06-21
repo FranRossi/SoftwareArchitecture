@@ -4,6 +4,8 @@ import (
 	"external_electoral_api/uruguay_election"
 	"external_electoral_api/uruguay_election/models"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 type ElectionRepo struct {
@@ -13,7 +15,11 @@ type ElectionRepo struct {
 var electionUruguay models.ElectionModel
 
 func NewUruguayanElection() {
-	id, voterAmount := "1", 10000
+	numString := os.Getenv("NUM_OF_VOTERS")
+	num, _ := strconv.Atoi(numString)
+	fmt.Println("Numbers of voters: " + numString)
+
+	id, voterAmount := "1", num
 	var err error
 	electionUruguay, err = uruguay_election.CreateElectionMock(id, voterAmount)
 	if err != nil {
