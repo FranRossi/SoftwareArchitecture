@@ -16,7 +16,7 @@ func ValidateInitial(election models.ElectionModelEssential) error {
 	errors := p.Run(election)
 	if len(errors) > 0 {
 		LogValidationErrors(errors)
-		// TODO add error code
+		//TODO add error code
 		return fmt.Errorf("election is not valid: %v", errors)
 	}
 	return nil
@@ -31,7 +31,7 @@ func ValidateEndAct(act models.ClosingAct) error {
 	errors := p.Run(act)
 	if len(errors) > 0 {
 		LogValidationErrors(errors)
-		// TODO add error code
+		//TODO add error code
 		return fmt.Errorf("end final: %v", errors)
 	}
 	return nil
