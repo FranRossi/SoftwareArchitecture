@@ -12,8 +12,6 @@ import (
 	"voter_api/repository"
 )
 
-var electionSession = make([]string, 1)
-
 func StoreVote(vote domain.VoteModel) error {
 	validationError := validation.ValidateVote(vote)
 	if validationError != nil {
@@ -74,11 +72,6 @@ func updateNewVote(vote domain.VoteModel, region string) error {
 	return nil
 }
 
-func GenerateElectionSession(idElection string) {
-	idElectionInt, _ := strconv.Atoi(idElection)
-	electionSession = append(electionSession, strconv.Itoa(idElectionInt))
-}
-
 func DeleteVote(vote domain.VoteModel) error {
 	err := repository.DeleteVote(vote)
 	if err != nil {
@@ -99,10 +92,8 @@ func StoreVoteInfo(idVoter, idElection, voteIdentification string, timeFrontEnd,
 }
 
 func GenerateRandomVoteIdentification(idElection string) string {
-	idElectionInt, _ := strconv.Atoi(idElection)
-	sessionNumber := electionSession[idElectionInt]
 	randomNumber := strconv.Itoa(int(time.Now().UnixNano()))
-	return sessionNumber + randomNumber
+	return idElection + randomNumber
 }
 
 func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront time.Time, err error) {

@@ -100,7 +100,6 @@ func processVoteAndSendEmail(req *pb.VoteRequest, timeFrontEnd time.Time) {
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
-	logic.GenerateElectionSession(voteModel.IdElection)
 	voteIdentification := logic.GenerateRandomVoteIdentification(voteModel.IdElection)
 	failed := verifySignatureVote(voteModel)
 	if failed != nil {

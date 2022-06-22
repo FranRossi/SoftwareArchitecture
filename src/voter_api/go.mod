@@ -53,3 +53,6 @@ replace message_queue => ./../message_queue
 replace encrypt => ./../encrypt
 
 replace own_logger => ./../own_logger
+
+replace cache => ./../cache
+

@@ -1,6 +1,0 @@
-ERROR: 2022/06/20 02:45:52 asm_amd64.s:1571: invalid token: token is expired by 6m58s
-INFO: 2022/06/20 02:46:04 cache.go:16:  Cache: Value with key  election_config_1 was not found in cache
-INFO: 2022/06/20 02:46:04 cache.go:27: Saving value with key  election_config_1 to cache
-INFO: 2022/06/20 02:46:04 election_info.go:68: Election configuration requested
-INFO: 2022/06/20 02:46:09 cache.go:20: Cache: Value with key election_config_1 was found in cache
-INFO: 2022/06/20 02:46:09 election_info.go:68: Election configuration requested

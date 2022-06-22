@@ -193,82 +193,84 @@ func calculateWhichHoursHaveMoreVotes(results []bson.M) map[string]int {
 	return hours
 }
 
-const votesPerCircuitCachePrefix = "votes_per_circuit_election_"
-
-func (certRepo *VotesRepo) RequestVotesPerCircuits(electionId string) ([]m.VotesPerCircuits, error) {
-	var resultFromCache []m.VotesPerCircuits
-	errCache := cache.Get(votesPerCircuitCachePrefix+electionId, &resultFromCache)
+func votesPerCircuitCacheKey(electionId string, circuit string) string {
+	return "votes_per_circuit_election_" + electionId + "_" + circuit
+}
+func (certRepo *VotesRepo) RequestVotesPerCircuits(electionId string, circuit string) (m.VotesPerCircuits, error) {
+	var resultFromCache m.VotesPerCircuits
+	errCache := cache.Get(votesPerCircuitCacheKey(electionId, circuit), &resultFromCache)
 	if errCache == nil {
 		return resultFromCache, nil
 	}
 
 	client := certRepo.mongoClient
-	database := client.Database(certRepo.database)
-	collection := database.Collection("statistics")
-	filter := bson.D{{"election_id", electionId}, {"group_type", "circuit"}}
+	database := client.Database("statistics")
+	collection := database.Collection("votes_stats")
+	filter := bson.D{{"election_id", electionId}, {"group_type", "circuit"}, {"circuit", circuit}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		return []m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits: %v", err)
+		return m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits: %v", err)
 	}
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		return []m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits using cursor: %v", err)
+		return m.VotesPerCircuits{}, fmt.Errorf("error requesting votes per circuits using cursor: %v", err)
 	}
-	votesPerCircuits := convertVotesPerCircuitsToStruct(electionId, results)
-	cache.Save(votesPerCircuitCachePrefix+electionId, votesPerCircuits, cache.DefaultExpiration)
+	votesPerGroup := convertVotesPerGroupToStruct(results)
+	votesPerCircuits := m.VotesPerCircuits{
+		ElectionId:   electionId,
+		Circuit:      circuit,
+		DataPerGroup: votesPerGroup,
+	}
+	cache.Save(votesPerCircuitCacheKey(electionId, circuit), votesPerCircuits, cache.DefaultExpiration)
 	return votesPerCircuits, nil
 }
 
-func convertVotesPerCircuitsToStruct(electionId string, results []bson.M) []m.VotesPerCircuits {
-	var votesPerCircuits []m.VotesPerCircuits
+func convertVotesPerGroupToStruct(results []bson.M) []m.VotesPerGroup {
+	var votesPerCircuits []m.VotesPerGroup
 	for _, result := range results {
-		perCircuit := m.VotesPerCircuits{
-			ElectionId:       electionId,
-			Circuit:          result["circuit"].(string),
-			VotesPerCircuits: int(result["votes"].(int32)),
-			GroupName:        result["group_name"].(string),
+		perCircuit := m.VotesPerGroup{
+
+			GroupName:    result["group_name"].(string),
+			MinAge:       int(result["min_age"].(int32)),
+			MaxAge:       int(result["max_age"].(int32)),
+			Sex:          result["sex"].(string),
+			CurrentVotes: int(result["votes"].(int32)),
+			Total:        int(result["capacity"].(int32)),
 		}
 		votesPerCircuits = append(votesPerCircuits, perCircuit)
 	}
 	return votesPerCircuits
 }
 
-const votesPerRegionCachePrefix = "votes_per_region_election_"
+func votesPerRegionCacheKey(electionId string, region string) string {
+	return "votes_per_region_election_" + electionId + "_" + region
+}
 
-func (certRepo *VotesRepo) RequestVotesPerRegions(electionId string) ([]m.VotesPerRegion, error) {
-	var resultFromCache []m.VotesPerRegion
-	errCache := cache.Get(votesPerRegionCachePrefix+electionId, &resultFromCache)
+func (certRepo *VotesRepo) RequestVotesPerRegions(electionId string, region string) (m.VotesPerRegion, error) {
+	var resultFromCache m.VotesPerRegion
+	errCache := cache.Get(votesPerRegionCacheKey(electionId, region), &resultFromCache)
 	if errCache == nil {
 		return resultFromCache, nil
 	}
 
 	client := certRepo.mongoClient
-	database := client.Database(certRepo.database)
-	collection := database.Collection("statistics")
-	filter := bson.D{{"election_id", electionId}, {"group_type", "region"}}
+	database := client.Database("statistics")
+	collection := database.Collection("votes_stats")
+	filter := bson.D{{"election_id", electionId}, {"group_type", "region"}, {"region", region}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		return []m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions: %v", err)
+		return m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions: %v", err)
 	}
 	var results []bson.M
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		return []m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions using cursor: %v", err)
+		return m.VotesPerRegion{}, fmt.Errorf("error requesting votes per regions using cursor: %v", err)
 	}
-	votesPerRegions := convertVotesPerRegionsToStruct(electionId, results)
-	cache.Save(votesPerRegionCachePrefix+electionId, votesPerRegions, cache.DefaultExpiration)
+	votesPerGroup := convertVotesPerGroupToStruct(results)
+	votesPerRegions := m.VotesPerRegion{
+		ElectionId:   electionId,
+		Region:       region,
+		DataPerGroup: votesPerGroup,
+	}
+	cache.Save(votesPerRegionCacheKey(electionId, region), votesPerRegions, cache.DefaultExpiration)
 	return votesPerRegions, nil
-}
-
-func convertVotesPerRegionsToStruct(electionId string, results []bson.M) []m.VotesPerRegion {
-	var votesPerCircuits []m.VotesPerRegion
-	for _, result := range results {
-		perCircuit := m.VotesPerRegion{
-			ElectionId:     electionId,
-			Region:         result["region"].(string),
-			VotesPerRegion: int(result["votes"].(int32)),
-			GroupName:      result["group_name"].(string),
-		}
-		votesPerCircuits = append(votesPerCircuits, perCircuit)
-	}
-	return votesPerCircuits
 }

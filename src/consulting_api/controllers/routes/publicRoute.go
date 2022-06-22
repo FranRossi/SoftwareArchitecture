@@ -2,6 +2,7 @@ package routes
 
 import (
 	"consulting_api/controllers"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,8 +11,8 @@ func PublicRoutesElectionVotes(a *fiber.App, controller *controllers.ConsultingE
 	route.Get("/consulting/vote/:electionId/:voterId", controller.RequestVote)
 	route.Get("/consulting/election/:electionId", controller.RequestElectionResult)
 	route.Get("/consulting/election/votesHours/:electionId", controller.RequestPopularVotingTimes)
-	route.Get("/consulting/election/votesPerRegions/:electionId:regionId", controller.RequestVotesPerRegions)
-	route.Get("/consulting/election/votesPerCircuits/:electionId:circuitId", controller.RequestVotesPerCircuits)
+	route.Get("/consulting/election/votesPerRegions/:electionId/:regionId", controller.RequestVotesPerRegions)
+	route.Get("/consulting/election/votesPerCircuits/:electionId/:circuitId", controller.RequestVotesPerCircuits)
 
 }
 

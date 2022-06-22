@@ -4,6 +4,7 @@ import (
 	"auth/jwt"
 	"consulting_api/models"
 	"consulting_api/repositories"
+
 	"github.com/gofiber/fiber/v2"
 
 	l "own_logger"
@@ -156,7 +157,8 @@ func ValidateRole(roleFromRequest string, roleForApi ...string) bool {
 func (controller *ConsultingElectionVotesController) RequestVotesPerCircuits(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	electionId := c.Params("electionId")
-	response, err := controller.repo.RequestVotesPerCircuits(electionId)
+	circuit := c.Params("circuitId")
+	response, err := controller.repo.RequestVotesPerCircuits(electionId, circuit)
 	if err != nil {
 		l.LogError(err.Error())
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
@@ -167,28 +169,24 @@ func (controller *ConsultingElectionVotesController) RequestVotesPerCircuits(c *
 	}
 
 	timeQueryResponse := time.Now()
-	requestTime := timeQueryRequest.Format(time.RFC3339)
-	responseTime := timeQueryResponse.Format(time.RFC3339)
-	processingTime := timeQueryResponse.Sub(timeQueryRequest).String()
+	response.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
+	response.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
+	response.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
 
 	l.LogInfo("Requested votes per circuit for election " + electionId)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"error":             false,
-		"msg":               "Votes Per Hours",
-		"voter_per_circuit": response,
-		"request": fiber.Map{
-			"request_time":    requestTime,
-			"response_time":   responseTime,
-			"processing_time": processingTime,
-		},
+		"error":   false,
+		"msg":     "Votes Per Group",
+		"request": response,
 	})
 }
 
 func (controller *ConsultingElectionVotesController) RequestVotesPerRegions(c *fiber.Ctx) error {
 	timeQueryRequest := time.Now()
 	electionId := c.Params("electionId")
-	votesPerDepartments, err := controller.repo.RequestVotesPerRegions(electionId)
+	region := c.Params("regionId")
+	response, err := controller.repo.RequestVotesPerRegions(electionId, region)
 	if err != nil {
 		l.LogError(err.Error())
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
@@ -198,18 +196,14 @@ func (controller *ConsultingElectionVotesController) RequestVotesPerRegions(c *f
 		})
 	}
 	timeQueryResponse := time.Now()
-	requestTime := timeQueryRequest.Format(time.RFC3339)
-	responseTime := timeQueryResponse.Format(time.RFC3339)
-	processingTime := timeQueryResponse.Sub(timeQueryRequest).String()
+	response.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
+	response.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
+	response.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
+
 	l.LogInfo("Requested votes per circuit for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"error":            false,
-		"msg":              "Votes Per Regions",
-		"votes_per_region": votesPerDepartments,
-		"request": fiber.Map{
-			"request_time":    requestTime,
-			"response_time":   responseTime,
-			"processing_time": processingTime,
-		},
+		"error":   false,
+		"msg":     "Votes Per Regions",
+		"request": response,
 	})
 }
