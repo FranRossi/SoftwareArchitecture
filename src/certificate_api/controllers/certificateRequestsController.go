@@ -6,6 +6,7 @@ import (
 	"certificate_api/repositories"
 	electoral_service_models "electoral_service/models"
 	"encoding/json"
+	"encrypt"
 	"fmt"
 	l "own_logger"
 	"sync"
@@ -78,5 +79,6 @@ func (controller *CertificateController) sendCertificateRequestedToEmail(request
 		wg.Done()
 	}()
 	wg.Wait()
+	encrypt.DecryptVoter(&voter)
 	go providers.SendEmail(certificate, voter)
 }

@@ -9,6 +9,6 @@ import (
 func PublicRoutes(a *fiber.App, controller *controllers.CertificateController) {
 	route := a.Group("/api/v1")
 
-	route.Post("/certificate/request", controller.RequestCertificate)
+	route.Get("/certificate/request", controller.RequestCertificate)
 
 }
