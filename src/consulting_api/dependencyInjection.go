@@ -20,6 +20,7 @@ func InjectDependencies() {
 	repoElection := repositories.NewElectionRepo(mongoClient, "uruguay_election")
 	electionController := controllers.NewConsultingElectionConfigController(repoElection, manager)
 	api.ConnectionAPI(controller, electionController)
+	defer connections.CloseMongoClient()
 }
 
 func createJwtManager() *jwt.Manager {

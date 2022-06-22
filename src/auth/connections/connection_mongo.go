@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	l "own_logger"
 	"sync"
 	"time"
 )
@@ -49,4 +50,15 @@ func connectionMongo() *mongo.Client {
 		log.Fatal(err)
 	}
 	return client
+}
+
+func CloseMongoClient() {
+	if mongoClientInstance != nil {
+		err := mongoClientInstance.Disconnect(context.TODO())
+		if err != nil {
+			l.LogError(err.Error() + " cannot close mongo client")
+			return
+		}
+		l.LogInfo("mongo client closed")
+	}
 }
