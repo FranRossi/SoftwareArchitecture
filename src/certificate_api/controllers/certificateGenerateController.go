@@ -7,7 +7,6 @@ import (
 	"certificate_api/repositories"
 	"encoding/json"
 	"encrypt"
-	"fmt"
 	mq "message_queue"
 	l "own_logger"
 )
@@ -18,34 +17,33 @@ func ListenerForNewCertificates() {
 		err := json.Unmarshal(message, &voteInfo)
 		if err != nil {
 			l.LogError(err.Error())
-			fmt.Println(err.Error())
-			return err // TODO no devolver error, eso solo hace que el rabbit no haga el ack
+			return nil
 		}
 		mongoClient := connections.GetInstanceMongoClient()
 		repo := repositories.NewRequestsRepo(mongoClient, "certificates")
 		controller := CertificateRequestsController(repo)
-		return controller.GenerateCertificate(voteInfo) // TODO no devolver error, eso solo hace que el rabbit no haga el ack
+		controller.GenerateCertificate(voteInfo) // TODO no devolver error, eso solo hace que el rabbit no haga el ack
+		return nil
 	})
 }
 
-func (controller *CertificateController) GenerateCertificate(voteInfo models.VoteInfo) error {
+func (controller *CertificateController) GenerateCertificate(voteInfo models.VoteInfo) {
 	var certificate models.CertificateModel
 	certificate.IdVoter = voteInfo.IdVoter
 	certificate.IdElection = voteInfo.IdElection
 	certificate.TimeVoted = voteInfo.TimeVoted
 	certificate.VoteIdentification = voteInfo.VoteIdentification
+	if voteInfo.Error != "" {
+		certificate.Error = voteInfo.Error
+	}
 
 	voter, err := controller.repo.FindVoter(voteInfo.IdVoter)
 	if err != nil {
-		l.LogError(err.Error())
-		fmt.Println(err.Error())
-		return fmt.Errorf("voter cannot be found when generating certificate: %w", err)
+		l.LogError("voter cannot be found when generating certificate: " + err.Error())
 	}
 	election, err := controller.repo.FindElection(voteInfo.IdElection)
 	if err != nil {
-		l.LogError(err.Error())
-		fmt.Println(err.Error())
-		return fmt.Errorf("election cannot be found when generating certificate: %w", err)
+		l.LogError("election cannot be found when generating certificate: " + err.Error())
 	}
 	encrypt.DecryptVoter(&voter)
 	certificate.Fullname = voter.FullName
@@ -56,8 +54,6 @@ func (controller *CertificateController) GenerateCertificate(voteInfo models.Vot
 	go providers.SendSMS(certificate, voter)
 	err = controller.repo.StoreCertificate(certificate)
 	if err != nil {
-		l.LogError(err.Error())
-		fmt.Println(err.Error() + "cannot store certificate")
+		l.LogError(err.Error() + "cannot store certificate")
 	}
-	return nil
 }

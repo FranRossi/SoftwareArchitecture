@@ -7,6 +7,7 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 	"os"
+	l "own_logger"
 )
 
 func DecryptText(encryptedText string) string {
@@ -16,7 +17,7 @@ func DecryptText(encryptedText string) string {
 	bytesToDecrypt, _ := b64.StdEncoding.DecodeString(encryptedText)
 	decryptedBytes, err := rsa.DecryptOAEP(sha256.New(), rng, privKey, bytesToDecrypt, nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error from decryption: %s\n", err)
+		l.LogError("Error from decryption: " + err.Error())
 	}
 
 	plaintext := string(decryptedBytes)
