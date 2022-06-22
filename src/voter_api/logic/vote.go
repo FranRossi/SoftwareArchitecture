@@ -47,7 +47,7 @@ func StoreVote(vote domain.VoteModel) error {
 	howManyTimesVoted = howManyTimesVoted + 1
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	go updateElectionResult(vote, region)
-	go RegisterVoteOnCertainGroup(vote.IdElection, voter)
+	//TODO go RegisterVoteOnCertainGroup(vote.IdElection, voter)
 	return nil
 }
 
