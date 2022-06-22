@@ -6,14 +6,14 @@ import (
 	mq "message_queue"
 	"os"
 	l "own_logger"
+	"stats_service/controllers"
 )
 
 func main() {
-	fmt.Println("Hello, world!")
 	l.LogInfo("Starting stats application...")
 	mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
 
-	//repo := repositories.NewRequestsRepo(mongoClient, "certificates")
+	controllers.ListenForNewStats()
 
 	fmt.Println("Press Enter to exit")
 	input := bufio.NewScanner(os.Stdin)

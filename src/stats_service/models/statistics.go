@@ -13,8 +13,8 @@ type Statistics struct {
 type VoterStats struct {
 	ElectionId string
 	BirthDate  string
+	Age        int
 	Region     string
 	Circuit    string
 	Sex        string
-	Capacity   int
 }
