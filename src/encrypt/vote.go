@@ -1,7 +1,5 @@
 package encrypt
 
-import "fmt"
-
 type VoteModel struct {
 	IdElection  string
 	IdVoter     string
@@ -12,10 +10,6 @@ type VoteModel struct {
 
 func EncryptVote(vote *VoteModel) {
 	applyFunToVote(vote, EncryptText)
-}
-
-func Test(t string) {
-	fmt.Println(t)
 }
 
 func DecryptVote(vote *VoteModel) {

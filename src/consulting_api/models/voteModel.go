@@ -22,6 +22,7 @@ type VotesPerCircuits struct {
 	Circuit             string `json:"circuit"`
 	VotesPerCircuits    int    `json:"votes_per_circuits"`
 	GroupName           string `json:"group_name"`
+	Age                 string `json:"age"`
 	QueryRequestTime    string `json:"query_request_time"`
 	QueryResponseTime   string `json:"query_response_time"`
 	QueryProcessingTime string `json:"query_processing_time"`

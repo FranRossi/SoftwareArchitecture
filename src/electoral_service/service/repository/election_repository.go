@@ -4,8 +4,12 @@ import (
 	"context"
 	"electoral_service/connections"
 	"electoral_service/models"
+	"encoding/json"
 	"encrypt"
 	"fmt"
+	mq "message_queue"
+	l "own_logger"
+
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -39,8 +43,13 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 	return err
 }
 
-func StoreElectionVoters(voters []models.VoterModel) error {
-	encryptVoter(voters)
+func StoreElectionVoters(electionId string, voters []models.VoterModel) error {
+
+	// Don't use for voter := range voters, because it won't change the properties of the voters in the original array
+	for i := range voters {
+		sendStatsOfVoterToStatsService(electionId, &voters[i])
+		encrypt.EncryptVoter(&voters[i])
+	}
 	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
 	uruguayDataBase := client.Database("uruguay_election")
@@ -52,12 +61,27 @@ func StoreElectionVoters(voters []models.VoterModel) error {
 	return nil
 }
 
-func encryptVoter(voters []models.VoterModel) {
-
-	// Don't use for voter := range voters, because it won't change the properties of the voters in the original array
-	for i := range voters {
-		encrypt.EncryptVoter(&voters[i])
+func sendStatsOfVoterToStatsService(electionId string, voter *models.VoterModel) {
+	type VoterStats struct {
+		ElectionId string
+		BirthDate  string
+		Region     string
+		Circuit    string
+		Sex        string
 	}
+
+	var voterStats VoterStats
+	voterStats.BirthDate = voter.BirthDate
+	voterStats.Circuit = voter.OtherFields["circuit"].(string)
+	voterStats.Region = voter.Region
+	voterStats.Sex = voter.Sex
+	voterStats.ElectionId = electionId
+
+	jsonStats, errs := json.Marshal(voterStats)
+	if errs != nil {
+		l.LogError("error sending voter stats to queue:" + errs.Error())
+	}
+	mq.GetMQWorker().Send("stats-total", jsonStats)
 }
 
 func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {

@@ -3,8 +3,9 @@ package jwt
 import (
 	"auth/models"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type Manager struct {
@@ -61,15 +62,17 @@ func (manager *Manager) Verify(accessToken string) (*models.UserClaim, error) {
 }
 
 type Roles struct {
-	Consulter string
-	Voter     string
-	Electoral string
+	Consulter        string
+	Voter            string
+	Electoral        string
+	ConsultingAgents string
 }
 
 func GetRoles() Roles {
 	return Roles{
-		Consulter: "Consulter",
-		Voter:     "Voter",
-		Electoral: "Electoral",
+		Consulter:        "Consulter",
+		Voter:            "Voter",
+		Electoral:        "Electoral",
+		ConsultingAgents: "ConsultingAgents",
 	}
 }

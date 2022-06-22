@@ -20,3 +20,5 @@ ERROR: 2022/06/21 10:25:35 log.go:14: amount of votes is greater than total amou
 ERROR: 2022/06/21 10:25:35 log.go:14: end final: [amount of votes is greater than total amount of voters]
 ERROR: 2022/06/21 14:46:48 log.go:14: amount of votes is greater than total amount of voters
 ERROR: 2022/06/21 14:46:48 log.go:14: end final: [amount of votes is greater than total amount of voters]
+ERROR: 2022/06/22 01:16:11 log.go:10: amount of votes is greater than total amount of voters
+ERROR: 2022/06/22 01:16:11 log.go:10: end final: [amount of votes is greater than total amount of voters]

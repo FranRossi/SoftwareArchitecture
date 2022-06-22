@@ -1,5 +1,19 @@
 - name: add_to_vote_group
   params:
+    min_age: 0
+    max_age: 150
+    type: "region"
+    sex: "M"
+    name: "all_male_voters_region"
+- name: add_to_vote_group
+  params:
+    min_age: 0
+    max_age: 150
+    type: "region"
+    sex: "F"
+    name: "all_female_voters_region"
+- name: add_to_vote_group
+  params:
     min_age: 18
     max_age: 50
     type: "circuit"

@@ -36,7 +36,7 @@ func (logicElection *ElectionLogic) storeInitialValues(election *models.Election
 	if err != nil {
 		return fmt.Errorf("election cannot be stored: %w", err)
 	}
-	err = storeVoters(election.Voters)
+	err = storeVoters(election.Id, election.Voters)
 	if err != nil {
 		return err
 	}
@@ -111,8 +111,8 @@ func getVotesPerParties(votesCandidates []models.CandidateEssential) []models.Po
 	return votesPerPartiesResume
 }
 
-func storeVoters(voters []models.VoterModel) error {
-	err := repository.StoreElectionVoters(voters)
+func storeVoters(electionId string, voters []models.VoterModel) error {
+	err := repository.StoreElectionVoters(electionId, voters)
 	if err != nil {
 		return fmt.Errorf("voters cannot be stored: %w", err)
 	}

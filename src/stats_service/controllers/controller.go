@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"stats_service/logic"
 	"stats_service/models"
 
@@ -28,17 +29,27 @@ func listenForStats(filter func(data any, params map[string]any) error, queueNam
 		return
 	}
 
-	mq.GetMQWorker().Listen(5, queueName, func(message []byte) error {
+	go listen(queueName, pipeLine)
+
+}
+
+func listen(queueName string, pipeLine p_f.Pipeline) {
+	mq.GetMQWorker().Listen(50, queueName, func(message []byte) error {
 		var stats models.VoterStats
 		err := json.Unmarshal(message, &stats)
 		if err != nil {
 			l.LogError("Couldn't parse message")
 			return err
 		}
-		filtersErrs := pipeLine.Run(stats)
-		logFiltersErrors(filtersErrs)
-		return filtersErrs[0]
+		fmt.Print(".") // TODO optional, use for demo
+		go runPipeAndLog(pipeLine, stats)
+		return nil
 	})
+}
+
+func runPipeAndLog(pipeLine p_f.Pipeline, stats models.VoterStats) {
+	filtersErrs := pipeLine.Run(stats)
+	logFiltersErrors(filtersErrs)
 }
 
 func logFiltersErrors(errors []error) {
