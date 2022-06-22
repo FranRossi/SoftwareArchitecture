@@ -51,6 +51,8 @@ require (
 
 replace auth => ./../auth/
 
+replace cache => ./../cache
+
 replace pipes_and_filters => ./../pipes_and_filters
 
 replace electoral_service => ./../electoral_service/

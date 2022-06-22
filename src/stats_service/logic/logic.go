@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func AddVoteToCertainGroupGenerics(data any, params map[string]any, field string,
-	updateStatsFunc func(string, models.VoterStats, string, string, int, int) error) error {
+func AddVoteToCertainGroupGenerics(data any, params map[string]any,
+	updateStatsFunc func(models.VoterStats, string, string, int, int) error) error {
 	statistics := data.(models.VoterStats)
 	minAge := params["min_age"].(int)
 	maxAge := params["max_age"].(int)
@@ -18,7 +18,7 @@ func AddVoteToCertainGroupGenerics(data any, params map[string]any, field string
 	statistics.Age = getAge(statistics.BirthDate)
 
 	if statistics.Age >= minAge && statistics.Age <= maxAge && statistics.Sex == sex {
-		err := updateStatsFunc(field, statistics, groupType, groupName, minAge, maxAge)
+		err := updateStatsFunc(statistics, groupType, groupName, minAge, maxAge)
 		if err != nil {
 			l.LogError("error storing statistics on database")
 			return err
@@ -28,11 +28,11 @@ func AddVoteToCertainGroupGenerics(data any, params map[string]any, field string
 }
 
 func AddVoteToCertainGroupTotal(data any, params map[string]any) error {
-	return AddVoteToCertainGroupGenerics(data, params, "capacity", repository.UpdateStatistics)
+	return AddVoteToCertainGroupGenerics(data, params, repository.UpdateTotalStatistics)
 }
 
 func AddVoteToCertainGroupActual(data any, params map[string]any) error {
-	return AddVoteToCertainGroupGenerics(data, params, "votes", repository.UpdateStatistics)
+	return AddVoteToCertainGroupGenerics(data, params, repository.UpdateActualStatistics)
 }
 
 func getAge(birthDate string) int {
