@@ -38,7 +38,6 @@ func ConnectionGRPC() *grpc.Server {
 }
 
 func ServeGRPC(server *grpc.Server) {
-	// runtime.LockOSThread() TODO
 	if err := server.Serve(connection); err != nil {
 		l.LogError("gRPC server error: " + err.Error())
 		log.Fatal(err)

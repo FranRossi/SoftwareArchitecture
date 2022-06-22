@@ -44,8 +44,6 @@ func RegisterServicesServer(grpcServer *grpc.Server, jwtManager *jwt.Manager) *V
 }
 
 func (newVote *VoterServer) Vote(ctx context.Context, req *pb.VoteRequest) (*pb.VoteReply, error) {
-	// fmt.Println(runtime.NumGoroutine())
-	// runtime.LockOSThread() TODO
 	message := "We received your vote, we will validate it shortly and send you a notification"
 	var voteAndTime VoteAndTime
 	voteAndTime.Vote = req
