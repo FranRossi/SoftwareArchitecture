@@ -17,7 +17,9 @@ func applyFunToVoter(voter *models.VoterModel, fun func(string) string) {
 	voter.BirthDate = fun(voter.BirthDate)
 	voter.Email = fun(voter.Email)
 	voter.FullName = fun(voter.FullName)
-	voter.LastCandidateVotedId = fun(voter.LastCandidateVotedId)
+	if voter.LastCandidateVotedId != "" {
+		voter.LastCandidateVotedId = fun(voter.LastCandidateVotedId)
+	}
 	voter.Phone = fun(voter.Phone)
 	voter.Sex = fun(voter.Sex)
 

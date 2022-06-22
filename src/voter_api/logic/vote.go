@@ -43,7 +43,7 @@ func StoreVote(vote domain.VoteModel) error {
 	if err4 != nil {
 		return fmt.Errorf("vote cannot be registered: %w", err4)
 	}
-	generateElectionSession(vote.IdElection)
+	go generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	go updateElectionResult(vote, region)
@@ -101,8 +101,8 @@ func StoreVoteInfo(idVoter, idElection string, timeFrontEnd, timeBackEnd time.Ti
 }
 
 func generateRandomVoteIdentification(idElection string) string {
-	//idElectionInt, _ := strconv.Atoi(idElection)
-	sessionNumber := "1234" //electionSession[idElectionInt]
+	idElectionInt, _ := strconv.Atoi(idElection)
+	sessionNumber := electionSession[idElectionInt]
 	randomNumber := strconv.Itoa(int(time.Now().UnixNano()))
 	return sessionNumber + randomNumber
 }
@@ -114,12 +114,11 @@ func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront
 		IdElection:         vote.IdElection,
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
+		Error:              err,
 	}
 	queue := "voting-certificates"
 	if err != nil {
 		l.LogError(err.Error())
-		queue = "voting-certificates-error"
-		fmt.Println("error sending certificate: %w", err)
 	}
 	sendCertificateToMQ(certificate, queue)
 }

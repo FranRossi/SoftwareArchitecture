@@ -92,10 +92,9 @@ func processVoteAndSendEmail(req *pb.VoteRequest, timeFrontEnd time.Time) {
 	if err != nil {
 		go l.LogError(err.Error())
 		fmt.Println(err.Error())
-		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
 	go l.LogInfo("Vote processed")
-	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
+	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {

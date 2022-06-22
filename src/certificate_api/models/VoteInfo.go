@@ -5,4 +5,5 @@ type VoteInfo struct {
 	IdElection         string
 	TimeVoted          string
 	VoteIdentification string
+	Error              error
 }

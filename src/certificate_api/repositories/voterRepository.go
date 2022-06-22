@@ -46,7 +46,7 @@ func (certRepo *CertificatesRepo) FindElection(idElection string) (election elec
 		Id:            result["id"].(string),
 		ElectionMode:  result["electionMode"].(string),
 		StartingDate:  result["startingDate"].(string),
-		FinishingDate: result["configuration_election"].(string),
+		FinishingDate: result["finishingDate"].(string),
 	}
 	return election, nil
 }
