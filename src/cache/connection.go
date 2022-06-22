@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sync"
 
@@ -16,16 +15,18 @@ var lockRedis = &sync.Mutex{}
 
 var redisClientInstance *redis.Client
 
-func GetInstanceRedisClient() *redis.Client {
+func GetInstanceRedisClient() (*redis.Client, error) {
+
+	var err error
 	if redisClientInstance == nil {
 		lockRedis.Lock()
 		defer lockRedis.Unlock()
 		if redisClientInstance == nil {
-			fmt.Println("Creating redis client instance now.")
-			redisClientInstance, _ = connectionRedis()
+			l.LogInfo("Creating redis client instance now.")
+			redisClientInstance, err = connectionRedis()
 		}
 	}
-	return redisClientInstance
+	return redisClientInstance, err
 }
 
 func connectionRedis() (*redis.Client, error) {

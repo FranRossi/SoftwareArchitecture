@@ -10,7 +10,10 @@ import (
 const DefaultExpiration time.Duration = time.Second * 30 // TODO cambiar a un numero más grande
 
 func Get(key string, result any) error {
-	cache := GetInstanceRedisClient()
+	cache, err := GetInstanceRedisClient()
+	if err != nil {
+		return err
+	}
 	ctx := context.Background()
 
 	valInBytes, err := cache.Get(ctx, key).Bytes()
@@ -27,7 +30,10 @@ func Get(key string, result any) error {
 func Save(key string, value any, expiration time.Duration) error {
 
 	l.LogInfo("Saving value with key  " + key + " to cache")
-	cache := GetInstanceRedisClient()
+	cache, err := GetInstanceRedisClient()
+	if err != nil {
+		return err
+	}
 	ctx := context.Background()
 	valInBytes, err := json.Marshal(value)
 	if err != nil {
