@@ -1,4 +1,4 @@
-package domain
+package models
 
 type Statistics struct {
 	ElectionId string `json:"election_id"`
@@ -8,4 +8,13 @@ type Statistics struct {
 	Sex        string `json:"sex" bson:"sex"`
 	Capacity   int    `json:"capacity" bson:"capacity"`
 	Votes      int    `json:"votes" bson:"votes"`
+}
+
+type VoterStats struct {
+	ElectionId string
+	BirthDate  string
+	Age        int
+	Region     string
+	Circuit    string
+	Sex        string
 }

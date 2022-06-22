@@ -1,4 +1,7 @@
 - name: echo_data
+- name: error
+  params:
+    maxRetries: 3
 - name: write_file
 - name: check_age_lower
   params: 
