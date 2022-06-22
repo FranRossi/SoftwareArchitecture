@@ -203,7 +203,7 @@ func (controller *ConsultingElectionVotesController) RequestVotesPerRegions(c *f
 	l.LogInfo("Requested votes per circuit for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
-		"msg":     "Votes Per Regions",
+		"msg":     "Votes Per Group",
 		"request": response,
 	})
 }
