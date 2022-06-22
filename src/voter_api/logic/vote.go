@@ -98,12 +98,18 @@ func GenerateRandomVoteIdentification(idElection string) string {
 
 func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront time.Time, err error) {
 	timeVoted := timeFront.Format(time.RFC3339)
+	const message = "vote processed correctly"
 	certificate := domain.VoteInfo{
 		IdVoter:            vote.IdVoter,
 		IdElection:         vote.IdElection,
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
-		Error:              err.Error(),
+		Message:            message,
+		Error:              false,
+	}
+	if err != nil {
+		certificate.Error = true
+		certificate.Message = err.Error()
 	}
 	queue := "voting-certificates"
 	sendCertificateToMQ(certificate, queue)

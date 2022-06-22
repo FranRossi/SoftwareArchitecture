@@ -49,7 +49,7 @@ func (certRepo *CertificatesRepo) FindCertificate(voterId, voteIdentification st
 	certificatesDatabase := certRepo.mongoClient.Database(certRepo.database)
 	requestsCollection := certificatesDatabase.Collection(certCollection)
 	var result bson.M
-	err2 := requestsCollection.FindOne(context.TODO(), bson.D{{"id", voterId}, {"voteIdentification", voteIdentification}}).Decode(&result)
+	err2 := requestsCollection.FindOne(context.TODO(), bson.D{{"id_voter", voterId}, {"vote_identification", voteIdentification}}).Decode(&result)
 	if err2 != nil {
 		return req, fmt.Errorf("there is no certificate assigned to the voter with that id: %v", err2)
 	}
@@ -62,6 +62,7 @@ func (certRepo *CertificatesRepo) FindCertificate(voterId, voteIdentification st
 		FinishingDate:      result["finishing_date"].(string),
 		ElectionMode:       result["election_mode"].(string),
 		Fullname:           result["fullname"].(string),
+		Message:            result["message"].(string),
 	}
 	return req, nil
 }

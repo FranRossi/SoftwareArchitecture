@@ -9,5 +9,5 @@ type CertificateModel struct {
 	FinishingDate      string `bson:"finishing_date"`
 	ElectionMode       string `bson:"election_mode"`
 	Fullname           string `bson:"fullname"`
-	Error              string `bson:"error"`
+	Message            string `bson:"message"`
 }

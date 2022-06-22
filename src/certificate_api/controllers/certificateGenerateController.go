@@ -33,8 +33,8 @@ func (controller *CertificateController) GenerateCertificate(voteInfo models.Vot
 	certificate.IdElection = voteInfo.IdElection
 	certificate.TimeVoted = voteInfo.TimeVoted
 	certificate.VoteIdentification = voteInfo.VoteIdentification
-	if voteInfo.Error != "" {
-		certificate.Error = voteInfo.Error
+	if voteInfo.Error {
+		certificate.Message = voteInfo.Message
 	}
 
 	voter, err := controller.repo.FindVoter(voteInfo.IdVoter)

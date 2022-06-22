@@ -5,5 +5,6 @@ type VoteInfo struct {
 	IdElection         string
 	TimeVoted          string
 	VoteIdentification string
-	Error              string
+	Message            string
+	Error              bool
 }
