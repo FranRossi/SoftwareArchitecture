@@ -2,8 +2,10 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"os"
 	"sync"
+	"time"
 
 	l "own_logger"
 
@@ -15,8 +17,19 @@ var lockRedis = &sync.Mutex{}
 
 var redisClientInstance *redis.Client
 
-func GetInstanceRedisClient() (*redis.Client, error) {
+var cacheDisable = false
 
+var timeForDisablingCache time.Time
+
+func GetInstanceRedisClient() (*redis.Client, error) {
+	if cacheDisable {
+		if time.Now().After(timeForDisablingCache) {
+			cacheDisable = false
+			l.LogInfo("Enabling cache")
+		} else {
+			return nil, errors.New("cache was disable by the programme")
+		}
+	}
 	var err error
 	if redisClientInstance == nil {
 		lockRedis.Lock()
@@ -26,6 +39,11 @@ func GetInstanceRedisClient() (*redis.Client, error) {
 			redisClientInstance, err = connectionRedis()
 		}
 	}
+	if err != nil {
+		cacheDisable = true
+		timeForDisablingCache = time.Now().Add(1 * time.Minute)
+		l.LogWarning("Disabling  cache, connection failed")
+	}
 	return redisClientInstance, err
 }
 
@@ -33,6 +51,7 @@ func connectionRedis() (*redis.Client, error) {
 	errLoadingEnv := godotenv.Load("./../cache/.env")
 	if errLoadingEnv != nil {
 		l.LogError("Error loading .env file of cache: " + errLoadingEnv.Error())
+		return nil, errLoadingEnv
 	}
 	uri := os.Getenv("REDIS_URI")
 	password := os.Getenv("REDIS_PASSWORD")
