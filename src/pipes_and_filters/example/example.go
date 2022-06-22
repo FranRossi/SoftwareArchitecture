@@ -16,6 +16,7 @@ func main() {
 		"check_age_between": FilterCheckAgeBetween,
 		"echo_data":         FilterEchoData,
 		"write_file":        FilterCreateFile,
+		"error":             FilterError,
 	}
 
 	fmt.Println("Test")
@@ -124,6 +125,10 @@ func FilterEchoData(data any, params map[string]any) error {
 	input, _ := data.(int)
 	fmt.Printf("data Data: %d\n", input)
 	return nil
+}
+
+func FilterError(data any, params map[string]any) error {
+	return errors.New("Test error")
 }
 
 func FilterCreateFile(data any, params map[string]any) error {

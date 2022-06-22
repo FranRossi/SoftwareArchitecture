@@ -65,7 +65,9 @@ func insertParameters(missingParameterFilter FilterWithParams, params map[string
 			if err == nil {
 				return nil
 			}
-			l.LogWarning("Filter " + filterName + " failed. Retrying for " + strconv.Itoa(i) + "th time...")
+			if maxRetries > 1 {
+				l.LogWarning("Filter " + filterName + " failed. Retrying for " + strconv.Itoa(i+1) + "° time...")
+			}
 		}
 		return err
 	}

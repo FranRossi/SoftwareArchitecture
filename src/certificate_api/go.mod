@@ -3,8 +3,10 @@ module certificate_api
 go 1.18
 
 require (
+	encrypt v0.0.0-00010101000000-000000000000
 	github.com/gofiber/fiber/v2 v2.34.0
 	go.mongodb.org/mongo-driver v1.9.1
+	own_logger v0.0.0-00010101000000-000000000000
 )
 
 require (
