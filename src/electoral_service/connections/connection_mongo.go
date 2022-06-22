@@ -10,7 +10,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var lockDB = &sync.Mutex{}
@@ -31,21 +30,25 @@ func GetInstanceMongoClient() *mongo.Client {
 
 func connectionMongo() *mongo.Client {
 	const uri = "mongodb://localhost:27017" // TODO .env
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	opts := options.Client().ApplyURI(uri).SetDirect(true)
+	client, err := mongo.Connect(ctx, opts)
+	if err != nil {
+		l.LogError(err.Error())
+		log.Fatal(err)
+	}
 
-	if err != nil {
-		l.LogError(err.Error())
-		log.Fatal(err)
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
-	err = client.Connect(ctx)
-	if err != nil {
-		l.LogError(err.Error())
-		log.Fatal(err)
-	}
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		l.LogError(err.Error())
-	}
 	return client
+}
+
+func CloseMongoClient() {
+	if mongoClientInstance != nil {
+		err := mongoClientInstance.Disconnect(context.TODO())
+		if err != nil {
+			l.LogError(err.Error() + " cannot close mongo client")
+			return
+		}
+		l.LogInfo("mongo client closed")
+	}
 }
