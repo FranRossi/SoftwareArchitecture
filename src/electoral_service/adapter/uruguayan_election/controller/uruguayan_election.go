@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"electoral_service/adapter/uruguayan_election"
 	models2 "electoral_service/adapter/uruguayan_election/models"
 	modelsGeneric "electoral_service/models"
 	"encoding/json"
@@ -15,7 +14,6 @@ type ElectionController struct {
 }
 
 func (controller *ElectionController) GetElectionSettings() *modelsGeneric.ElectionModelEssential {
-	uruguayan_election.ConfigEnvironment()
 	url := os.Getenv("electoral_service_url")
 	response, err := http.Get(url)
 	if err != nil {
