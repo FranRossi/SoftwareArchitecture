@@ -87,26 +87,29 @@ func processVoteAndSendEmail(req *pb.VoteRequest, timeFrontEnd time.Time) {
 		IdCandidate: req.IdCandidate,
 		Signature:   req.Signature,
 	}
-	encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
+	decryptVote := os.Getenv("ENCRYPT")
+	if decryptVote == "true" {
+		encrypt.DecryptVote((*encrypt.VoteModel)(&voteModel))
+	}
 	voteIdentification, err := processVote(timeFrontEnd, voteModel)
 	if err != nil {
 		go l.LogError(err.Error())
-		fmt.Println(err.Error())
-		go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 	}
 	go l.LogInfo("Vote processed")
-	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, nil)
+	go logic.SendCertificate(voteModel, voteIdentification, timeFrontEnd, err)
 }
 
 func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, error) {
+	logic.GenerateElectionSession(voteModel.IdElection)
+	voteIdentification := logic.GenerateRandomVoteIdentification(voteModel.IdElection)
 	failed := verifySignatureVote(voteModel)
 	if failed != nil {
-		return "", failed
+		return voteIdentification, failed
 	}
 	timeBackEnd := time.Now()
 	err := logic.StoreVote(voteModel)
 	if err != nil {
-		return "", err
+		return voteIdentification, err
 	}
 	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
 	//	err2 := logic.DeleteVote(voteModel)
@@ -117,9 +120,9 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	//	return "", fmt.Errorf(messageFailed)
 	//} else {
 	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME
-	voteIdentification, err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, timeFrontEnd, timeBackEnd)
+	err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, voteIdentification, timeFrontEnd, timeBackEnd)
 	if err2 != nil {
-		return "", fmt.Errorf("cannot store vote info: %v", err2)
+		return voteIdentification, fmt.Errorf("cannot store vote info: %v", err2)
 	}
 	return voteIdentification, nil
 	//}

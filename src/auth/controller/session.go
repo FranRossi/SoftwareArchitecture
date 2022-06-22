@@ -8,17 +8,19 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"io/ioutil"
 	l "own_logger"
-	"time"
 )
 
 type SessionController struct {
-	repo *repository.UsersRepo
+	repo    *repository.UsersRepo
+	manager *jwt.Manager
 }
 
-func NewSessionController(repo *repository.UsersRepo) *SessionController {
-	return &SessionController{repo: repo}
+func NewSessionController(repo *repository.UsersRepo, manager *jwt.Manager) *SessionController {
+	return &SessionController{
+		repo:    repo,
+		manager: manager,
+	}
 }
 
 func (controller *SessionController) Login(c *fiber.Ctx) error {
@@ -31,20 +33,22 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 			"login": nil,
 		})
 	}
-
+	message := "Invalid credentials"
 	user, err := controller.repo.FindUser(login.Id)
 	if err != nil {
+		l.LogError(message)
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
 			"error": true,
-			"msg":   err.Error(),
+			"msg":   message,
 			"login": nil,
 		})
 	}
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(login.Password))
 	if err2 != nil {
+		l.LogWarning(message)
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
-			"msg":   err2.Error() + " password is incorrect",
+			"msg":   message,
 			"login": nil,
 		})
 	}
@@ -52,36 +56,17 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 		Id:   user.Id,
 		Role: user.Role,
 	}
-	duration := 30 * time.Minute
 
-	privateKey, err := ioutil.ReadFile("./private.rsa")
+	token, err := controller.manager.Generate(generator)
 	if err != nil {
-		l.LogError(err.Error())
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(fiber.Map{
-			"error": true,
-			"msg":   err.Error() + " cannot read private key",
-			"login": nil,
-		})
-	}
-	publicKey, err := ioutil.ReadFile("./public.rsa")
-	if err != nil {
-		l.LogError(err.Error())
-		return c.Status(fiber.ErrInternalServerError.Code).JSON(fiber.Map{
-			"error": true,
-			"msg":   err.Error() + " cannot read public key",
-			"login": nil,
-		})
-	}
-	manager := jwt.NewJWTManager(privateKey, publicKey, duration)
-
-	token, err := manager.Generate(generator)
-	if err != nil {
+		l.LogError("Token cannot be generated")
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
 			"msg":   err.Error() + " cannot generate token",
 			"login": nil,
 		})
 	}
+	l.LogInfo("Login successful")
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error": false,
 		"msg":   "Login successful",

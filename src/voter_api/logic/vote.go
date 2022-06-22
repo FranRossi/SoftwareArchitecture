@@ -43,7 +43,6 @@ func StoreVote(vote domain.VoteModel) error {
 	if err4 != nil {
 		return fmt.Errorf("vote cannot be registered: %w", err4)
 	}
-	generateElectionSession(vote.IdElection)
 	howManyTimesVoted = howManyTimesVoted + 1
 	go checkMaxVotesAndSendAlert(howManyTimesVoted, vote)
 	go updateElectionResult(vote, region)
@@ -75,7 +74,7 @@ func updateNewVote(vote domain.VoteModel, region string) error {
 	return nil
 }
 
-func generateElectionSession(idElection string) {
+func GenerateElectionSession(idElection string) {
 	idElectionInt, _ := strconv.Atoi(idElection)
 	electionSession = append(electionSession, strconv.Itoa(idElectionInt))
 }
@@ -88,21 +87,20 @@ func DeleteVote(vote domain.VoteModel) error {
 	return nil
 }
 
-func StoreVoteInfo(idVoter, idElection string, timeFrontEnd, timeBackEnd time.Time) (string, error) {
+func StoreVoteInfo(idVoter, idElection, voteIdentification string, timeFrontEnd, timeBackEnd time.Time) error {
 	timeFront := timeFrontEnd.Format(time.RFC3339)
 	timeBack := timeBackEnd.Format(time.RFC3339)
 	timePassed := timeBackEnd.Sub(timeFrontEnd).String()
-	voteIdentification := generateRandomVoteIdentification(idElection)
 	err := repository.StoreVoteInfo(idVoter, idElection, timeFront, timeBack, timePassed, voteIdentification)
 	if err != nil {
-		return "", fmt.Errorf("vote info cannot be stored: %w", err)
+		return fmt.Errorf("vote info cannot be stored: %w", err)
 	}
-	return voteIdentification, nil
+	return nil
 }
 
-func generateRandomVoteIdentification(idElection string) string {
-	//idElectionInt, _ := strconv.Atoi(idElection)
-	sessionNumber := "1234" //electionSession[idElectionInt]
+func GenerateRandomVoteIdentification(idElection string) string {
+	idElectionInt, _ := strconv.Atoi(idElection)
+	sessionNumber := electionSession[idElectionInt]
 	randomNumber := strconv.Itoa(int(time.Now().UnixNano()))
 	return sessionNumber + randomNumber
 }
@@ -114,13 +112,9 @@ func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront
 		IdElection:         vote.IdElection,
 		TimeVoted:          timeVoted,
 		VoteIdentification: voteIdentification,
+		Error:              err.Error(),
 	}
 	queue := "voting-certificates"
-	if err != nil {
-		l.LogError(err.Error())
-		queue = "voting-certificates-error"
-		fmt.Println("error sending certificate: %w", err)
-	}
 	sendCertificateToMQ(certificate, queue)
 }
 

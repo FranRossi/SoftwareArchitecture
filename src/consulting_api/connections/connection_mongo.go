@@ -50,3 +50,14 @@ func connectionMongo() *mongo.Client {
 	}
 	return client
 }
+
+func CloseMongoClient() {
+	if mongoClientInstance != nil {
+		err := mongoClientInstance.Disconnect(context.TODO())
+		if err != nil {
+			l.LogError(err.Error() + " cannot close mongo client")
+			return
+		}
+		l.LogInfo("mongo client closed")
+	}
+}
