@@ -1,6 +1,5 @@
 .idea 
 **/logs.txt
-**/.env
 # Created by https://www.toptal.com/developers/gitignore/api/go,goland,visualstudiocode,windows,redis,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,goland,visualstudiocode,windows,redis,macos
 

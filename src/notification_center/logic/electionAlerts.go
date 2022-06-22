@@ -18,12 +18,12 @@ func ReceiveAlert() {
 		if er != nil {
 			l.LogError(er.Error())
 		}
-		notifyAlertEmails(alert)
+		NotifyAlertEmails(alert)
 		wg.Done()
 		return nil
 	})
 }
 
-func notifyAlertEmails(alert models.Alert) {
+func NotifyAlertEmails(alert models.Alert) {
 	managersElection.SendAlertEmails(alert)
 }

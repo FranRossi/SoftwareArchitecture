@@ -1,12 +1,13 @@
 package service
 
 import (
-	"os"
 	"own_logger"
+
+	"github.com/joho/godotenv"
 )
 
 func SetEnvironmentConfig() {
-	err := os.Setenv("mq_address", "amqp://guest:guest@localhost:5672/")
+	err := godotenv.Load()
 	if err != nil {
 		own_logger.LogWarning("Error getting environmental variables")
 	}

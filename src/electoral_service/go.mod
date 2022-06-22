@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	go.mongodb.org/mongo-driver v1.9.1
-	own_logger v0.0.0-00010101000000-000000000000
 	message_queue v0.0.0-00010101000000-000000000000
+	own_logger v0.0.0-00010101000000-000000000000
 	pipes_and_filters v0.0.0-00010101000000-000000000000
 )
 
@@ -14,6 +14,7 @@ require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/streadway/amqp v1.0.0 // indirect
@@ -32,4 +33,5 @@ replace pipes_and_filters => ./../pipes_and_filters
 replace message_queue => ./../message_queue
 
 replace encrypt => ./../encrypt
+
 replace own_logger => ./../own_logger

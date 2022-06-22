@@ -1,3 +1,55 @@
 INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: montevideo@intendencia.com
 INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: montevideo@presidencia.com
 INFO: 2022/06/18 18:46:49 uruguay_acts.go:12: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:27:42 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:27:42 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:27:42 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:27:43 log.go:14: Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/22 02:27:43 log.go:14: Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/22 02:27:43 log.go:14: Sending alert email to: alberto.fernandez@gmail.com
+INFO: 2022/06/22 02:28:41 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:28:41 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:28:41 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:29:59 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:29:59 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:29:59 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:30:17 log.go:14: Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/22 02:30:17 log.go:14: Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/22 02:30:17 log.go:14: Sending alert email to: alberto.fernandez@gmail.com
+ERROR: 2022/06/22 02:30:31 log.go:10: could not open file alert_emails.txtto get emails to send alert
+INFO: 2022/06/22 02:30:31 log.go:14: Sending alert email to: mailDeAlerta1, mailDeAlerta2
+INFO: 2022/06/22 02:31:45 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:31:45 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:31:45 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:32:23 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:32:23 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:32:23 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:33:08 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:33:08 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:33:08 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:34:10 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:34:10 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:34:10 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:34:47 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:34:47 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:34:47 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:35:12 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:35:12 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:35:12 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:37:16 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:37:16 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:37:16 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:38:18 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:38:18 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:38:18 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:38:32 log.go:14: Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/22 02:38:32 log.go:14: Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/22 02:38:32 log.go:14: Sending alert email to: alberto.rodriguez@hotmail.com
+INFO: 2022/06/22 02:41:58 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:41:58 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:41:58 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:42:12 log.go:14: Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/22 02:42:12 log.go:14: Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/22 02:42:12 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/22 02:42:12 log.go:14: Sending alert email to: mailDeAlerta1
+INFO: 2022/06/22 02:42:12 log.go:14: Sending alert email to: mailDeAlerta2

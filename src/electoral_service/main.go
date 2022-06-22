@@ -10,7 +10,7 @@ import (
 
 func main() {
 	service.SetEnvironmentConfig()
-	mq.BuildRabbitWorker(os.Getenv("mq_address"))
+	mq.BuildRabbitWorker(os.Getenv("MQ_HOST"))
 	electoral_service := dependencyinjection.Injection()
 	electoral_service.DropDataBases()
 	electoral_service.GetElectionSettings()
