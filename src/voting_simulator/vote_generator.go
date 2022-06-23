@@ -67,6 +67,8 @@ func convertResultsToVoters(results []bson.M) []models.VoterModel {
 
 func CreateVotes() {
 	voters, err := GetVoters()
+	limit := os.Getenv("LIMIT_VOTES")
+	limitVotes, err := strconv.Atoi(limit)
 	if err != nil {
 		l.LogError(err.Error())
 	}
@@ -76,8 +78,8 @@ func CreateVotes() {
 	count := 0
 	batchString := os.Getenv("BATCH_SIZE")
 	batchSize, _ := strconv.Atoi(batchString)
-	fmt.Println("Batchsize: " + batchString)
-	for i := 0; i < len(voters); i++ {
+	fmt.Println("Batch-size: " + batchString)
+	for i := 0; i < len(voters) && i <= limitVotes; i++ {
 		localVoter := voters[i]
 		count++
 		wg.Add(1)

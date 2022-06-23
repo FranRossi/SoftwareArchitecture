@@ -47,11 +47,16 @@ func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionMo
 func StoreElectionVoters(electionId string, voters []models.VoterModel) error {
 
 	// Don't use for voter := range voters, because it won't change the properties of the voters in the original array
+	var votersInterface []interface{}
+
 	for i := range voters {
-		sendStatsOfVoterToStatsService(electionId, &voters[i])
-		encrypt.EncryptVoter(&voters[i])
+		voter := voters[i]
+		j := i
+		circuit := voter.OtherFields["circuit"].(string)
+		go sendStatsOfVoterToStatsService(electionId, voter, circuit)
+		encrypt.EncryptVoter(&voters[j])
+		votersInterface = append(votersInterface, &voters[j])
 	}
-	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
 	electionDataBase := client.Database(os.Getenv("ELECTION_DB"))
 	votersCollection := electionDataBase.Collection(os.Getenv("VOTERS_COL"))
@@ -62,7 +67,7 @@ func StoreElectionVoters(electionId string, voters []models.VoterModel) error {
 	return nil
 }
 
-func sendStatsOfVoterToStatsService(electionId string, voter *models.VoterModel) {
+func sendStatsOfVoterToStatsService(electionId string, voter models.VoterModel, circuit string) {
 	type VoterStats struct {
 		ElectionId string
 		BirthDate  string
@@ -73,7 +78,7 @@ func sendStatsOfVoterToStatsService(electionId string, voter *models.VoterModel)
 
 	var voterStats VoterStats
 	voterStats.BirthDate = voter.BirthDate
-	voterStats.Circuit = voter.OtherFields["circuit"].(string)
+	voterStats.Circuit = circuit
 	voterStats.Region = voter.Region
 	voterStats.Sex = voter.Sex
 	voterStats.ElectionId = electionId
@@ -83,14 +88,6 @@ func sendStatsOfVoterToStatsService(electionId string, voter *models.VoterModel)
 		l.LogError("error sending voter stats to queue:" + errs.Error())
 	}
 	mq.GetMQWorker().Send("stats-total", jsonStats)
-}
-
-func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {
-	var votersInterface []interface{}
-	for _, v := range voters {
-		votersInterface = append(votersInterface, v)
-	}
-	return votersInterface
 }
 
 func StoreCandidates(candidates []models.CandidateModel) error {

@@ -11,6 +11,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+func DropDataBases() {
+	client := connections.GetInstanceMongoClient()
+	statsDataBase := client.Database(os.Getenv("DB"))
+	statsDataBase.Drop(context.TODO())
+}
+
 func UpdateActualStatistics(statistics models.VoterStats, groupType, groupName string, minAge int, maxAge int) error {
 	client := connections.GetInstanceMongoClient()
 	db := client.Database(os.Getenv("DB"))

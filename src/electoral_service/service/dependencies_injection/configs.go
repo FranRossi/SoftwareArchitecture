@@ -12,6 +12,8 @@ func Injection() *service.ElectionService {
 
 	var availableAdapters = map[string]service.Adapter{
 		"uruguay": &controller.UruguayAdapter{},
+		//"argentina": &controller.ArgentinaAdapter{}, Example
+		//"brasil": &controller.BrasilAdapter{}, Example
 	}
 	adapter := availableAdapters[os.Getenv("ADAPTER")]
 

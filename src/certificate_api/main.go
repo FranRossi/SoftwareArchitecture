@@ -16,7 +16,8 @@ func main() {
 	mongoClient := connections.GetInstanceMongoClient()
 	mq.BuildRabbitWorker(os.Getenv("MQ_HOST"))
 
-	repo := repositories.NewRequestsRepo(mongoClient, os.Getenv("CERTIFICATES_COLLECTION"))
+	repo := repositories.NewRequestsRepo(mongoClient, os.Getenv("CERTIFICATES_DB"))
+	repo.DropDataBases()
 	controller := controllers.CertificateRequestsController(repo)
 	controllers.ListenerForNewCertificates()
 	api.ConnectionAPI(controller)

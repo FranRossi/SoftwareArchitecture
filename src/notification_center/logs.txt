@@ -16,3 +16,24 @@ INFO: 2022/06/22 21:59:35 log.go:14: Sending email with initial act to: montevid
 INFO: 2022/06/22 21:59:35 log.go:14: Sending email with initial act to: montevideo@presidencia.com
 INFO: 2022/06/22 21:59:35 log.go:14: Sending email with initial act to: colonia@intendencia.com
 INFO: 2022/06/22 21:59:35 log.go:14: Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 15:48:36 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 15:48:36 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 15:48:36 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 16:08:05 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 16:08:05 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 16:08:05 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 16:16:22 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 16:16:22 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 16:16:22 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 16:27:28 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 16:27:28 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 16:27:28 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 16:57:41 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 16:57:41 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 16:57:41 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 17:04:06 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 17:04:06 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 17:04:06 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 17:10:39 Sending email with initial act to: montevideo@intendencia.com
+INFO: 2022/06/23 17:10:39 Sending email with initial act to: montevideo@presidencia.com
+INFO: 2022/06/23 17:10:39 Sending email with initial act to: colonia@intendencia.com

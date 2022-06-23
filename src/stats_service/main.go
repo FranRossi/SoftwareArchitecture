@@ -7,13 +7,14 @@ import (
 	"os"
 	l "own_logger"
 	"stats_service/controllers"
+	"stats_service/repository"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
-
+	repository.DropDataBases()
 	l.LogInfo("Starting stats application...")
 	mq.BuildRabbitWorker(os.Getenv("MQ_HOST"))
 

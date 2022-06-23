@@ -25,10 +25,7 @@ func DecryptText(encryptedText string) string {
 }
 
 func EncryptText(text string) string {
-
-	publicKeyPEM := ReadKeyFromFile("./../encrypt/pubkey_appEV.pem")
-	publicKey := ExportPEMStrToPubKey(publicKeyPEM)
-
+	publicKey := GetInstancePublicKey()
 	secretMessage := []byte(text)
 	rng := rand.Reader
 
@@ -41,7 +38,9 @@ func EncryptText(text string) string {
 	return ciphertextBase64
 }
 
+//Only for testing purposes
 var privateKeyInstance = readPrivateKey()
+var pubKeyInstance = readPublicKey()
 
 func GetInstancePrivateKey() *rsa.PrivateKey {
 	if privateKeyInstance == nil {
@@ -54,4 +53,17 @@ func readPrivateKey() *rsa.PrivateKey {
 	privateKeyPEM := ReadKeyFromFile("./../encrypt/privkey_appEV.pem")
 	privKey := ExportPEMStrToPrivKey(privateKeyPEM)
 	return privKey
+}
+
+func GetInstancePublicKey() *rsa.PublicKey {
+	if pubKeyInstance == nil {
+		pubKeyInstance = readPublicKey()
+	}
+	return pubKeyInstance
+}
+
+func readPublicKey() *rsa.PublicKey {
+	publicKeyPEM := ReadKeyFromFile("./../encrypt/pubkey_appEV.pem")
+	publicKey := ExportPEMStrToPubKey(publicKeyPEM)
+	return publicKey
 }
