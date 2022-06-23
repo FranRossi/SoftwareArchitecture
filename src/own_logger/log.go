@@ -24,7 +24,7 @@ func LogSync(message, logType string, args ...interface{}) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger := log.New(file, logType, log.Ldate|log.Ltime|log.Lshortfile)
+	logger := log.New(file, logType, log.Ldate|log.Ltime)
 	logger.Output(2, fmt.Sprintf(message, args...))
 	file.Close()
 }

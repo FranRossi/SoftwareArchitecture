@@ -1,5 +1,10 @@
 package models
 
+type ElectionResultJson struct {
+	Error  bool          `json:"error"`
+	Msg    string        `json:"msg"`
+	Result ElectionModel `json:"request"`
+}
 type ElectionModel struct {
 	Result              ResultElection `json:"result"`
 	QueryRequestTime    string         `json:"query_request_time"`
@@ -32,6 +37,12 @@ type CandidateEssential struct {
 	Name           string `bson:"name"`
 	Votes          int    `bson:"votes"`
 	PoliticalParty string `bson:"politicalParty"`
+}
+
+type ElectionConfigJson struct {
+	Error  bool           `json:"error"`
+	Msg    string         `json:"msg"`
+	Config ElectionConfig `json:"request"`
 }
 
 type ElectionConfig struct {

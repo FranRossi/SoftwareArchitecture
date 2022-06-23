@@ -24,12 +24,12 @@ func NewRequestsRepo(mongoClient *mongo.Client, database string) *VotesRepo {
 	}
 }
 
-func (certRepo *VotesRepo) RequestVote(voterId, electionId string) (*m.VoteModel, error) {
+func (certRepo *VotesRepo) RequestVote(voterId, electionId string) (m.VoteModel, error) {
 
 	var voteFromCache m.VoteModel
 	errCache := cache.Get(voteCacheKey(voterId, electionId), &voteFromCache)
 	if errCache == nil {
-		return &voteFromCache, nil
+		return voteFromCache, nil
 	}
 
 	client := certRepo.mongoClient
@@ -39,9 +39,9 @@ func (certRepo *VotesRepo) RequestVote(voterId, electionId string) (*m.VoteModel
 	var result bson.M
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		return &m.VoteModel{}, fmt.Errorf("error requesting voter on election: %v", err)
+		return m.VoteModel{}, fmt.Errorf("error requesting voter on election: %v", err)
 	}
-	vote := &m.VoteModel{
+	vote := m.VoteModel{
 		VoterId:   result["voter"].(string),
 		TimeVoted: result["time_front_end"].(string),
 	}
