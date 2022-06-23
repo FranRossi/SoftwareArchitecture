@@ -19,23 +19,23 @@ type ElectionRepo struct {
 
 func DropDataBases() {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("ELECTION_DB"))
-	uruguayDataBase.Drop(context.TODO())
-	uruguayDataBase = client.Database(os.Getenv("VOTES_DB"))
-	uruguayDataBase.Drop(context.TODO())
+	electionDataBase := client.Database(os.Getenv("ELECTION_DB"))
+	electionDataBase.Drop(context.TODO())
+	electionDataBase = client.Database(os.Getenv("VOTES_DB"))
+	electionDataBase.Drop(context.TODO())
 }
 
 func (repo *ElectionRepo) StoreElectionConfiguration(election *models.ElectionModelEssential) error {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("ELECTION_DB"))
-	uruguayanElectionCollection := uruguayDataBase.Collection(os.Getenv("CONF_COL"))
-	_, err := uruguayanElectionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode, "otherField": election.OtherFields})
+	electionDataBase := client.Database(os.Getenv("ELECTION_DB"))
+	electionCollection := electionDataBase.Collection(os.Getenv("CONF_COL"))
+	_, err := electionCollection.InsertOne(context.TODO(), bson.M{"id": election.Id, "startingDate": election.StartingDate, "finishingDate": election.FinishingDate, "electionMode": election.ElectionMode, "otherField": election.OtherFields})
 	if err != nil {
 		return fmt.Errorf("error storing election configuration")
 	}
 
-	uruguayVotesDataBase := client.Database(os.Getenv("VOTES_DB"))
-	collectionTotalVotes := uruguayVotesDataBase.Collection(os.Getenv("TOTAL_VOTES_COL"))
+	votesDataBase := client.Database(os.Getenv("VOTES_DB"))
+	collectionTotalVotes := votesDataBase.Collection(os.Getenv("TOTAL_VOTES_COL"))
 	amountVotes := bson.D{{"votes_counted", 0}, {"election_id", election.Id}}
 	_, err = collectionTotalVotes.InsertOne(context.TODO(), amountVotes)
 	if err != nil {
@@ -53,9 +53,9 @@ func StoreElectionVoters(electionId string, voters []models.VoterModel) error {
 	}
 	votersInterface := convertVotersModelToInterface(voters)
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("ELECTION_DB"))
-	uruguayanVotersCollection := uruguayDataBase.Collection(os.Getenv("VOTERS_COL"))
-	_, err := uruguayanVotersCollection.InsertMany(context.TODO(), votersInterface)
+	electionDataBase := client.Database(os.Getenv("ELECTION_DB"))
+	votersCollection := electionDataBase.Collection(os.Getenv("VOTERS_COL"))
+	_, err := votersCollection.InsertMany(context.TODO(), votersInterface)
 	if err != nil {
 		return fmt.Errorf("error storing voters")
 	}
@@ -96,9 +96,9 @@ func convertVotersModelToInterface(voters []models.VoterModel) []interface{} {
 func StoreCandidates(candidates []models.CandidateModel) error {
 	client := connections.GetInstanceMongoClient()
 	candidatesToStore := convertCandidateModelToInterface(candidates)
-	uruguayDataBase := client.Database(os.Getenv("VOTES_DB"))
-	uruguayanCandidatesCollection := uruguayDataBase.Collection(os.Getenv("CANDIDATES_VOTES_COL"))
-	_, err := uruguayanCandidatesCollection.InsertMany(context.TODO(), candidatesToStore)
+	votesDataBase := client.Database(os.Getenv("VOTES_DB"))
+	candidatesCollection := votesDataBase.Collection(os.Getenv("CANDIDATES_VOTES_COL"))
+	_, err := candidatesCollection.InsertMany(context.TODO(), candidatesToStore)
 	if err != nil {
 		return fmt.Errorf("error storing initial candidates")
 	}
@@ -119,10 +119,10 @@ func convertCandidateModelToInterface(candidates []models.CandidateModel) []inte
 
 func GetTotalVotes(electionId string) (int, error) {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("VOTES_DB"))
-	uruguayanVotesCollection := uruguayDataBase.Collection(os.Getenv("TOTAL_VOTES_COL"))
+	votesDataBase := client.Database(os.Getenv("VOTES_DB"))
+	votesCollection := votesDataBase.Collection(os.Getenv("TOTAL_VOTES_COL"))
 	var amountVotes bson.M
-	err := uruguayanVotesCollection.FindOne(context.TODO(), bson.D{{"election_id", electionId}}).Decode(&amountVotes)
+	err := votesCollection.FindOne(context.TODO(), bson.D{{"election_id", electionId}}).Decode(&amountVotes)
 	if err != nil {
 		return -1, fmt.Errorf("error getting amount of votes")
 	}
@@ -132,10 +132,10 @@ func GetTotalVotes(electionId string) (int, error) {
 
 func GetEachCandidatesVotes() ([]models.CandidateEssential, error) {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("VOTES_DB"))
-	uruguayanVotesCollection := uruguayDataBase.Collection(os.Getenv("CANDIDATES_VOTES_COL"))
+	votesDataBase := client.Database(os.Getenv("VOTES_DB"))
+	votesCollection := votesDataBase.Collection(os.Getenv("CANDIDATES_VOTES_COL"))
 	var results []bson.M
-	cursor, err := uruguayanVotesCollection.Find(context.TODO(), bson.D{})
+	cursor, err := votesCollection.Find(context.TODO(), bson.D{})
 	if err != nil {
 		return []models.CandidateEssential{}, fmt.Errorf("there are no votes: %v", err)
 	}
@@ -157,9 +157,9 @@ func GetEachCandidatesVotes() ([]models.CandidateEssential, error) {
 
 func StoreElectionResult(resultElection models.ResultElection) error {
 	client := connections.GetInstanceMongoClient()
-	uruguayDataBase := client.Database(os.Getenv("VOTES_DB"))
-	uruguayanVotesCollection := uruguayDataBase.Collection(os.Getenv("RESULT_COL"))
-	_, err := uruguayanVotesCollection.InsertOne(context.TODO(), resultElection)
+	votesDataBase := client.Database(os.Getenv("VOTES_DB"))
+	votesCollection := votesDataBase.Collection(os.Getenv("RESULT_COL"))
+	_, err := votesCollection.InsertOne(context.TODO(), resultElection)
 	if err != nil {
 		message := "error storing result election"
 		return fmt.Errorf(message)
