@@ -4,6 +4,7 @@ import (
 	"certificate_api/configs"
 	"certificate_api/controllers"
 	"certificate_api/controllers/routes"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,9 +17,9 @@ func ConnectionAPI(controller *controllers.CertificateController) {
 	app := fiber.New(config)
 
 	// Routes.
-	// Aqui defino cuales van a ser las rutas accesibles
+	// Define accesable routes
 	routes.PublicRoutes(app, controller) // Register a public routes for app.
 
-	// Aqui inicializamos el servidor en el puerto 8081
-	app.Listen(":8081")
+	// Start server in port 8081 (specify in the .env)
+	app.Listen(os.Getenv("API_PORT"))
 }

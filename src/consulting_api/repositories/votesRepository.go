@@ -5,6 +5,7 @@ import (
 	m "consulting_api/models"
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 
@@ -254,8 +255,8 @@ func (certRepo *VotesRepo) RequestVotesPerRegions(electionId string, region stri
 	}
 
 	client := certRepo.mongoClient
-	database := client.Database("statistics")
-	collection := database.Collection("votes_stats")
+	database := client.Database(os.Getenv("STATS_DB"))
+	collection := database.Collection(os.Getenv("STATS_COLLECTION"))
 	filter := bson.D{{"election_id", electionId}, {"group_type", "region"}, {"region", region}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {

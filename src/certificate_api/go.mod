@@ -19,6 +19,7 @@ require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

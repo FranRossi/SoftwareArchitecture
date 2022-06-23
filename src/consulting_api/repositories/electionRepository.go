@@ -5,6 +5,7 @@ import (
 	m "consulting_api/models"
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,10 +35,10 @@ func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.Electi
 	}
 
 	client := certRepo.mongoClient
-	electionDatabase := client.Database("uruguay_election")
-	uruguayCollection := electionDatabase.Collection("configuration_election")
+	electionDatabase := client.Database(os.Getenv("ELECTION_DB"))
+	collection := electionDatabase.Collection(os.Getenv("CONFIG_COLLECTION"))
 	var result bson.M
-	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", electionId}}).Decode(&result)
+	err2 := collection.FindOne(context.TODO(), bson.D{{"id", electionId}}).Decode(&result)
 	if err2 != nil {
 		return m.ElectionConfig{}, fmt.Errorf("election not found: %v", err2)
 	}
@@ -51,7 +52,7 @@ func (certRepo *ElectionRepo) RequestElectionConfig(electionId string) (m.Electi
 		emailsArray = append(emailsArray, email.(string))
 	}
 	if err3 != nil {
-		return m.ElectionConfig{}, fmt.Errorf("worng maximum values: %v", err3)
+		return m.ElectionConfig{}, fmt.Errorf("wrong maximum values: %v", err3)
 	}
 	configs := m.ElectionConfig{
 		MaxVotes:        maxVotes,

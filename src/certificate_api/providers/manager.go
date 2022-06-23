@@ -45,7 +45,7 @@ func sendMessageToQueue(queueName string, certificate models.CertificateModel, v
 
 	jsonMsg, err := json.Marshal(msg)
 	if err != nil {
-		l.LogError(err.Error() + "Error while marshalling initial act")
+		l.LogError(err.Error() + "Error while sending to queue " + queueName + " json marshalling error")
 	}
 	queue := queueName
 	mq.GetMQWorker().Send(queue, jsonMsg)

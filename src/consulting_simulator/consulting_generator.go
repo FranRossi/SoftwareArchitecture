@@ -7,13 +7,14 @@ import (
 	"consulting_simulator/repository"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"net/http"
 	"os"
 	l "own_logger"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -93,37 +94,39 @@ func generateElectionResult(tokenElectoral string) {
 	const electionId = "1"
 	url += electionId
 	for i := 0; i <= 30; i++ {
-		timeFront := time.Now()
-		req, err := http.NewRequest("GET", url, nil)
-		req.Header.Set("Authorization", tokenElectoral)
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			l.LogError("There are no election's result at the moment, retry later")
-			return
-		}
-		timeBack := time.Now()
-		jsonBytes, err := ioutil.ReadAll(resp.Body)
+		go func() {
+			timeFront := time.Now()
+			req, err := http.NewRequest("GET", url, nil)
+			req.Header.Set("Authorization", tokenElectoral)
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				l.LogError("There are no election's result at the moment, retry later")
+				return
+			}
+			timeBack := time.Now()
+			jsonBytes, err := ioutil.ReadAll(resp.Body)
 
-		var electionResult models.ElectionResultJson
-		er := json.Unmarshal(jsonBytes, &electionResult)
-		if er != nil {
-			go l.LogError(err.Error() + " error casting election result")
-		}
-		err = resp.Body.Close()
-		if err != nil {
-			go l.LogError(err.Error())
-		}
-		timesSub := timeBack.Sub(timeFront).Seconds()
-		timeReq := fmt.Sprintf("%f", timesSub)
-		if electionResult.Error {
-			go l.LogError(electionResult.Msg + " error on election's result")
-			fmt.Println("There is not result for election: " + electionId)
-		} else {
-			message := "Election result for election with id " + electionId + " received correctly on: " + timeReq + " seconds"
-			fmt.Println(message)
-			l.LogInfo(message)
-		}
+			var electionResult models.ElectionResultJson
+			er := json.Unmarshal(jsonBytes, &electionResult)
+			if er != nil {
+				go l.LogError(err.Error() + " error casting election result")
+			}
+			err = resp.Body.Close()
+			if err != nil {
+				go l.LogError(err.Error())
+			}
+			timesSub := timeBack.Sub(timeFront).Seconds()
+			timeReq := fmt.Sprintf("%f", timesSub)
+			if electionResult.Error {
+				go l.LogError(electionResult.Msg + " error on election's result")
+				fmt.Println("There is not result for election: " + electionId)
+			} else {
+				message := "Election result for election with id " + electionId + " received correctly on: " + timeReq + " seconds"
+				fmt.Println(message)
+				l.LogInfo(message)
+			}
+		}()
 	}
 }
 
@@ -132,35 +135,36 @@ func generatePopularVotingTimes() {
 	const electionId = "1/"
 	url += electionId
 	for i := 0; i <= 15; i++ {
-		timeFront := time.Now()
-		response, err := http.Get(url)
-		if err != nil {
-			l.LogError("There are not votes per hours available, retry later")
-			return
-		}
-		timeBack := time.Now()
-		jsonBytes, err := ioutil.ReadAll(response.Body)
+		go func() {
+			timeFront := time.Now()
+			response, err := http.Get(url)
+			if err != nil {
+				l.LogError("There are not votes per hours available, retry later")
+				return
+			}
+			timeBack := time.Now()
+			jsonBytes, err := ioutil.ReadAll(response.Body)
 
-		var votesPerHours models.VoterPerHoursJson
-		er := json.Unmarshal(jsonBytes, &votesPerHours)
-		if er != nil {
-			go l.LogError(err.Error() + " error casting votes per hours")
-		}
-		err = response.Body.Close()
-		if err != nil {
-			go l.LogError(err.Error())
-		}
-		timesSub := timeBack.Sub(timeFront).Seconds()
-		timeReq := fmt.Sprintf("%f", timesSub)
-		if votesPerHours.Error {
-			go l.LogError(votesPerHours.Msg + " error on votes per hours")
-			fmt.Println("There are not voter per hours for election: " + electionId)
-		} else {
-			message := "Vote per hours received correctly on: " + timeReq + " seconds"
-			fmt.Println(message)
-			l.LogInfo(message)
-		}
-
+			var votesPerHours models.VoterPerHoursJson
+			er := json.Unmarshal(jsonBytes, &votesPerHours)
+			if er != nil {
+				go l.LogError(err.Error() + " error casting votes per hours")
+			}
+			err = response.Body.Close()
+			if err != nil {
+				go l.LogError(err.Error())
+			}
+			timesSub := timeBack.Sub(timeFront).Seconds()
+			timeReq := fmt.Sprintf("%f", timesSub)
+			if votesPerHours.Error {
+				go l.LogError(votesPerHours.Msg + " error on votes per hours")
+				fmt.Println("There are not voter per hours for election: " + electionId)
+			} else {
+				message := "Vote per hours received correctly on: " + timeReq + " seconds"
+				fmt.Println(message)
+				l.LogInfo(message)
+			}
+		}()
 	}
 }
 
@@ -229,37 +233,39 @@ func generateElectionConfiguration(tokenConsulter string) {
 	const electionId = "1"
 	url += electionId
 	for i := 0; i <= 30; i++ {
-		timeFront := time.Now()
-		req, err := http.NewRequest("GET", url, nil)
-		req.Header.Set("Authorization", tokenConsulter)
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			l.LogError("There are no election available with that id, retry later")
-			return
-		}
-		timeBack := time.Now()
-		jsonBytes, err := ioutil.ReadAll(resp.Body)
+		go func() {
+			timeFront := time.Now()
+			req, err := http.NewRequest("GET", url, nil)
+			req.Header.Set("Authorization", tokenConsulter)
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				l.LogError("There are no election available with that id, retry later")
+				return
+			}
+			timeBack := time.Now()
+			jsonBytes, err := ioutil.ReadAll(resp.Body)
 
-		var electionConfig models.ElectionConfigJson
-		er := json.Unmarshal(jsonBytes, &electionConfig)
-		if er != nil {
-			go l.LogError(err.Error() + " error casting election config")
-		}
-		err = resp.Body.Close()
-		if err != nil {
-			go l.LogError(err.Error())
-		}
-		timesSub := timeBack.Sub(timeFront).Seconds()
-		timeReq := fmt.Sprintf("%f", timesSub)
-		if electionConfig.Error {
-			go l.LogError(electionConfig.Msg + " error on election config")
-			fmt.Println("There are not config for election: " + electionId)
-		} else {
-			message := "Election config with id " + electionId + " received correctly on: " + timeReq + " seconds"
-			fmt.Println(message)
-			l.LogInfo(message)
-		}
+			var electionConfig models.ElectionConfigJson
+			er := json.Unmarshal(jsonBytes, &electionConfig)
+			if er != nil {
+				go l.LogError(err.Error() + " error casting election config")
+			}
+			err = resp.Body.Close()
+			if err != nil {
+				go l.LogError(err.Error())
+			}
+			timesSub := timeBack.Sub(timeFront).Seconds()
+			timeReq := fmt.Sprintf("%f", timesSub)
+			if electionConfig.Error {
+				go l.LogError(electionConfig.Msg + " error on election config")
+				fmt.Println("There are not config for election: " + electionId)
+			} else {
+				message := "Election config with id " + electionId + " received correctly on: " + timeReq + " seconds"
+				fmt.Println(message)
+				l.LogInfo(message)
+			}
+		}()
 	}
 }
 
@@ -299,7 +305,6 @@ func generateCertificates(certificates []models.CertificateResponseModel) {
 			fmt.Println(message)
 			l.LogInfo(message)
 		}
-
 	}
 }
 
@@ -315,36 +320,39 @@ func votesPerRegion() {
 	url += electionId
 	urlBasic := url
 	for i := 0; i <= 9; i++ {
-		timeFront := time.Now()
-		url += departments[i]
-		response, err := http.Get(url)
-		if err != nil {
-			l.LogError("There are not votes coverage per regions available, retry later")
-			return
-		}
-		timeBack := time.Now()
-		jsonBytes, err := ioutil.ReadAll(response.Body)
+		j := i
+		go func(i int) {
+			timeFront := time.Now()
+			url += departments[i]
+			response, err := http.Get(url)
+			if err != nil {
+				l.LogError("There are not votes coverage per regions available, retry later")
+				return
+			}
+			timeBack := time.Now()
+			jsonBytes, err := ioutil.ReadAll(response.Body)
 
-		var votesPerRegionCoverage models.VoteRegionCoverage
-		er := json.Unmarshal(jsonBytes, &votesPerRegionCoverage)
-		if er != nil {
-			go l.LogError(err.Error() + " error casting votes coverage per region")
-		}
-		err = response.Body.Close()
-		if err != nil {
-			go l.LogError(err.Error())
-		}
-		timesSub := timeBack.Sub(timeFront).Seconds()
-		timeReq := fmt.Sprintf("%f", timesSub)
-		if votesPerRegionCoverage.Error {
-			go l.LogError(votesPerRegionCoverage.Msg + " error on votes per region")
-			fmt.Println("There are not votes for that circuit")
-		} else {
-			message := "Vote coverage per region " + departments[i] + " received correctly on: " + timeReq + " seconds"
-			fmt.Println(message)
-			l.LogInfo(message)
-		}
-		url = urlBasic
+			var votesPerRegionCoverage models.VoteRegionCoverage
+			er := json.Unmarshal(jsonBytes, &votesPerRegionCoverage)
+			if er != nil {
+				go l.LogError(err.Error() + " error casting votes coverage per region")
+			}
+			err = response.Body.Close()
+			if err != nil {
+				go l.LogError(err.Error())
+			}
+			timesSub := timeBack.Sub(timeFront).Seconds()
+			timeReq := fmt.Sprintf("%f", timesSub)
+			if votesPerRegionCoverage.Error {
+				go l.LogError(votesPerRegionCoverage.Msg + " error on votes per region")
+				fmt.Println("There are not votes for that circuit")
+			} else {
+				message := "Vote coverage per region " + departments[i] + " received correctly on: " + timeReq + " seconds"
+				fmt.Println(message)
+				l.LogInfo(message)
+			}
+			url = urlBasic
+		}(j)
 	}
 }
 
@@ -354,35 +362,38 @@ func votesPerCircuit() {
 	url += electionId
 	urlBasic := url
 	for i := 0; i <= 9; i++ {
-		timeFront := time.Now()
-		url += strconv.Itoa(i)
-		response, err := http.Get(url)
-		if err != nil {
-			l.LogError(err.Error())
-			return
-		}
-		timeBack := time.Now()
-		jsonBytes, err := ioutil.ReadAll(response.Body)
+		j := i
+		go func(i int) {
+			timeFront := time.Now()
+			url += strconv.Itoa(i)
+			response, err := http.Get(url)
+			if err != nil {
+				l.LogError(err.Error())
+				return
+			}
+			timeBack := time.Now()
+			jsonBytes, err := ioutil.ReadAll(response.Body)
 
-		var votesPerCircuitCoverage models.VoteCircuitCoverage
-		er := json.Unmarshal(jsonBytes, &votesPerCircuitCoverage)
-		if er != nil {
-			go l.LogError(err.Error() + " error casting votes coverage per circuit")
-		}
-		err = response.Body.Close()
-		if err != nil {
-			go l.LogError(err.Error())
-		}
-		timesSub := timeBack.Sub(timeFront).Seconds()
-		timeReq := fmt.Sprintf("%f", timesSub)
-		if votesPerCircuitCoverage.Error {
-			go l.LogError(votesPerCircuitCoverage.Msg + " error on votes per circuit")
-			fmt.Println("There are not votes for that circuit")
-		} else {
-			message := "Vote coverage per circuit " + strconv.Itoa(i) + " received correctly on: " + timeReq + " seconds"
-			fmt.Println(message)
-			l.LogInfo(message)
-		}
-		url = urlBasic
+			var votesPerCircuitCoverage models.VoteCircuitCoverage
+			er := json.Unmarshal(jsonBytes, &votesPerCircuitCoverage)
+			if er != nil {
+				go l.LogError(err.Error() + " error casting votes coverage per circuit")
+			}
+			err = response.Body.Close()
+			if err != nil {
+				go l.LogError(err.Error())
+			}
+			timesSub := timeBack.Sub(timeFront).Seconds()
+			timeReq := fmt.Sprintf("%f", timesSub)
+			if votesPerCircuitCoverage.Error {
+				go l.LogError(votesPerCircuitCoverage.Msg + " error on votes per circuit")
+				fmt.Println("There are not votes for that circuit")
+			} else {
+				message := "Vote coverage per circuit " + strconv.Itoa(i) + " received correctly on: " + timeReq + " seconds"
+				fmt.Println(message)
+				l.LogInfo(message)
+			}
+			url = urlBasic
+		}(j)
 	}
 }

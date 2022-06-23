@@ -5,14 +5,15 @@ import (
 	"context"
 	electoral_service_models "electoral_service/models"
 	"fmt"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func (certRepo *CertificatesRepo) FindVoter(idVoter string) (user electoral_service_models.VoterModel, err error) {
 	client := connections.GetInstanceMongoClient()
-	votesDatabase := client.Database("uruguay_election")
-	uruguayCollection := votesDatabase.Collection("voters")
+	votesDatabase := client.Database(os.Getenv("ELECTION_DB"))
+	uruguayCollection := votesDatabase.Collection(os.Getenv("VOTERS_COLLECTION"))
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idVoter}}).Decode(&result)
 	if err2 != nil {
@@ -35,8 +36,8 @@ func (certRepo *CertificatesRepo) FindVoter(idVoter string) (user electoral_serv
 
 func (certRepo *CertificatesRepo) FindElection(idElection string) (election electoral_service_models.ElectionModelEssential, err error) {
 	client := connections.GetInstanceMongoClient()
-	votesDatabase := client.Database("uruguay_election")
-	uruguayCollection := votesDatabase.Collection("configuration_election")
+	votesDatabase := client.Database(os.Getenv("ELECTION_DB"))
+	uruguayCollection := votesDatabase.Collection(os.Getenv("CONF_COLLECTION"))
 	var result bson.M
 	err2 := uruguayCollection.FindOne(context.TODO(), bson.D{{"id", idElection}}).Decode(&result)
 	if err2 != nil {

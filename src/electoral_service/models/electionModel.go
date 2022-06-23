@@ -10,7 +10,7 @@ type ElectionModelEssential struct {
 	Id            string `bson:"id"`
 	StartingDate  string `bson:"startingDate"`
 	FinishingDate string `bson:"finishingDate"`
-	ElectionMode  string `bson:"electionMode"` // "unico" o "multi"
+	ElectionMode  string `bson:"electionMode"` // "unico" or "multi"
 
 	Voters           []VoterModel          `json:"voters" bson:"voters"`
 	PoliticalParties []PoliticalPartyModel `json:"politicalParties"`

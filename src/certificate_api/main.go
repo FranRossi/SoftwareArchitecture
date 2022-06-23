@@ -6,18 +6,21 @@ import (
 	"certificate_api/controllers"
 	"certificate_api/repositories"
 	mq "message_queue"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-
+	godotenv.Load()
 	mongoClient := connections.GetInstanceMongoClient()
-	mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
+	mq.BuildRabbitWorker(os.Getenv("MQ_HOST"))
 
-	repo := repositories.NewRequestsRepo(mongoClient, "certificates")
+	repo := repositories.NewRequestsRepo(mongoClient, os.Getenv("CERTIFICATES_COLLECTION"))
 	controller := controllers.CertificateRequestsController(repo)
 	controllers.ListenerForNewCertificates()
 	api.ConnectionAPI(controller)
 
 	mq.GetMQWorker().Close()
-	// mongoClient.Disconnect() TODO
+	connections.CloseMongoClient()
 }

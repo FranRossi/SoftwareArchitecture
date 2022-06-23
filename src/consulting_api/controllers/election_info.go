@@ -4,9 +4,10 @@ import (
 	"auth/jwt"
 	"consulting_api/models"
 	"consulting_api/repositories"
-	"github.com/gofiber/fiber/v2"
 	l "own_logger"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type ConsultingElectionInfoController struct {
@@ -44,6 +45,7 @@ func (controller *ConsultingElectionInfoController) RequestElectionConfiguration
 			"request": nil,
 		})
 	}
+	go l.LogInfo("User " + claims.TokenInfo.Id + " requested an election configuration and is authorized")
 	electionId := c.Params("electionId")
 	electionConfig, err := controller.repo.RequestElectionConfig(electionId)
 	if err != nil {

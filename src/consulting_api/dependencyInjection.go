@@ -7,6 +7,7 @@ import (
 	"consulting_api/controllers"
 	"consulting_api/repositories"
 	"io/ioutil"
+	"os"
 	l "own_logger"
 	"time"
 )
@@ -15,9 +16,9 @@ func InjectDependencies() {
 	mongoClient := connections.GetInstanceMongoClient()
 	manager := createJwtManager()
 
-	repo := repositories.NewRequestsRepo(mongoClient, "uruguay_votes")
+	repo := repositories.NewRequestsRepo(mongoClient, os.Getenv("VOTES_DB"))
 	controller := controllers.NewConsultingController(repo, manager)
-	repoElection := repositories.NewElectionRepo(mongoClient, "uruguay_election")
+	repoElection := repositories.NewElectionRepo(mongoClient, os.Getenv("ELECTION_DB"))
 	electionController := controllers.NewConsultingElectionConfigController(repoElection, manager)
 	api.ConnectionAPI(controller, electionController)
 	defer connections.CloseMongoClient()

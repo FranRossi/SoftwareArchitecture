@@ -3,13 +3,15 @@ package connections
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"os"
 	l "own_logger"
 	"sync"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var lock = &sync.Mutex{}
@@ -29,7 +31,7 @@ func GetInstanceMongoClient() *mongo.Client {
 }
 
 func connectionMongo() *mongo.Client {
-	const uri = "mongodb://localhost:27017"
+	uri := os.Getenv("MONGO")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 

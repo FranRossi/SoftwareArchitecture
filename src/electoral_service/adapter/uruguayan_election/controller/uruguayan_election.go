@@ -10,10 +10,10 @@ import (
 	l "own_logger"
 )
 
-type ElectionController struct {
+type UruguayAdapter struct {
 }
 
-func (controller *ElectionController) GetElectionSettings() *modelsGeneric.ElectionModelEssential {
+func (controller *UruguayAdapter) GetElectionSettings() *modelsGeneric.ElectionModelEssential {
 	url := os.Getenv("electoral_service_url")
 	response, err := http.Get(url)
 	if err != nil {

@@ -45,6 +45,7 @@ func (controller *ConsultingElectionVotesController) RequestVote(c *fiber.Ctx) e
 			"request": nil,
 		})
 	}
+	go l.LogInfo("User " + claims.TokenInfo.Id + " requested a vote and is authorized")
 	voterId := c.Params("voterId")
 	electionId := c.Params("electionId")
 	vote, err := controller.repo.RequestVote(voterId, electionId)
@@ -61,7 +62,7 @@ func (controller *ConsultingElectionVotesController) RequestVote(c *fiber.Ctx) e
 	vote.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
 	vote.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	vote.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
-	l.LogInfo("Requested voted by " + voterId + " for election " + electionId)
+	l.LogInfo("Successfully requested voted by " + voterId + " for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"msg":     "Vote found",
@@ -91,6 +92,7 @@ func (controller *ConsultingElectionVotesController) RequestElectionResult(c *fi
 			"request": nil,
 		})
 	}
+	go l.LogInfo("User " + claims.TokenInfo.Id + " requested an election result and is authorized")
 	electionId := c.Params("electionId")
 	electionResult, err := controller.repo.RequestElectionResult(electionId)
 	if err != nil {
@@ -109,7 +111,7 @@ func (controller *ConsultingElectionVotesController) RequestElectionResult(c *fi
 	electionResponse.QueryRequestTime = timeQueryRequest.Format(time.RFC3339)
 	electionResponse.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	electionResponse.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
-	l.LogInfo("Requested election result for election " + electionId)
+	l.LogInfo("Successfully requested election result for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"msg":     "Result of election" + electionId,
@@ -137,7 +139,7 @@ func (controller *ConsultingElectionVotesController) RequestPopularVotingTimes(c
 	timeQueryResponse := time.Now()
 	response.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	response.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
-	l.LogInfo("Requested popular voting times for election " + electionId)
+	l.LogInfo(" Successfully requested popular voting times for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"msg":     "Votes Per Hours",
@@ -173,7 +175,7 @@ func (controller *ConsultingElectionVotesController) RequestVotesPerCircuits(c *
 	response.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	response.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
 
-	l.LogInfo("Requested votes per circuit for election " + electionId)
+	l.LogInfo("Successfully requested votes per circuit for election " + electionId)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
@@ -200,7 +202,7 @@ func (controller *ConsultingElectionVotesController) RequestVotesPerRegions(c *f
 	response.QueryResponseTime = timeQueryResponse.Format(time.RFC3339)
 	response.QueryProcessingTime = timeQueryResponse.Sub(timeQueryRequest).String()
 
-	l.LogInfo("Requested votes per circuit for election " + electionId)
+	l.LogInfo("Successfully requested votes per circuit for election " + electionId)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"msg":     "Votes Per Group",
