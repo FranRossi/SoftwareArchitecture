@@ -1,5 +1,11 @@
 package models
 
+type VoteJson struct {
+	Error bool      `json:"error"`
+	Msg   string    `json:"msg"`
+	Vote  VoteModel `json:"request"`
+}
+
 type VoteModel struct {
 	ElectionId          string `json:"electionId"`
 	VoterId             string `json:"id"`
@@ -8,7 +14,11 @@ type VoteModel struct {
 	QueryResponseTime   string `json:"query_response_time"`
 	QueryProcessingTime string `json:"query_processing_time"`
 }
-
+type VoterPerHoursJson struct {
+	Error bool          `json:"error"`
+	Msg   string        `json:"msg"`
+	Votes VotesPerHours `json:"request"`
+}
 type VotesPerHours struct {
 	ElectionId            string         `json:"electionId"`
 	AmountOfVotesPerHours map[string]int `json:"amount_of_votes_per_hours"`
