@@ -7,11 +7,15 @@ import (
 	"os"
 	l "own_logger"
 	"stats_service/controllers"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+
 	l.LogInfo("Starting stats application...")
-	mq.BuildRabbitWorker("amqp://guest:guest@localhost:5672/")
+	mq.BuildRabbitWorker(os.Getenv("MQ_HOST"))
 
 	controllers.ListenForNewStats()
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"os"
 	"stats_service/connections"
 	"stats_service/models"
 
@@ -12,8 +13,8 @@ import (
 
 func UpdateActualStatistics(statistics models.VoterStats, groupType, groupName string, minAge int, maxAge int) error {
 	client := connections.GetInstanceMongoClient()
-	db := client.Database("statistics")
-	collection := db.Collection("votes_stats")
+	db := client.Database(os.Getenv("DB"))
+	collection := db.Collection(os.Getenv("COL"))
 	var query bson.M
 	if groupType == "region" {
 		query = bson.M{
@@ -49,8 +50,8 @@ func UpdateActualStatistics(statistics models.VoterStats, groupType, groupName s
 
 func UpdateTotalStatistics(statistics models.VoterStats, groupType, groupName string, minAge int, maxAge int) error {
 	client := connections.GetInstanceMongoClient()
-	db := client.Database("statistics")
-	collection := db.Collection("votes_stats")
+	db := client.Database(os.Getenv("DB"))
+	collection := db.Collection(os.Getenv("COL"))
 	var query bson.M
 	if groupType == "region" {
 		query = bson.M{

@@ -9,7 +9,6 @@ import (
 
 func main() {
 	godotenv.Load()
-	connections.ConfigurationEnvironment()
 	connections.ConnectionRabbitMQ()
 	grpcServer := connections.ConnectionGRPC()
 	jwt := connections.ConnectionJWT()

@@ -15,7 +15,7 @@ func ListenForNewStats() {
 
 	go listenForStats(logic.AddVoteToCertainGroupActual, "stats-actual")
 	go listenForStats(logic.AddVoteToCertainGroupTotal, "stats-total")
-
+	fmt.Println("Listening for new voters statistics...")
 }
 
 func listenForStats(filter func(data any, params map[string]any) error, queueName string) {
@@ -41,7 +41,6 @@ func listen(queueName string, pipeLine p_f.Pipeline) {
 			l.LogError("Couldn't parse message")
 			return err
 		}
-		fmt.Print(".") // TODO optional, use for demo
 		go runPipeAndLog(pipeLine, stats)
 		return nil
 	})

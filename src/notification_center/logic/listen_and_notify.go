@@ -6,21 +6,21 @@ import (
 	l "own_logger"
 )
 
-func listenForMsg[M any](queue_name string, notifyFuncs ...func(act M)) {
+func listenForMsg[M any](queue_name string, notifyFuncs ...func(msg M)) {
 	worker := mq.ConnectionRabbit()
 	worker.Listen(50, queue_name, func(message []byte) error {
-		var act M
-		er := json.Unmarshal(message, &act)
+		var model M
+		er := json.Unmarshal(message, &model)
 		if er != nil {
 			l.LogError(er.Error())
 		}
-		notify(notifyFuncs, act)
+		notify(notifyFuncs, model)
 		return nil
 	})
 }
 
-func notify[T any](notifyFuncs []func(act T), act T) {
+func notify[T any](notifyFuncs []func(msg T), msg T) {
 	for _, notify := range notifyFuncs {
-		go notify(act)
+		go notify(msg)
 	}
 }

@@ -16,7 +16,6 @@ func ValidateVote(vote domain.VoteModel) error {
 
 	errors := p.Run(vote)
 	if len(errors) > 0 {
-		// TODO add error code
 		LogValidationErrors(errors)
 		return fmt.Errorf("vote is not valid: %v", errors)
 	}

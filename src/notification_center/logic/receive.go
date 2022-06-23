@@ -9,14 +9,14 @@ import (
 func StartReceivingMsgs() {
 
 	// ADD PROVIDER'S FUNCTIONS AS PARAMETER ON THE CORRESPONDING RECEIVER
-	receiveAct(email.SendInitialActsEmails)
+	receiveInitialAct(email.SendInitialActsEmails)
 	receiveClosingAct(email.SendClosingEmails)
 	receiveAlert(email.SendAlertEmails)
 	receiveCertificateGenerated(sms.SendCertificateSMS)
 	receiveCertificateRequested(email.SendCertificateEmail)
 }
 
-func receiveAct(notifyFuncs ...func(act models.InitialAct)) {
+func receiveInitialAct(notifyFuncs ...func(act models.InitialAct)) {
 	listenForMsg("initial-election-queue", notifyFuncs...)
 }
 

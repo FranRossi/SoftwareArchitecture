@@ -126,9 +126,8 @@ type VoteModel struct {
 	Signature   []byte
 }
 
-const addr = "localhost:50004"
-
 func Vote(vote VoteModel) {
+	addr := os.Getenv("GRPC")
 	encryptVote(&vote)
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))

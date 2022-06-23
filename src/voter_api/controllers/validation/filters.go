@@ -45,7 +45,7 @@ func FilterValidateCircuit(data any, params map[string]any) error {
 func FilterValidateUniqueCandidate(data any, params map[string]any) error {
 	vote := data.(domain.VoteModel)
 	if len(vote.IdCandidate) > 1 {
-		return fmt.Errorf("voter can vote only one candidate: %v")
+		return fmt.Errorf("voter can vote only one candidate, voter id: %v", vote.IdVoter)
 	}
 	return nil
 }
@@ -81,7 +81,7 @@ func FilterValidateVotingTime(data any, params map[string]any) error {
 	if err != nil {
 		return fmt.Errorf("election does not exist: %v", err)
 	}
-	startingDateAsDate, err := time.Parse(time.RFC3339, startingDate)
+	startingDateAsDate, _ := time.Parse(time.RFC3339, startingDate)
 	closingDateAsDate, err := time.Parse(time.RFC3339, closingDate)
 	if err != nil {
 		return fmt.Errorf("election date are misconfigured: %v", err)

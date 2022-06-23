@@ -28,6 +28,7 @@ func NewUruguayanElection() {
 }
 
 func (electionRepo *ElectionRepo) GetElection(id string) (models.ElectionModel, error) {
+	// In case you don't want to keep the election on memory
 	//const voterAmount = 10
 	//election, err := UruguayanElection.CreateElectionMock(id, voterAmount)
 	//if err != nil {

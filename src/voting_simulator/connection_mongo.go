@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	l "own_logger"
 	"sync"
 	"time"
@@ -30,7 +31,7 @@ func GetInstanceMongoClient() *mongo.Client {
 }
 
 func connectionMongo() *mongo.Client {
-	const uri = "mongodb://localhost:27017" // TODO .env
+	uri := os.Getenv("MONGO")
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 
 	if err != nil {
