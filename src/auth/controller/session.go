@@ -6,9 +6,10 @@ import (
 	"auth/repository"
 	"encoding/json"
 	"fmt"
+	l "own_logger"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	l "own_logger"
 )
 
 type SessionController struct {
@@ -36,7 +37,7 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 	message := "Invalid credentials"
 	user, err := controller.repo.FindUser(login.Id)
 	if err != nil {
-		l.LogError(message)
+		go l.LogError(message)
 		return c.Status(fiber.ErrNotFound.Code).JSON(fiber.Map{
 			"error": true,
 			"msg":   message,
@@ -45,7 +46,7 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 	}
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(login.Password))
 	if err2 != nil {
-		l.LogWarning(message)
+		go l.LogWarning(message)
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
 			"msg":   message,
@@ -59,14 +60,14 @@ func (controller *SessionController) Login(c *fiber.Ctx) error {
 
 	token, err := controller.manager.Generate(generator)
 	if err != nil {
-		l.LogError("Token cannot be generated")
+		go l.LogError(err.Error() + "Token cannot be generated, userID: " + user.Id)
 		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{
 			"error": true,
 			"msg":   err.Error() + " cannot generate token",
 			"login": nil,
 		})
 	}
-	l.LogInfo("Login successful")
+	go l.LogInfo("Login successful, userID: " + user.Id)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error": false,
 		"msg":   "Login successful",
@@ -78,6 +79,7 @@ func (controller *SessionController) RegisterUser(c *fiber.Ctx) error {
 	var register models.UserRegister
 	err := json.Unmarshal(c.Body(), &register)
 	if err != nil {
+		go l.LogError("failed user register, user malformed")
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error": true,
 			"msg":   "User malformed",
@@ -86,12 +88,14 @@ func (controller *SessionController) RegisterUser(c *fiber.Ctx) error {
 	}
 	user, err := controller.createUser(&register)
 	if err != nil {
+		go l.LogError("failed user register, creating user failed")
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"error": true,
 			"msg":   "Register failed",
 			"user":  nil,
 		})
 	}
+	go l.LogInfo("User register successful, user: " + user.Id)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"error": false,
 		"msg":   "Register successful",
@@ -102,6 +106,7 @@ func (controller *SessionController) RegisterUser(c *fiber.Ctx) error {
 func (controller *SessionController) createUser(user *models.UserRegister) (*models.TokenInfo, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
+		l.LogError("error hashing password for user: " + user.Id)
 		return nil, fmt.Errorf("cannot hash password: %w", err)
 	}
 

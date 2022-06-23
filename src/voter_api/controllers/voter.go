@@ -108,21 +108,21 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	if err != nil {
 		return voteIdentification, err
 	}
-	//if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
-	//	err2 := logic.DeleteVote(voteModel)
-	//	if err2 != nil {
-	//		return "", fmt.Errorf("cannot delete vote that was processed over 2 seconds: %v", err2)
-	//	}
-	//	messageFailed := "vote cannot processed under 2 seconds"
-	//	return "", fmt.Errorf(messageFailed)
-	//} else { TODO
-	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME TO PROCESS Vote
+	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
+		messageFailed := "vote coundn't be processed under 2 seconds"
+		return voteIdentification, fmt.Errorf(messageFailed)
+	}
+
+	showProcTime := os.Getenv("SHOW_PROCESS_TIME")
+	if showProcTime == "true" {
+		fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds())
+	}
+
 	err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, voteIdentification, timeFrontEnd, timeBackEnd)
 	if err2 != nil {
 		return voteIdentification, fmt.Errorf("cannot store vote info: %v", err2)
 	}
 	return voteIdentification, nil
-	//}
 }
 
 func verifySignatureVote(vote domain.VoteModel) error {

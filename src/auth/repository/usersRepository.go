@@ -6,14 +6,11 @@ import (
 	"context"
 	"errors"
 	"log"
+	"os"
 	l "own_logger"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-)
-
-const (
-	Collection = "users"
 )
 
 type UsersRepo struct {
@@ -31,7 +28,7 @@ func NewUsersRepo(mongoClient *mongo.Client, database string) *UsersRepo {
 func (repo *UsersRepo) RegisterUser(user *models.UserDB) error {
 	client := connections.GetInstanceMongoClient()
 	usersDatabase := client.Database(repo.database)
-	uruguayUsersCollection := usersDatabase.Collection(Collection)
+	uruguayUsersCollection := usersDatabase.Collection(os.Getenv("COLLECTION_NAME"))
 	_, err2 := uruguayUsersCollection.InsertOne(context.TODO(), user)
 	if err2 != nil {
 		l.LogError(err2.Error())
@@ -46,7 +43,7 @@ func (repo *UsersRepo) RegisterUser(user *models.UserDB) error {
 func (repo *UsersRepo) FindUser(idUser string) (*models.UserDB, error) {
 	client := connections.GetInstanceMongoClient()
 	usersDatabase := client.Database(repo.database)
-	uruguayUsersCollection := usersDatabase.Collection(Collection)
+	uruguayUsersCollection := usersDatabase.Collection(os.Getenv("COLLECTION_NAME"))
 	var result bson.M
 	err2 := uruguayUsersCollection.FindOne(context.TODO(), bson.D{{"id", idUser}}).Decode(&result)
 	if err2 != nil {

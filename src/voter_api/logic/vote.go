@@ -109,7 +109,7 @@ func SendCertificate(vote domain.VoteModel, voteIdentification string, timeFront
 	}
 	if err != nil {
 		certificate.Error = true
-		certificate.Message = err.Error()
+		certificate.Message = err.Error() + " ERROR_CODE[VOTE-PROC]"
 	}
 	queue := "voting-certificates"
 	sendCertificateToMQ(certificate, queue)

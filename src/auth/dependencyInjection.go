@@ -7,6 +7,7 @@ import (
 	"auth/jwt"
 	"auth/repository"
 	"io/ioutil"
+	"os"
 	l "own_logger"
 	"time"
 )
@@ -14,7 +15,7 @@ import (
 func InjectDependencies() {
 	mongoClient := connections.GetInstanceMongoClient()
 
-	repo := repository.NewUsersRepo(mongoClient, "uruguayan_users")
+	repo := repository.NewUsersRepo(mongoClient, os.Getenv("DATABASE_NAME"))
 	manager := createJwtManager()
 	sessionController := controller.NewSessionController(repo, manager)
 	api.ConnectionAPI(sessionController)
