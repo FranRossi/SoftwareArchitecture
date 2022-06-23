@@ -133,7 +133,7 @@ func GetMaxVotesAndEmailsBeforeAlert(idElection string) (int, []string, error) {
 		emailsArray = append(emailsArray, email.(string))
 	}
 	if err3 != nil {
-		return -1, []string{}, fmt.Errorf("worng maximum values")
+		return -1, []string{}, fmt.Errorf("wrong maximum values")
 	}
 	return maxVotes, emailsArray, nil
 }

@@ -72,14 +72,6 @@ func updateNewVote(vote domain.VoteModel, region string) error {
 	return nil
 }
 
-func DeleteVote(vote domain.VoteModel) error {
-	err := repository.DeleteVote(vote)
-	if err != nil {
-		return fmt.Errorf("vote cannot be deleted: %w", err)
-	}
-	return nil
-}
-
 func StoreVoteInfo(idVoter, idElection, voteIdentification string, timeFrontEnd, timeBackEnd time.Time) error {
 	timeFront := timeFrontEnd.Format(time.RFC3339)
 	timeBack := timeBackEnd.Format(time.RFC3339)

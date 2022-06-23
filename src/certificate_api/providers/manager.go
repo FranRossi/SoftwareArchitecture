@@ -22,6 +22,20 @@ type certificateNotification struct {
 	Email              string `json:"email"`
 }
 
+type AlertCertificates struct {
+	VoterId string
+}
+
+func SendAlert(voterId string) {
+	queue := "certificate-queue-alert"
+	alert := AlertCertificates{VoterId: voterId}
+	jsonMsg, err := json.Marshal(alert)
+	if err != nil {
+		l.LogError(err.Error() + "Error while sending to queue " + queue + " json marshalling error")
+	}
+	mq.GetMQWorker().Send(queue, jsonMsg)
+}
+
 func SendSMS(certificate models.CertificateModel, voter m.VoterModel) {
 	sendMessageToQueue("certificate-queue-sms", certificate, voter)
 }

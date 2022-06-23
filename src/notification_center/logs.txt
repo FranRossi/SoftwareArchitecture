@@ -37,3 +37,15 @@ INFO: 2022/06/23 17:04:06 Sending email with initial act to: colonia@intendencia
 INFO: 2022/06/23 17:10:39 Sending email with initial act to: montevideo@intendencia.com
 INFO: 2022/06/23 17:10:39 Sending email with initial act to: montevideo@presidencia.com
 INFO: 2022/06/23 17:10:39 Sending email with initial act to: colonia@intendencia.com
+INFO: 2022/06/23 19:47:55 Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/23 19:47:55 Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/23 19:47:55 Sending alert email to: alberto.rodriguez@hotmail.com
+INFO: 2022/06/23 19:48:18 Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/23 19:48:18 Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/23 19:48:18 Sending alert email to: alberto.rodriguez@hotmail.com
+INFO: 2022/06/23 19:48:28 Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/23 19:48:28 Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/23 19:48:28 Sending alert email to: alberto.rodriguez@hotmail.com
+INFO: 2022/06/23 19:50:46 Sending alert email to: alertas@indentencia.gob.uy
+INFO: 2022/06/23 19:50:46 Sending alert email to: seguridad@agesic.gob.uy
+INFO: 2022/06/23 19:50:46 Sending alert email to: alberto.rodriguez@hotmail.com

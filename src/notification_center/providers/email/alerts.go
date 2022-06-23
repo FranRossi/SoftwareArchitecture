@@ -9,7 +9,29 @@ import (
 	"strconv"
 )
 
-func SendAlertEmails(alert models.Alert) {
+func SendCertificatesAlertEmails(alert models.AlertCertificates) {
+	var emails []string
+	emailsFromFile, err := getEmailsFromFile()
+	if err != nil || len(emailsFromFile) == 0 {
+		l.LogWarning("There are not emails configured for alerts")
+		return
+	} else {
+		emails = emailsFromFile
+	}
+	for _, email := range emails {
+		l.LogInfo("Sending alert email to: " + email)
+		sendCertificateAlertEmailTo(email, alert)
+	}
+}
+
+func sendCertificateAlertEmailTo(email string, alert models.AlertCertificates) {
+	fmt.Println("Sending email to: " + email)
+	fmt.Println()
+	fmt.Println("El votante: " + alert.VoterId + " ha solicitado un certificado de voto un número inusual de veces")
+	fmt.Println()
+}
+
+func SendVotesAlertEmails(alert models.AlertVotes) {
 
 	var emails []string
 	emailsFromFile, err := getEmailsFromFile()
@@ -24,7 +46,7 @@ func SendAlertEmails(alert models.Alert) {
 	}
 }
 
-func sendAlertEmailTo(email string, alert models.Alert) {
+func sendAlertEmailTo(email string, alert models.AlertVotes) {
 	fmt.Println("Sending email to: " + email)
 	fmt.Println()
 	fmt.Println("En la elección: " + alert.IdElection)

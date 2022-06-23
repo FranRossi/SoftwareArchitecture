@@ -175,7 +175,7 @@ func (certRepo *VotesRepo) RequestPopularVotingTimes(electionId string) (map[str
 	return averageTimes, nil
 }
 
-const popularTimeCachePrefix = "popular_time__election_"
+const popularTimeCachePrefix = "popular_time_election_"
 
 func calculateWhichHoursHaveMoreVotes(results []bson.M) map[string]int {
 	hours := make(map[string]int)

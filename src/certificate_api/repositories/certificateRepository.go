@@ -25,6 +25,22 @@ func NewRequestsRepo(mongoClient *mongo.Client, database string) *CertificatesRe
 	}
 }
 
+func (certRepo *CertificatesRepo) FindAmountOfRequest(voterId string) (int, error) {
+	client := certRepo.mongoClient
+	database := client.Database(certRepo.database)
+	collection := database.Collection(reqCollection)
+	filter := bson.D{{"voterid", voterId}}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return -1, fmt.Errorf("error getting all certificates requests: %v", err)
+	}
+	var results []bson.M
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return -1, fmt.Errorf("error getting all certificates requests: %v", err)
+	}
+	return len(results), nil
+}
+
 func (certRepo *CertificatesRepo) StoreRequest(req models.CertificateRequestModel) error {
 	certificatesDatabase := certRepo.mongoClient.Database(certRepo.database)
 	requestsCollection := certificatesDatabase.Collection(reqCollection)

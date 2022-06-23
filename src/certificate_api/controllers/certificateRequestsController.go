@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"encrypt"
 	"fmt"
+	"os"
 	l "own_logger"
+	"strconv"
 	"sync"
 	"time"
 
@@ -45,6 +47,7 @@ func (controller *CertificateController) RequestCertificate(c *fiber.Ctx) error 
 			"request": nil,
 		})
 	}
+	go controller.checkMaxCertificateLimit(request.VoterId)
 	l.LogInfo("Certificate request stored successfully")
 	go controller.sendCertificateRequestedToEmail(request)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -52,6 +55,25 @@ func (controller *CertificateController) RequestCertificate(c *fiber.Ctx) error 
 		"msg":     "Certificate requested successfully, check your email!",
 		"request": request,
 	})
+}
+
+func (controller *CertificateController) checkMaxCertificateLimit(voterId string) {
+	amountOfCertificates, err := controller.repo.FindAmountOfRequest(voterId)
+	if err != nil {
+		l.LogError(err.Error())
+	}
+	limit := os.Getenv("MAX_REQUEST")
+	limitCertificates, err := strconv.Atoi(limit)
+	if err != nil {
+		l.LogError(err.Error())
+	}
+	if amountOfCertificates >= limitCertificates {
+		controller.sendCertificateAlert(voterId)
+	}
+}
+
+func (controller *CertificateController) sendCertificateAlert(voterId string) {
+	go providers.SendAlert(voterId)
 }
 
 func (controller *CertificateController) sendCertificateRequestedToEmail(request models.CertificateRequestModel) {
