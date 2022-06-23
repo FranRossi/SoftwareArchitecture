@@ -109,7 +109,7 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 		return voteIdentification, err
 	}
 	if timeBackEnd.Sub(timeFrontEnd).Seconds() > 2 {
-		messageFailed := "vote coundn't be processed under 2 seconds"
+		messageFailed := "vote couldn't be processed under 2 seconds"
 		return voteIdentification, fmt.Errorf(messageFailed)
 	}
 
