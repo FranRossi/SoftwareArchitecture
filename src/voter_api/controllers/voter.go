@@ -115,8 +115,8 @@ func processVote(timeFrontEnd time.Time, voteModel domain.VoteModel) (string, er
 	//	}
 	//	messageFailed := "vote cannot processed under 2 seconds"
 	//	return "", fmt.Errorf(messageFailed)
-	//} else {
-	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME
+	//} else { TODO
+	fmt.Println(timeBackEnd.Sub(timeFrontEnd).Seconds()) // TIME TO PROCESS Vote
 	err2 := logic.StoreVoteInfo(voteModel.IdVoter, voteModel.IdElection, voteIdentification, timeFrontEnd, timeBackEnd)
 	if err2 != nil {
 		return voteIdentification, fmt.Errorf("cannot store vote info: %v", err2)

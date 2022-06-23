@@ -1,4 +1,4 @@
-package uruguay
+package email
 
 import (
 	"bufio"
