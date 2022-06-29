@@ -56,6 +56,7 @@ func sendMessageToQueue(queueName string, certificate models.CertificateModel, v
 	msg.Fullname = certificate.Fullname
 	msg.Phone = voter.Phone
 	msg.Email = voter.Email
+	msg.Message = certificate.Message
 
 	jsonMsg, err := json.Marshal(msg)
 	if err != nil {
